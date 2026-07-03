@@ -186,26 +186,67 @@ def main():
         if idx:
             var_total = round((idx - 1) * 100, 2)
 
-    # tabla de ejemplo: los productos de la canasta con mayor brecha de precio
-    # entre cadenas principales (los más noticiables)
     def brecha(ean):
         ps = [hoy[n]["precios"][ean] for n in principales]
         return max(ps) / min(ps)
 
-    tabla = []
-    for ean in sorted(canasta, key=brecha, reverse=True)[:TABLA_EJEMPLOS]:
-        desc = next(
+    def descripcion(ean):
+        return next(
             (hoy[n]["descripciones"].get(ean) for n in principales
              if hoy[n]["descripciones"].get(ean)),
             ean,
         )
-        tabla.append({
+
+    def var_producto(ean):
+        """Cambio semanal del producto: media geométrica de (hoy/base) entre
+        las cadenas principales que lo tienen en ambas fechas."""
+        rel = []
+        for n in principales:
+            if n in base and ean in base[n]["precios"]:
+                b = base[n]["precios"][ean]
+                if b > 0:
+                    rel.append(math.log(hoy[n]["precios"][ean] / b))
+        if not rel:
+            return None
+        return round((math.exp(sum(rel) / len(rel)) - 1) * 100, 2)
+
+    # --- catálogo completo (archivo aparte para no inflar el dashboard) ---
+    productos = []
+    for ean in sorted(canasta, key=brecha, reverse=True):
+        precios = {n: round(hoy[n]["precios"][ean], 2) for n in principales}
+        vals = list(precios.values())
+        productos.append({
             "ean": ean,
-            "descripcion": desc[:70],
-            "precios": {n: round(hoy[n]["precios"][ean], 2) for n in principales},
+            "descripcion": descripcion(ean)[:80],
+            "precios": precios,
+            "min": min(vals),
+            "max": max(vals),
+            "brecha": round(max(vals) / min(vals), 3),
+            "var_pct": var_producto(ean),
         })
 
-    out = {
+    # --- datos para gráficos ---
+    # histograma de brechas de precio entre cadenas
+    cortes = [1.0, 1.05, 1.1, 1.2, 1.35, 1.5, 2.0, float("inf")]
+    etiquetas = ["<5%", "5-10%", "10-20%", "20-35%", "35-50%", "50-100%", ">100%"]
+    hist = [0] * len(etiquetas)
+    for p in productos:
+        for i in range(len(etiquetas)):
+            if cortes[i] <= p["brecha"] < cortes[i + 1]:
+                hist[i] += 1
+                break
+    histograma = [{"rango": e, "cantidad": c} for e, c in zip(etiquetas, hist)]
+
+    # en cuántos productos cada cadena tiene el precio más bajo (o empatado)
+    mas_barato = {n: 0 for n in principales}
+    for ean in canasta:
+        precios = {n: hoy[n]["precios"][ean] for n in principales}
+        piso = min(precios.values())
+        for n, pr in precios.items():
+            if abs(pr - piso) < 0.01:
+                mas_barato[n] += 1
+
+    resumen = {
         "fecha": fecha,
         "fecha_base": fecha_base,
         "provincia": "Tucumán",
@@ -217,12 +258,27 @@ def main():
         "var_semanal_total_pct": var_total,
         "pares_comparados": n_pares,
         "cadenas": cadenas_out,
-        "tabla": tabla,
+        "tabla": [
+            {"ean": p["ean"], "descripcion": p["descripcion"], "precios": p["precios"]}
+            for p in productos[:TABLA_EJEMPLOS]
+        ],
+        "histograma_brechas": histograma,
+        "mas_barato": [{"cadena": n, "productos": mas_barato[n]} for n in principales],
     }
+
+    catalogo = {
+        "fecha": fecha,
+        "fecha_base": fecha_base,
+        "cadenas_principales": principales,
+        "productos": productos,
+    }
+
     salida = Path(args.salida)
     salida.parent.mkdir(parents=True, exist_ok=True)
-    salida.write_text(json.dumps(out, ensure_ascii=False, indent=1), encoding="utf-8")
-    print(f"OK → {salida}", file=sys.stderr)
+    salida.write_text(json.dumps(resumen, ensure_ascii=False, indent=1), encoding="utf-8")
+    cat_path = salida.parent / "productos.json"
+    cat_path.write_text(json.dumps(catalogo, ensure_ascii=False), encoding="utf-8")
+    print(f"OK → {salida} ({len(productos)} productos → {cat_path})", file=sys.stderr)
 
 
 if __name__ == "__main__":

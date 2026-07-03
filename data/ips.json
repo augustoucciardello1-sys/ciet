@@ -313,5 +313,53 @@
     "Market": 8900.0
    }
   }
+ ],
+ "histograma_brechas": [
+  {
+   "rango": "<5%",
+   "cantidad": 1356
+  },
+  {
+   "rango": "5-10%",
+   "cantidad": 858
+  },
+  {
+   "rango": "10-20%",
+   "cantidad": 462
+  },
+  {
+   "rango": "20-35%",
+   "cantidad": 185
+  },
+  {
+   "rango": "35-50%",
+   "cantidad": 26
+  },
+  {
+   "rango": "50-100%",
+   "cantidad": 16
+  },
+  {
+   "rango": ">100%",
+   "cantidad": 1
+  }
+ ],
+ "mas_barato": [
+  {
+   "cadena": "Jumbo",
+   "productos": 346
+  },
+  {
+   "cadena": "Vea",
+   "productos": 1422
+  },
+  {
+   "cadena": "Hipermercado Carrefour",
+   "productos": 2185
+  },
+  {
+   "cadena": "Market",
+   "productos": 2069
+  }
  ]
 }

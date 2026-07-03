@@ -54,6 +54,22 @@
   th.num { text-align: right; }
   td .gap { color: var(--accent); font-weight: 700; }
   .panel { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 18px; overflow-x: auto; }
+  .charts { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 640px) { .charts { grid-template-columns: 1fr; } }
+  .chart-title { font-size: 0.9rem; font-weight: 600; margin-bottom: 12px; }
+  .chart-note { font-size: 0.75rem; color: var(--muted); margin-top: 10px; }
+  .bar-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; font-size: 0.8rem; }
+  .bar-row .lbl { width: 110px; flex-shrink: 0; color: var(--muted); text-align: right; }
+  .bar-row .track { flex: 1; background: var(--panel-2); border-radius: 4px; overflow: hidden; height: 22px; }
+  .bar-row .fill { height: 100%; border-radius: 4px; background: var(--accent); display: flex; align-items: center; justify-content: flex-end; padding-right: 6px; font-size: 0.72rem; font-weight: 700; color: #08111c; }
+  .bar-row .fill.green { background: var(--green); }
+  .hist { display: flex; align-items: flex-end; gap: 6px; height: 150px; padding-top: 10px; }
+  .hist .col { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; gap: 4px; }
+  .hist .colbar { width: 100%; background: var(--accent); border-radius: 4px 4px 0 0; min-height: 2px; }
+  .hist .colval { font-size: 0.7rem; font-weight: 700; }
+  .hist .collbl { font-size: 0.66rem; color: var(--muted); text-align: center; }
+  .verlink { display: inline-block; margin-top: 14px; color: var(--accent); text-decoration: none; font-weight: 600; font-size: 0.9rem; }
+  .verlink:hover { text-decoration: underline; }
   .metodo { font-size: 0.85rem; color: var(--muted); }
   .metodo strong { color: var(--text); }
   .metodo ol { margin: 8px 0 0 20px; }
@@ -87,6 +103,25 @@
     <p style="font-size:0.85rem;color:var(--muted);margin-bottom:12px" id="canasta-desc"></p>
     <div class="grid" id="cadenas"></div>
 
+    <h2>Panorama en gráficos</h2>
+    <div class="charts">
+      <div class="panel chart">
+        <div class="chart-title">Cuánto más cara es la canasta que la más barata</div>
+        <div id="chart-costo"></div>
+        <p class="chart-note">Sobreprecio de cada cadena respecto de la más barata, valuando la misma canasta completa en todas.</p>
+      </div>
+      <div class="panel chart">
+        <div class="chart-title">¿Quién tiene el precio más bajo?</div>
+        <div id="chart-barato"></div>
+        <p class="chart-note">En cuántos de los productos de la canasta cada cadena ofrece el precio mínimo (o empatado).</p>
+      </div>
+      <div class="panel chart" style="grid-column:1/-1">
+        <div class="chart-title">Dispersión de precios: cuánto varía el mismo producto entre cadenas</div>
+        <div id="chart-hist"></div>
+        <p class="chart-note">Distribución de la brecha (precio máximo ÷ mínimo) entre cadenas, producto por producto.</p>
+      </div>
+    </div>
+
     <h2>Mayores brechas de precio entre cadenas (mismo producto, mismo día)</h2>
     <div class="panel">
       <table id="tabla">
@@ -94,6 +129,7 @@
         <tbody></tbody>
       </table>
     </div>
+    <a class="verlink" href="productos.html" id="verlink">Ver el catálogo completo de productos →</a>
 
     <h2>Metodología</h2>
     <div class="panel metodo" id="metodo">
@@ -105,7 +141,11 @@
         <li>La variación temporal se calcula con un <strong>índice de Jevons</strong> (media geométrica de relativos de precio) sobre los pares cadena-producto presentes en ambas fechas, el método estándar para datos de scanner.</li>
       </ol>
       <p style="margin-top:10px" id="metodo-detalle"></p>
-      <p style="margin-top:10px"><strong>Limitaciones:</strong> los precios son los informados por las cadenas al regulador (precio de lista, sin promociones por medio de pago); cubren solo cadenas obligadas a reportar, no comercios de cercanía. Alguna cadena puede reportar de forma incompleta en un día dado; esos casos se excluyen del titular y se informan aparte.</p>
+      <p style="margin-top:14px"><strong>Por qué la mediana y no el promedio.</strong> Dentro de una misma cadena las sucursales suelen tener precios casi idénticos, pero un error de carga puntual (un cero de más) distorsiona el promedio. La mediana es robusta a esos valores atípicos.</p>
+      <p style="margin-top:10px"><strong>Por qué el índice de Jevons.</strong> Para medir la variación temporal se compara cada par cadena-producto consigo mismo entre dos fechas y se promedian los cambios en forma geométrica. Es el estándar internacional para datos de <em>scanner</em> (millones de precios) porque no exige ponderaciones de consumo —que no tenemos— y es simétrico ante subas y bajas. No es un IPC: mide la variación del precio de lista de una canasta fija de góndola, no el costo de vida de un hogar representativo.</p>
+      <p style="margin-top:10px"><strong>Qué cadenas entran.</strong> Se consideran "principales" las que informan un catálogo amplio (más de 1.000 productos) en sus sucursales tucumanas; sobre ellas se calcula la canasta comparable. Las que reportan de forma incompleta un día dado se listan aparte, sin costo de canasta, para no ensuciar la comparación.</p>
+      <p style="margin-top:10px"><strong>Limitaciones.</strong> Los precios son los que las cadenas declaran al regulador: precio de lista, sin descuentos por medio de pago, día de la semana ni programas de fidelización. Cubren solo supermercados obligados a reportar a SEPA, no comercios de barrio ni mayoristas. La cobertura de EAN varía entre cadenas, por eso se compara únicamente la intersección exacta de productos.</p>
+      <p style="margin-top:10px"><strong>Reproducibilidad.</strong> Todo el procesamiento es un script abierto que parte del dump público de SEPA; cualquiera puede reejecutarlo y obtener los mismos números. El código y los datos procesados están en el repositorio del proyecto.</p>
     </div>
 
   </div>
@@ -178,6 +218,40 @@ fetch('../data/ips.json')
     }
 
     $('metodo-detalle').innerHTML = `<strong>Este relevamiento:</strong> ${d.metodo} Cadenas principales: ${d.cadenas_principales.join(', ')}.`;
+    $('verlink').textContent = `Ver el catálogo completo de ${d.canasta_total_productos.toLocaleString('es-AR')} productos →`;
+
+    // gráfico: sobreprecio de cada cadena respecto de la más barata
+    const maxPremium = Math.max(...costos.map(c => c / minCosto - 1));
+    $('chart-costo').innerHTML = principales
+      .slice().sort((a, b) => a.canasta_costo - b.canasta_costo)
+      .map(c => {
+        const premium = c.canasta_costo / minCosto - 1;
+        const esMin = premium < 1e-9;
+        const w = esMin ? 100 : Math.max((premium / maxPremium) * 100, 14);
+        const extra = esMin ? 'más barata' : '+' + (premium * 100).toFixed(1) + '%';
+        return `<div class="bar-row"><span class="lbl">${c.cadena}</span>
+          <span class="track"><span class="fill ${esMin ? 'green' : ''}" style="width:${w}%">${extra}</span></span></div>`;
+      }).join('');
+
+    // gráfico: quién es más barato (cantidad de productos)
+    const mb = d.mas_barato.slice().sort((a, b) => b.productos - a.productos);
+    const maxMb = Math.max(...mb.map(x => x.productos));
+    $('chart-barato').innerHTML = mb.map(x => {
+      const w = (x.productos / maxMb) * 100;
+      const p = ((x.productos / d.canasta_total_productos) * 100).toFixed(0);
+      return `<div class="bar-row"><span class="lbl">${x.cadena}</span>
+        <span class="track"><span class="fill" style="width:${w}%">${x.productos} · ${p}%</span></span></div>`;
+    }).join('');
+
+    // histograma de brechas
+    const h = d.histograma_brechas;
+    const maxH = Math.max(...h.map(x => x.cantidad));
+    $('chart-hist').innerHTML = '<div class="hist">' + h.map(x => {
+      const alto = (x.cantidad / maxH) * 110;
+      return `<div class="col"><span class="colval">${x.cantidad}</span>
+        <div class="colbar" style="height:${alto}px"></div>
+        <span class="collbl">${x.rango}</span></div>`;
+    }).join('') + '</div>';
   })
   .catch(err => {
     $('estado').textContent = 'No se pudieron cargar los datos del índice (' + err.message + ').';
