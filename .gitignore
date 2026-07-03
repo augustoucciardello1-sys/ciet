@@ -1,0 +1,5 @@
+# Dumps crudos de SEPA (pesados; no se versionan). Solo se versiona data/ips.json procesado.
+*.zip
+sepa/
+scripts/__pycache__/
+.DS_Store

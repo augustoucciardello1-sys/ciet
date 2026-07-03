@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IPS — Índice de Precios de Supermercados de Tucumán | CIET</title>
+<meta name="description" content="Índice de Precios de Supermercados de Tucumán (IPS-CIET): seguimiento de precios por cadena a partir de datos abiertos SEPA.">
+<style>
+  :root {
+    --bg: #0f1420;
+    --panel: #1a2233;
+    --panel-2: #212c42;
+    --text: #e8ecf4;
+    --muted: #93a0b8;
+    --accent: #ef5350;
+    --green: #66bb6a;
+    --border: #2c3a55;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg); color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    min-height: 100vh; padding: 20px; line-height: 1.6;
+  }
+  .wrap { max-width: 900px; margin: 0 auto; }
+  nav a { color: var(--muted); font-size: 0.8rem; text-decoration: none; }
+  header { padding: 18px 0 22px; }
+  h1 { font-size: 1.6rem; font-weight: 800; letter-spacing: -0.01em; }
+  h1 span { color: var(--accent); }
+  .subtitle { color: var(--muted); font-size: 0.95rem; margin-top: 6px; max-width: 640px; }
+  h2 { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin: 30px 0 12px; }
+  .headline {
+    background: linear-gradient(135deg, var(--panel), var(--panel-2));
+    border: 1px solid var(--border); border-radius: 14px; padding: 24px;
+    display: flex; flex-wrap: wrap; gap: 24px; align-items: baseline;
+  }
+  .headline .big { font-size: 2.6rem; font-weight: 800; color: var(--accent); font-variant-numeric: tabular-nums; }
+  .headline .what { color: var(--muted); font-size: 0.9rem; max-width: 420px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 14px; }
+  .card { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; }
+  .card h4 { font-size: 1rem; }
+  .card .tag { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); }
+  .card .precio { font-size: 1.5rem; font-weight: 800; margin-top: 6px; font-variant-numeric: tabular-nums; }
+  .card .meta { font-size: 0.78rem; color: var(--muted); margin-top: 6px; }
+  .card .var { font-weight: 700; }
+  .var.up { color: var(--accent); }
+  .var.down { color: var(--green); }
+  .mejor { border-color: var(--green); }
+  .mejor .badge { display: inline-block; font-size: 0.68rem; background: rgba(102,187,106,0.15); color: var(--green); border-radius: 12px; padding: 2px 9px; margin-top: 8px; font-weight: 700; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.83rem; }
+  th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--border); }
+  th { color: var(--muted); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; }
+  td.num { text-align: right; font-variant-numeric: tabular-nums; }
+  th.num { text-align: right; }
+  td .gap { color: var(--accent); font-weight: 700; }
+  .panel { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 18px; overflow-x: auto; }
+  .metodo { font-size: 0.85rem; color: var(--muted); }
+  .metodo strong { color: var(--text); }
+  .metodo ol { margin: 8px 0 0 20px; }
+  .metodo li { margin-bottom: 4px; }
+  footer { margin: 34px 0 12px; color: var(--muted); font-size: 0.78rem; }
+  #estado { color: var(--muted); padding: 30px 0; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <nav><a href="../">← CIET — Centro de Investigación Económica de Tucumán</a></nav>
+
+  <header>
+    <h1>Índice de Precios de <span>Supermercados de Tucumán</span></h1>
+    <p class="subtitle">Relevamiento sobre los precios que las cadenas informan, sucursal por sucursal, al sistema oficial SEPA. Solo sucursales de la provincia de Tucumán.</p>
+  </header>
+
+  <div id="estado">Cargando datos…</div>
+  <div id="contenido" style="display:none">
+
+    <div class="headline">
+      <div>
+        <div class="tag" style="font-size:0.7rem;text-transform:uppercase;color:var(--muted)">Variación semanal de precios</div>
+        <div class="big" id="h-var">—</div>
+      </div>
+      <div class="what" id="h-detalle"></div>
+    </div>
+
+    <h2>La canasta, cadena por cadena</h2>
+    <p style="font-size:0.85rem;color:var(--muted);margin-bottom:12px" id="canasta-desc"></p>
+    <div class="grid" id="cadenas"></div>
+
+    <h2>Mayores brechas de precio entre cadenas (mismo producto, mismo día)</h2>
+    <div class="panel">
+      <table id="tabla">
+        <thead></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <h2>Metodología</h2>
+    <div class="panel metodo" id="metodo">
+      <p><strong>Fuente:</strong> dataset abierto SEPA (Sistema Electrónico de Publicidad de Precios Argentinos, Secretaría de Comercio), que publica a diario los precios que los supermercados están obligados a informar por sucursal (Res. 678/2020). Licencia CC-BY 4.0.</p>
+      <ol>
+        <li>Se toman únicamente las sucursales con provincia <strong>AR-T (Tucumán)</strong>.</li>
+        <li>El precio de un producto en una cadena es la <strong>mediana</strong> de su precio de lista entre las sucursales tucumanas de esa cadena.</li>
+        <li>La canasta comparativa es la <strong>intersección exacta de productos (mismo código EAN)</strong> entre las cadenas con catálogo completo — se comparan productos idénticos, no similares.</li>
+        <li>La variación temporal se calcula con un <strong>índice de Jevons</strong> (media geométrica de relativos de precio) sobre los pares cadena-producto presentes en ambas fechas, el método estándar para datos de scanner.</li>
+      </ol>
+      <p style="margin-top:10px" id="metodo-detalle"></p>
+      <p style="margin-top:10px"><strong>Limitaciones:</strong> los precios son los informados por las cadenas al regulador (precio de lista, sin promociones por medio de pago); cubren solo cadenas obligadas a reportar, no comercios de cercanía. Alguna cadena puede reportar de forma incompleta en un día dado; esos casos se excluyen del titular y se informan aparte.</p>
+    </div>
+
+  </div>
+
+  <footer>
+    CIET — Centro de Investigación Económica de Tucumán · Datos: SEPA (CC-BY 4.0) · Elaboración propia. Uso libre citando la fuente.
+  </footer>
+
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const peso = v => '$' + v.toLocaleString('es-AR', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+const pct = v => (v > 0 ? '+' : '') + v.toLocaleString('es-AR', { maximumFractionDigits: 2 }) + '%';
+const fechaLarga = iso => new Date(iso + 'T12:00:00').toLocaleDateString('es-AR', { day: 'numeric', month: 'long', year: 'numeric' });
+
+fetch('../data/ips.json')
+  .then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
+  .then(d => {
+    $('estado').style.display = 'none';
+    $('contenido').style.display = 'block';
+
+    // titular
+    if (d.var_semanal_total_pct !== null && d.var_semanal_total_pct !== undefined) {
+      $('h-var').textContent = pct(d.var_semanal_total_pct);
+      $('h-detalle').textContent = `Variación de precios en supermercados de Tucumán entre el ${fechaLarga(d.fecha_base)} y el ${fechaLarga(d.fecha)}, sobre ${d.pares_comparados.toLocaleString('es-AR')} pares cadena-producto comparados (índice de Jevons).`;
+    } else {
+      $('h-var').textContent = '—';
+      $('h-detalle').textContent = `Primer relevamiento: ${fechaLarga(d.fecha)}. La variación aparecerá cuando haya dos fechas comparables.`;
+    }
+
+    // cadenas
+    const principales = d.cadenas.filter(c => c.principal);
+    const costos = principales.map(c => c.canasta_costo);
+    const minCosto = Math.min(...costos);
+    $('canasta-desc').textContent = `Canasta de ${d.canasta_total_productos.toLocaleString('es-AR')} productos idénticos (mismo EAN) disponibles en todas las cadenas principales, valuada al ${fechaLarga(d.fecha)}. Las cadenas con reporte incompleto ese día se muestran sin costo de canasta.`;
+    const cont = $('cadenas');
+    for (const c of d.cadenas.sort((a, b) => (a.canasta_costo ?? 1e15) - (b.canasta_costo ?? 1e15))) {
+      const div = document.createElement('div');
+      div.className = 'card' + (c.canasta_costo === minCosto ? ' mejor' : '');
+      const varHtml = c.var_semanal_pct !== null && c.var_semanal_pct !== undefined
+        ? `<span class="var ${c.var_semanal_pct >= 0 ? 'up' : 'down'}">${pct(c.var_semanal_pct)}</span> vs. semana previa`
+        : 'sin comparación semanal';
+      const relHtml = c.canasta_costo && c.canasta_costo !== minCosto
+        ? `<div class="meta">canasta <span class="var up">${pct((c.canasta_costo / minCosto - 1) * 100)}</span> más cara que la más barata</div>`
+        : '';
+      div.innerHTML = `
+        <div class="tag">${c.sucursales} sucursal${c.sucursales === 1 ? '' : 'es'} en Tucumán · ${c.productos_relevados.toLocaleString('es-AR')} productos relevados</div>
+        <h4>${c.cadena}</h4>
+        <div class="precio">${c.canasta_costo ? peso(c.canasta_costo) : 'reporte incompleto'}</div>
+        <div class="meta">${varHtml}</div>
+        ${relHtml}
+        ${c.canasta_costo === minCosto ? '<span class="badge">CANASTA MÁS BARATA</span>' : ''}`;
+      cont.appendChild(div);
+    }
+
+    // tabla de brechas
+    const nombres = principales.map(c => c.cadena);
+    $('tabla').querySelector('thead').innerHTML =
+      '<tr><th>Producto</th>' + nombres.map(n => `<th class="num">${n}</th>`).join('') + '<th class="num">Brecha</th></tr>';
+    const tb = $('tabla').querySelector('tbody');
+    for (const p of d.tabla.slice(0, 15)) {
+      const vals = nombres.map(n => p.precios[n]);
+      const brecha = Math.max(...vals) / Math.min(...vals);
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td>${p.descripcion}</td>` +
+        vals.map(v => `<td class="num">${v ? peso(v) : '—'}</td>`).join('') +
+        `<td class="num"><span class="gap">×${brecha.toLocaleString('es-AR', { maximumFractionDigits: 1 })}</span></td>`;
+      tb.appendChild(tr);
+    }
+
+    $('metodo-detalle').innerHTML = `<strong>Este relevamiento:</strong> ${d.metodo} Cadenas principales: ${d.cadenas_principales.join(', ')}.`;
+  })
+  .catch(err => {
+    $('estado').textContent = 'No se pudieron cargar los datos del índice (' + err.message + ').';
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,317 @@
+{
+ "fecha": "2026-07-02",
+ "fecha_base": "2026-06-26",
+ "provincia": "Tucumán",
+ "metodo": "Mediana por cadena entre sucursales AR-T; canasta = intersección exacta de EANs de las cadenas con catálogo completo (>=1000 productos); variación por índice de Jevons.",
+ "cadenas_principales": [
+  "Jumbo",
+  "Vea",
+  "Hipermercado Carrefour",
+  "Market"
+ ],
+ "canasta_total_productos": 2904,
+ "var_semanal_total_pct": 0.23,
+ "pares_comparados": 39561,
+ "cadenas": [
+  {
+   "cadena": "FULL",
+   "principal": false,
+   "sucursales": 5,
+   "productos_relevados": 204,
+   "canasta_costo": null,
+   "var_semanal_pct": 0.01
+  },
+  {
+   "cadena": "Hipermercado Carrefour",
+   "principal": true,
+   "sucursales": 1,
+   "productos_relevados": 16090,
+   "canasta_costo": 17641165.85,
+   "var_semanal_pct": 0.34
+  },
+  {
+   "cadena": "Hipermercado Libertad",
+   "principal": false,
+   "sucursales": 2,
+   "productos_relevados": 1,
+   "canasta_costo": null,
+   "var_semanal_pct": null
+  },
+  {
+   "cadena": "Jumbo",
+   "principal": true,
+   "sucursales": 1,
+   "productos_relevados": 6714,
+   "canasta_costo": 18424266.59,
+   "var_semanal_pct": 0.32
+  },
+  {
+   "cadena": "Market",
+   "principal": true,
+   "sucursales": 3,
+   "productos_relevados": 10095,
+   "canasta_costo": 17685167.35,
+   "var_semanal_pct": 0.36
+  },
+  {
+   "cadena": "Vea",
+   "principal": true,
+   "sucursales": 11,
+   "productos_relevados": 7423,
+   "canasta_costo": 17800470.39,
+   "var_semanal_pct": -0.25
+  }
+ ],
+ "tabla": [
+  {
+   "ean": "7791473001283",
+   "descripcion": "Bizcochuelo Vainilla redondo 3 capas BSA-370-gr.",
+   "precios": {
+    "Jumbo": 12000.0,
+    "Vea": 12000.0,
+    "Hipermercado Carrefour": 5990.0,
+    "Market": 5990.0
+   }
+  },
+  {
+   "ean": "7790199604181",
+   "descripcion": "Bizcochuelo MORIXE Vainilla 540 gr CJA-540-gr.",
+   "precios": {
+    "Jumbo": 3000.0,
+    "Vea": 1700.0,
+    "Hipermercado Carrefour": 2095.0,
+    "Market": 2095.0
+   }
+  },
+  {
+   "ean": "7791708001422",
+   "descripcion": "pan VENEZIANA TRISALVADO Diet PAQ-620-gr.",
+   "precios": {
+    "Jumbo": 6300.0,
+    "Vea": 3750.0,
+    "Hipermercado Carrefour": 3750.0,
+    "Market": 3750.0
+   }
+  },
+  {
+   "ean": "7790199000020",
+   "descripcion": "Harina morixe 0000 1kg PAQ-1000-gr.",
+   "precios": {
+    "Jumbo": 1600.0,
+    "Vea": 999.0,
+    "Hipermercado Carrefour": 999.0,
+    "Market": 999.0
+   }
+  },
+  {
+   "ean": "7790199000051",
+   "descripcion": "Harina morixe leudante PAQ-1000-gr.",
+   "precios": {
+    "Jumbo": 1900.0,
+    "Vea": 1199.0,
+    "Hipermercado Carrefour": 1229.0,
+    "Market": 1229.0
+   }
+  },
+  {
+   "ean": "7790070320155",
+   "descripcion": "Fideos LUCCHETTI Cabello de Angel x500g PAQ-500-gr.",
+   "precios": {
+    "Jumbo": 2650.0,
+    "Vea": 1699.0,
+    "Hipermercado Carrefour": 2509.0,
+    "Market": 2509.0
+   }
+  },
+  {
+   "ean": "7790070336057",
+   "descripcion": "Fideos LUCCHETTI Tirabuzón Veg x500g PAQ-500-gr.",
+   "precios": {
+    "Jumbo": 2450.0,
+    "Vea": 1599.0,
+    "Hipermercado Carrefour": 2089.0,
+    "Market": 2139.0
+   }
+  },
+  {
+   "ean": "7792350067019",
+   "descripcion": "Arvejas INALPA Secas Remojadas x300gr LAT-300-gr.",
+   "precios": {
+    "Jumbo": 911.0,
+    "Vea": 632.0,
+    "Hipermercado Carrefour": 599.0,
+    "Market": 599.0
+   }
+  },
+  {
+   "ean": "7791120031564",
+   "descripcion": "Arroz MOLINOS ALA grano largo fino BSA-500-gr.",
+   "precios": {
+    "Jumbo": 1100.0,
+    "Vea": 799.0,
+    "Hipermercado Carrefour": 1029.0,
+    "Market": 1209.0
+   }
+  },
+  {
+   "ean": "7790070318343",
+   "descripcion": "fideos LUCCHETTI Coditos PAQ-500-gr.",
+   "precios": {
+    "Jumbo": 1650.0,
+    "Vea": 1099.0,
+    "Hipermercado Carrefour": 1279.0,
+    "Market": 1279.0
+   }
+  },
+  {
+   "ean": "7790070318374",
+   "descripcion": "fideos LUCCHETTI Ave Maria PAQ-500-gr.",
+   "precios": {
+    "Jumbo": 1650.0,
+    "Vea": 1099.0,
+    "Hipermercado Carrefour": 1279.0,
+    "Market": 1279.0
+   }
+  },
+  {
+   "ean": "7790070318398",
+   "descripcion": "fideos  LUCCHETTI Dedalitos PAQ-500-gr.",
+   "precios": {
+    "Jumbo": 1650.0,
+    "Vea": 1099.0,
+    "Hipermercado Carrefour": 1279.0,
+    "Market": 1279.0
+   }
+  },
+  {
+   "ean": "7790070336026",
+   "descripcion": "Fideos LUCCHETTI Tirabuzón N28 x500g PAQ-500-gr.",
+   "precios": {
+    "Jumbo": 1650.0,
+    "Vea": 1099.0,
+    "Hipermercado Carrefour": 1279.0,
+    "Market": 1279.0
+   }
+  },
+  {
+   "ean": "7790070336118",
+   "descripcion": "Fideos LUCCHETTI Tallarín N5 x500g PAQ-500-gr.",
+   "precios": {
+    "Jumbo": 1650.0,
+    "Vea": 1099.0,
+    "Hipermercado Carrefour": 1279.0,
+    "Market": 1279.0
+   }
+  },
+  {
+   "ean": "7790070336149",
+   "descripcion": "Fideos LUCCHETTI Mostachol N51 x500g PAQ-500-gr.",
+   "precios": {
+    "Jumbo": 1650.0,
+    "Vea": 1099.0,
+    "Hipermercado Carrefour": 1279.0,
+    "Market": 1279.0
+   }
+  },
+  {
+   "ean": "7790070336361",
+   "descripcion": "Fideos LUCCHETTI  Penne Rigatex500g PAQ-500-gr.",
+   "precios": {
+    "Jumbo": 1650.0,
+    "Vea": 1099.0,
+    "Hipermercado Carrefour": 1279.0,
+    "Market": 1279.0
+   }
+  },
+  {
+   "ean": "7790070336385",
+   "descripcion": "Fideos LUCCHETTI Spaghetti N7 x500g PAQ-500-gr.",
+   "precios": {
+    "Jumbo": 1650.0,
+    "Vea": 1099.0,
+    "Hipermercado Carrefour": 1279.0,
+    "Market": 1279.0
+   }
+  },
+  {
+   "ean": "7790625006879",
+   "descripcion": "Mortadela Bologna LARIO PZA-300-gr.",
+   "precios": {
+    "Jumbo": 5300.0,
+    "Vea": 5300.0,
+    "Hipermercado Carrefour": 3549.0,
+    "Market": 3549.0
+   }
+  },
+  {
+   "ean": "7790070336583",
+   "descripcion": "Fideos DON VICENTE Moños x500g PAQ-500-gr.",
+   "precios": {
+    "Jumbo": 5050.0,
+    "Vea": 3599.0,
+    "Hipermercado Carrefour": 3395.0,
+    "Market": 4750.0
+   }
+  },
+  {
+   "ean": "7896001004511",
+   "descripcion": "esponja BRILHUS multiuso PAQ-1-un.",
+   "precios": {
+    "Jumbo": 850.0,
+    "Vea": 1050.0,
+    "Hipermercado Carrefour": 719.0,
+    "Market": 719.0
+   }
+  },
+  {
+   "ean": "7791120037566",
+   "descripcion": "Arroz MOLINOS ALA grano largo dorado BSA-500-gr.",
+   "precios": {
+    "Jumbo": 1450.0,
+    "Vea": 999.0,
+    "Hipermercado Carrefour": 1319.0,
+    "Market": 1369.0
+   }
+  },
+  {
+   "ean": "7792180137258",
+   "descripcion": "Harina PUREZA Integral p/pizza c/Lev x1k PAQ-1000-gr.",
+   "precios": {
+    "Jumbo": 2400.0,
+    "Vea": 1699.0,
+    "Hipermercado Carrefour": 2239.0,
+    "Market": 2265.0
+   }
+  },
+  {
+   "ean": "7791120031557",
+   "descripcion": "Arroz MOLINOS ALA grano largo fino PAQ-1000-gr.",
+   "precios": {
+    "Jumbo": 1820.0,
+    "Vea": 1399.0,
+    "Hipermercado Carrefour": 1589.0,
+    "Market": 1975.0
+   }
+  },
+  {
+   "ean": "7790070318855",
+   "descripcion": "fideos LUCCHETTI Municiones PAQ-500-gr.",
+   "precios": {
+    "Jumbo": 1550.0,
+    "Vea": 1099.0,
+    "Hipermercado Carrefour": 1279.0,
+    "Market": 1279.0
+   }
+  },
+  {
+   "ean": "8445291020047",
+   "descripcion": "Leche en Polvo Svelty Extra Calc paq370g sof-370-gr.",
+   "precios": {
+    "Jumbo": 9300.0,
+    "Vea": 6599.0,
+    "Hipermercado Carrefour": 8900.0,
+    "Market": 8900.0
+   }
+  }
+ ]
+}

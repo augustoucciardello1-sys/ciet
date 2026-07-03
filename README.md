@@ -1,27 +1,29 @@
 # CIET — Centro de Investigación Económica de Tucumán
 
-Sitio educativo y de divulgación económica con dos líneas de trabajo: (1) modelos canónicos de la literatura presentados de forma interactiva, cada uno con simulador + sección formal con ecuaciones y referencias bibliográficas; (2) a futuro, análisis aplicado de la economía tucumana (coyuntura, estructura productiva, finanzas provinciales). La portada del sitio es [`index.html`](index.html); cada modelo vive en su carpeta y es una página HTML autocontenida (sin dependencias ni build), lista para GitHub Pages / Netlify.
+Sitio del CIET, centro independiente de investigación y divulgación económica centrado en Tucumán. Publicado en https://augustoucciardello1-sys.github.io/ciet/
 
-## Modelos
+## Producto insignia: Índice de Precios de Supermercados de Tucumán (IPS)
 
-| Modelo | Estado | Carpeta |
-|---|---|---|
-| Solow (crecimiento) | ✅ Listo | [`solow/`](solow/) |
-| IS-LM | Idea | — |
-| Oferta y demanda / excedentes | Idea | — |
-| Telaraña (cobweb) | Idea | — |
-| Ventaja comparativa (Ricardo) | Idea | — |
+Seguimiento de precios de supermercados con sucursales en Tucumán a partir del dataset abierto **SEPA** (Sistema Electrónico de Publicidad de Precios Argentinos, Secretaría de Comercio):
 
-## Cómo ver un modelo localmente
+1. Descarga diaria del dump SEPA (datos oficiales informados por las cadenas, por sucursal).
+2. Filtro de sucursales de la provincia de Tucumán.
+3. Canasta fija de productos idénticos (mismo EAN) presentes en todas las cadenas.
+4. Cálculo del índice (evolución temporal) y comparativa de canasta entre cadenas.
 
-Abrir el `index.html` directamente en el navegador, o servir la carpeta:
+El pipeline vive en `scripts/` y los datos procesados en `data/` (los dumps crudos de SEPA no se versionan).
+
+## Estructura
+
+- `index.html` — portada del sitio.
+- `ips/` — página del índice (metodología + visualizaciones).
+- `scripts/` — pipeline de datos en Python.
+- `data/` — series procesadas (JSON/CSV chicos) que consume la página.
+
+## Publicar cambios
 
 ```bash
-npx serve modelos-interactivos/solow
+git add -A && git commit -m "..." && git push
 ```
 
-## Convenciones
-
-- Un archivo `index.html` por modelo: HTML + CSS + JS vanilla, canvas para gráficos.
-- UI en español, tema oscuro, mobile-friendly (los links se comparten en redes).
-- Cada modelo muestra: parámetros con sliders, gráficos que reaccionan en vivo, resultados clave calculados, y 2-3 "intuiciones clave" al pie.
+GitHub Pages sirve la rama `main` (raíz) automáticamente en ~1 minuto.

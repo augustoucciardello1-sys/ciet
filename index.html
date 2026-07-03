@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CIET — Centro de Investigación Económica de Tucumán</title>
-<meta name="description" content="Centro de Investigación Económica de Tucumán: divulgación económica con modelos interactivos y análisis de la economía tucumana.">
+<meta name="description" content="Centro de Investigación Económica de Tucumán: Índice de Precios de Supermercados de Tucumán (IPS) y análisis de la economía tucumana con datos abiertos.">
 <style>
   :root {
     --bg: #0f1420;
@@ -34,20 +34,25 @@
     font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.1em;
     color: var(--muted); margin: 34px 0 14px;
   }
-  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; }
-  .card {
-    background: var(--panel); border: 1px solid var(--border); border-radius: 12px;
-    padding: 18px; display: block; color: inherit; text-decoration: none;
+  .hero {
+    display: block; color: inherit; text-decoration: none;
+    background: linear-gradient(135deg, var(--panel), var(--panel-2));
+    border: 1px solid var(--border); border-radius: 14px; padding: 26px;
     transition: border-color 0.15s, transform 0.15s;
   }
-  a.card:hover { border-color: var(--accent); transform: translateY(-2px); }
-  .card .area { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--accent); }
-  .card h3 { font-size: 1.05rem; margin: 6px 0 6px; }
-  .card p { font-size: 0.85rem; color: var(--muted); }
-  .card .status { display: inline-block; margin-top: 12px; font-size: 0.72rem; padding: 3px 9px; border-radius: 20px; }
-  .status.live { background: rgba(102,187,106,0.15); color: var(--green); }
-  .status.soon { background: var(--panel-2); color: var(--muted); }
-  .card.soon { opacity: 0.65; }
+  a.hero:hover { border-color: var(--accent); transform: translateY(-2px); }
+  .hero .area { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.07em; color: var(--accent); font-weight: 700; }
+  .hero h3 { font-size: 1.45rem; margin: 8px 0 10px; letter-spacing: -0.01em; }
+  .hero p { color: var(--muted); font-size: 0.95rem; max-width: 620px; }
+  .hero .status { display: inline-block; margin-top: 16px; font-size: 0.75rem; padding: 4px 12px; border-radius: 20px; background: rgba(239,83,80,0.12); color: var(--accent); font-weight: 600; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; }
+  .card {
+    background: var(--panel); border: 1px solid var(--border); border-radius: 12px;
+    padding: 18px;
+  }
+  .card h4 { font-size: 0.95rem; margin-bottom: 6px; }
+  .card p { font-size: 0.83rem; color: var(--muted); }
+  .card .num { font-size: 1.6rem; font-weight: 800; color: var(--accent); }
   .about {
     background: var(--panel); border: 1px solid var(--border); border-radius: 12px;
     padding: 20px 22px; font-size: 0.92rem; color: var(--muted);
@@ -62,54 +67,47 @@
   <header>
     <h1><span>CIET</span></h1>
     <p style="font-size:1.05rem;font-weight:600;margin-top:2px">Centro de Investigación Económica de Tucumán</p>
-    <p class="tagline">Divulgación y análisis económico. Modelos canónicos de la literatura presentados de forma interactiva — mover un parámetro y ver la economía responder enseña más que diez páginas de derivaciones — y, próximamente, análisis aplicado de la economía tucumana.</p>
+    <p class="tagline">Análisis de la economía tucumana con datos abiertos, metodología explícita y frecuencia sostenida.</p>
   </header>
 
-  <h2>Modelos disponibles</h2>
-  <div class="grid">
-    <a class="card" href="solow/">
-      <div class="area">Crecimiento económico</div>
-      <h3>Modelo de Solow</h3>
-      <p>¿Por qué ahorrar más eleva el nivel de ingreso pero no su crecimiento de largo plazo? Estado estacionario, regla de oro y convergencia.</p>
-      <span class="status live">● Disponible</span>
-    </a>
-    <div class="card soon">
-      <div class="area">Macroeconomía de corto plazo</div>
-      <h3>IS-LM</h3>
-      <p>Política fiscal y monetaria en el mercado de bienes y de dinero. Crowding out, trampa de liquidez.</p>
-      <span class="status soon">Próximamente</span>
-    </div>
-    <div class="card soon">
-      <div class="area">Microeconomía</div>
-      <h3>Oferta y demanda</h3>
-      <p>Equilibrio competitivo, excedentes, impuestos y controles de precios: quién gana, quién pierde y cuánto se pierde.</p>
-      <span class="status soon">Próximamente</span>
-    </div>
-    <div class="card soon">
-      <div class="area">Comercio internacional</div>
-      <h3>Ventaja comparativa</h3>
-      <p>El modelo ricardiano: por qué conviene comerciar incluso cuando un país es peor produciendo todo.</p>
-      <span class="status soon">Próximamente</span>
-    </div>
-  </div>
+  <a class="hero" href="ips/">
+    <div class="area">Producto insignia</div>
+    <h3>Índice de Precios de Supermercados de Tucumán (IPS)</h3>
+    <p>Seguimiento de los precios efectivamente publicados por las cadenas de supermercados con sucursales en Tucumán, a partir del sistema oficial de datos abiertos SEPA (Sistema Electrónico de Publicidad de Precios Argentinos). Canasta fija de productos, comparables entre cadenas y en el tiempo, con metodología pública y replicable.</p>
+    <span class="status">● Ver el relevamiento →</span>
+  </a>
 
-  <h2>Economía de Tucumán</h2>
+  <h2>Cómo va a funcionar</h2>
   <div class="grid">
-    <div class="card soon">
-      <div class="area">Análisis regional</div>
-      <h3>Informes de coyuntura y estructura productiva</h3>
-      <p>Análisis en profundidad de la economía tucumana: empleo, actividad, sector azucarero y citrícola, finanzas provinciales.</p>
-      <span class="status soon">En preparación</span>
+    <div class="card">
+      <div class="num">1</div>
+      <h4>Datos oficiales diarios</h4>
+      <p>Los supermercados están obligados a informar sus precios por sucursal al sistema SEPA. Tomamos esos datos abiertos, todos los días.</p>
+    </div>
+    <div class="card">
+      <div class="num">2</div>
+      <h4>Solo Tucumán</h4>
+      <p>Filtramos exclusivamente las sucursales ubicadas en la provincia: lo que se publica acá, no promedios nacionales.</p>
+    </div>
+    <div class="card">
+      <div class="num">3</div>
+      <h4>Canasta fija y comparable</h4>
+      <p>Una canasta de productos idénticos (mismo código de barras) presentes en todas las cadenas, para comparar peras con peras.</p>
+    </div>
+    <div class="card">
+      <div class="num">4</div>
+      <h4>Índice y comparativa</h4>
+      <p>Evolución del nivel de precios semana a semana, y qué cadena tiene la canasta más barata en cada momento.</p>
     </div>
   </div>
 
   <h2>Sobre el CIET</h2>
   <div class="about">
-    <p>El <strong>Centro de Investigación Económica de Tucumán (CIET)</strong> es un proyecto educativo y de divulgación sin fines comerciales, con dos líneas de trabajo: modelos económicos canónicos presentados de forma interactiva — con sus ecuaciones, supuestos y referencias explícitas — y análisis aplicado de la economía tucumana. Los modelos son simplificaciones deliberadas: su valor no está en predecir, sino en aislar mecanismos.</p>
+    <p>El <strong>Centro de Investigación Económica de Tucumán (CIET)</strong> es un proyecto independiente de investigación y divulgación económica centrado en la provincia de Tucumán. Trabaja exclusivamente con fuentes de datos públicas y metodologías abiertas: cada número publicado puede ser verificado y replicado por cualquiera. Sin fines comerciales.</p>
   </div>
 
   <footer>
-    CIET — Centro de Investigación Económica de Tucumán. Los simuladores son de uso libre para docencia citando la fuente.
+    CIET — Centro de Investigación Económica de Tucumán. Datos: SEPA (Secretaría de Comercio, datos abiertos). Los informes son de uso libre citando la fuente.
   </footer>
 
 </div>
