@@ -85,6 +85,10 @@
   th { color: var(--muted); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.04em; background: var(--surface); position: sticky; top: 0; }
   th.num, td.num { text-align: right; font-variant-numeric: tabular-nums; }
   td.desc { white-space: normal; min-width: 210px; }
+  #tabla-prod { table-layout: fixed; min-width: 640px; }
+  #tabla-prod th:first-child { width: 220px; }
+  #tabla-prod th.num, #tabla-prod td.num { width: 92px; }
+  #tabla-prod th:last-child, #tabla-prod td:last-child { width: 68px; }
   tr:last-child td { border-bottom: none; }
   td.min { color: var(--down); font-weight: 700; }
   td.max { color: var(--up); }
@@ -118,10 +122,10 @@
 <div class="topbar">
   <div class="inner">
     <a href="../" style="text-decoration:none">
-      <svg class="mark" viewBox="0 0 44 44" role="img" aria-label="CIET">
+      <svg class="mark" viewBox="0 0 44 44" role="img" aria-label="CIET Tucumán">
         <rect x="0" y="0" width="44" height="44" rx="8" fill="#0b3d68"/>
-        <path d="M15.5 8.5 L30 8 Q33 8 33.2 11 L32 17 Q35 20 32.5 23 L34 27.5 Q34.3 30 31 31.5 L24.5 36.5 Q22 38.4 20 35.8 L14.5 27 Q12.6 24 15 21.5 L12.2 15.5 Q11 12.6 14 11 Z" fill="#ffffff"/>
-        <circle cx="21.5" cy="20.5" r="2.1" fill="#1c6fb8"/>
+        <path transform="translate(8.4,4.4) scale(0.271)" fill="#ffffff" d="M8,20 L31,7 L45,6 L52,12 L68,7 L89,17 L92,33 L85,45 L84,60 L78,78 L74,92 L68,106 L55,116 L49,124 L38,118 L28,110 L20,95 L12,83 L22,74 L16,64 L24,48 L18,40 L24,30 Z"/>
+        <circle cx="19.5" cy="19.5" r="1.8" fill="#1c6fb8"/>
       </svg>
     </a>
     <div>
@@ -171,12 +175,6 @@
           <div id="chart-barato"></div>
           <p class="chart-note">De los productos de la canasta, en qué porcentaje cada cadena tiene el precio más barato (o empata en el más barato). Como muchos productos cuestan lo mismo en dos cadenas, los porcentajes se superponen y suman más de 100%.</p>
         </div>
-        <div class="chart" style="grid-column:1/-1">
-          <div class="chart-title">¿Cuánta diferencia de precio hay entre cadenas para un mismo producto?</div>
-          <div style="font-size:0.72rem;color:var(--muted);margin-bottom:4px">Cantidad de productos según la diferencia entre la cadena más cara y la más barata</div>
-          <div id="chart-hist"></div>
-          <p class="chart-note">Para cada producto miramos cuánto más caro está en la cadena más cara frente a la más barata. La mayoría varía poco (menos de 5%), pero hay productos que cuestan bastante más en una cadena que en otra. Ejemplo: una barra en “50-100%” cuenta los productos que en la cadena más cara cuestan entre 1,5 y 2 veces lo que valen en la más barata.</p>
-        </div>
       </div>
     </div>
   </section>
@@ -215,8 +213,18 @@
     <div id="web-cont" style="display:none">
       <p class="note" id="web-desc"></p>
       <div class="kpis" id="web-kpis"></div>
+
+      <h2 class="sec">Diferencia entre el precio web y el declarado a SEPA, por cadena</h2>
+      <div class="chart"><div id="chart-webdif"></div>
+        <p class="chart-note">Cuánto difiere en promedio el precio de la tienda online respecto del que la cadena informa al Estado (SEPA), sobre la canasta comparable. Un valor negativo significa que la web es más barata que lo declarado.</p>
+      </div>
+
+      <div class="callout" style="margin:16px 0">
+        <strong>¿Por qué hay diferencias tan grandes?</strong> No es un error: verificamos que se trata del mismo producto (mismo código de barras, marca y tamaño) en SEPA y en la web. Las diferencias son reales. <strong>Carrefour</strong> mantiene sus precios de SEPA casi idénticos a los de su web; en cambio <strong>Vea y Jumbo</strong> (grupo Cencosud) informan a SEPA precios que difieren bastante de lo que cobran online. Es un indicio de la calidad con que cada cadena cumple la obligación de publicar precios.
+      </div>
+
       <h2 class="sec">SEPA vs. tienda online, producto por producto</h2>
-      <p class="note">Cada fila compara el precio que la cadena informa al Estado (SEPA) con el publicado en su web. El enlace lleva al producto en la tienda online.</p>
+      <p class="note">Cada fila compara el precio que la cadena informa al Estado (SEPA) con el publicado en su web. El precio de la web es un enlace al producto en la tienda de cada cadena.</p>
       <div class="controls">
         <input type="search" id="wq" placeholder="Buscar producto…">
         <select id="worden">
@@ -288,6 +296,8 @@
 
 <script>
 const $ = id => document.getElementById(id);
+const SHORT = { 'Hipermercado Carrefour': 'Carrefour' };
+const disp = n => SHORT[n] || n;  // nombre para mostrar (la clave de datos sigue completa)
 const peso = v => '$' + Math.round(v).toLocaleString('es-AR');
 const pct = v => (v > 0 ? '+' : '') + v.toLocaleString('es-AR', { maximumFractionDigits: 1 }) + '%';
 const fechaLarga = iso => new Date(iso + 'T12:00:00').toLocaleDateString('es-AR', { day: 'numeric', month: 'long', year: 'numeric' });
@@ -332,7 +342,7 @@ fetch('../data/ips.json').then(r => r.json()).then(d => {
   $('kpis').innerHTML = [
     ['Cadenas en el índice', principales.length],
     ['Productos en la canasta', d.canasta_total_productos.toLocaleString('es-AR')],
-    ['Canasta más barata', barata.cadena],
+    ['Canasta más barata', disp(barata.cadena)],
     ['Pares comparados', d.pares_comparados.toLocaleString('es-AR')],
   ].map(([l, v]) => `<div class="kpi"><div class="label">${l}</div><div class="value">${v}</div></div>`).join('');
 
@@ -352,13 +362,13 @@ function renderCadenas() {
     const rel = c.canasta_costo && c.canasta_costo !== minCosto ? `<div class="meta">canasta <span class="var up">${pct((c.canasta_costo / minCosto - 1) * 100)}</span> más cara que la más barata</div>` : '';
     return `<div class="card ${c.canasta_costo === minCosto ? 'best' : ''}">
       <div class="tag">${c.sucursales} sucursal${c.sucursales === 1 ? '' : 'es'} · ${c.productos_relevados.toLocaleString('es-AR')} productos</div>
-      <h4>${c.cadena}</h4>
+      <h4>${disp(c.cadena)}</h4>
       <div class="precio">${c.canasta_costo ? peso(c.canasta_costo) : 'reporte incompleto'}</div>
       <div class="meta">${varHtml}</div>${rel}
       ${c.canasta_costo === minCosto ? '<span class="badge">CANASTA MÁS BARATA</span>' : ''}</div>`;
   }).join('');
 
-  $('tabla-brechas').querySelector('thead').innerHTML = '<tr><th>Producto</th>' + nombres.map(n => `<th class="num">${n}</th>`).join('') + '<th class="num">Brecha</th></tr>';
+  $('tabla-brechas').querySelector('thead').innerHTML = '<tr><th>Producto</th>' + nombres.map(n => `<th class="num">${disp(n)}</th>`).join('') + '<th class="num">Brecha</th></tr>';
   $('tabla-brechas').querySelector('tbody').innerHTML = d.tabla.slice(0, 15).map(p => {
     const vals = nombres.map(n => p.precios[n]);
     const brecha = Math.max(...vals) / Math.min(...vals);
@@ -373,34 +383,34 @@ function renderCharts() {
     const premium = c.canasta_costo / minCosto - 1, esMin = premium < 1e-9;
     const w = esMin ? 100 : Math.max((premium / maxPremium) * 100, 3);
     const val = esMin ? '<span class="val" style="color:var(--down)">más barata</span>' : `<span class="val">+${(premium * 100).toFixed(1)}%</span>`;
-    return `<div class="bar-row"><span class="lbl">${c.cadena}</span><span class="track"><span class="fill ${esMin ? 'best' : ''}" style="width:${w}%"></span></span>${val}</div>`;
+    return `<div class="bar-row"><span class="lbl">${disp(c.cadena)}</span><span class="track"><span class="fill ${esMin ? 'best' : ''}" style="width:${w}%"></span></span>${val}</div>`;
   }).join('');
 
   const mb = d.mas_barato.slice().sort((a, b) => b.productos - a.productos), maxMb = Math.max(...mb.map(x => x.productos));
   $('chart-barato').innerHTML = mb.map(x => {
     const w = (x.productos / maxMb) * 100, p = Math.round((x.productos / d.canasta_total_productos) * 100);
-    return `<div class="bar-row"><span class="lbl">${x.cadena}</span><span class="track"><span class="fill" style="width:${Math.max(w, 3)}%"></span></span><span class="val">${p}%</span></div>`;
+    return `<div class="bar-row"><span class="lbl">${disp(x.cadena)}</span><span class="track"><span class="fill" style="width:${Math.max(w, 3)}%"></span></span><span class="val">${p}%</span></div>`;
   }).join('');
 
-  const h = d.histograma_brechas, maxH = Math.max(...h.map(x => x.cantidad));
-  $('chart-hist').innerHTML = '<div class="hist">' + h.map(x =>
-    `<div class="col"><span class="colval">${x.cantidad}</span><div class="colbar" style="height:${(x.cantidad / maxH) * 110}px"></div><span class="collbl">${x.rango}</span></div>`
-  ).join('') + '</div>';
 }
 
 // ---- catálogo (productos.json, lazy) ----
-let PROD = null, filtrados = [], mostrados = 0; const PAGINA = 50;
+let PROD = null, catalogoListo = false, filtrados = [], mostrados = 0; const PAGINA = 50;
+function setupCatalogo() {
+  catalogoListo = true;
+  $('prod-loading').style.display = 'none';
+  $('prod-cont').style.display = 'block';
+  $('tabla-prod').querySelector('thead').innerHTML = '<tr><th>Producto</th>' + PROD_CAD().map(c => `<th class="num">${disp(c)}</th>`).join('') + '<th class="num">Brecha</th><th class="num">Sem.</th></tr>';
+  $('q').addEventListener('input', aplicarProd);
+  $('orden').addEventListener('change', aplicarProd);
+  $('btn-more').addEventListener('click', () => { mostrados += PAGINA; pintarProd(); });
+  aplicarProd();
+}
 function cargarCatalogo() {
-  if (PROD) return;
+  if (catalogoListo) return;
+  if (PROD) { setupCatalogo(); return; }  // ya lo trajo otra pestaña
   fetch('../data/productos.json').then(r => r.json()).then(d => {
-    PROD = d.productos;
-    $('prod-loading').style.display = 'none';
-    $('prod-cont').style.display = 'block';
-    $('tabla-prod').querySelector('thead').innerHTML = '<tr><th>Producto</th>' + d.cadenas_principales.map(c => `<th class="num">${c}</th>`).join('') + '<th class="num">Brecha</th><th class="num">Sem.</th></tr>';
-    $('q').addEventListener('input', aplicarProd);
-    $('orden').addEventListener('change', aplicarProd);
-    $('btn-more').addEventListener('click', () => { mostrados += PAGINA; pintarProd(); });
-    aplicarProd();
+    PROD = d.productos; setupCatalogo();
   }).catch(e => { $('prod-loading').textContent = 'No se pudo cargar el catálogo (' + e.message + ').'; });
 }
 function aplicarProd() {
@@ -433,11 +443,11 @@ function cargarWeb() {
       webRows = [];
       for (const [ean, f] of Object.entries(d.precios)) {
         const s = sepa[ean]; if (!s) continue;
-        const row = { ean, descripcion: f.descripcion || s.descripcion, sepa: {}, web: {}, link: null };
+        const row = { ean, descripcion: f.descripcion || s.descripcion, sepa: {}, web: {}, links: {} };
         for (const n of nombres) {
           row.sepa[n] = s.precios[n] ?? null;
-          if (f[n] && f[n].precio) { row.web[n] = f[n].precio; if (!row.link && f[n].link) row.link = f[n].link; }
-          else row.web[n] = null;
+          if (f[n] && f[n].precio) { row.web[n] = f[n].precio; row.links[n] = f[n].link || null; }
+          else { row.web[n] = null; row.links[n] = null; }
         }
         webRows.push(row);
       }
@@ -460,16 +470,32 @@ function renderWeb() {
 
   // índice web: canasta sobre productos con precio web y SEPA en las 3 cadenas
   const comunes = webRows.filter(r => nombres.every(n => r.sepa[n] && r.web[n]));
+  const difCadena = {};
   const kpis = [];
   for (const n of nombres) {
     const sepaB = comunes.reduce((a, r) => a + r.sepa[n], 0);
     const webB = comunes.reduce((a, r) => a + r.web[n], 0);
     const dif = (webB / sepaB - 1) * 100;
-    kpis.push(`<div class="kpi"><div class="label">${n} · web vs. SEPA</div><div class="value ${dif >= 0 ? '' : ''}">${pct(dif)}</div></div>`);
+    difCadena[n] = dif;
+    kpis.push(`<div class="kpi"><div class="label">${disp(n)} · web vs. SEPA</div><div class="value">${pct(dif)}</div></div>`);
   }
   $('web-kpis').innerHTML = `<div class="kpi"><div class="label">Canasta comparable</div><div class="value">${comunes.length}</div></div>` + kpis.join('');
 
-  $('tabla-web').querySelector('thead').innerHTML = '<tr><th>Producto</th>' + nombres.map(n => `<th class="num">${n}<br><span style="font-weight:400;text-transform:none">SEPA / web</span></th>`).join('') + '<th class="num">Dif.</th><th>Ver</th></tr>';
+  // gráfico de diferencia web vs SEPA por cadena (barras divergentes desde el centro)
+  const maxAbs = Math.max(...nombres.map(n => Math.abs(difCadena[n])), 1);
+  $('chart-webdif').innerHTML = nombres.map(n => {
+    const v = difCadena[n], w = (Math.abs(v) / maxAbs) * 50; // % del semiancho
+    const pos = v < 0
+      ? `right:50%;width:${w}%;background:var(--down)`
+      : `left:50%;width:${w}%;background:var(--up)`;
+    return `<div class="bar-row"><span class="lbl">${disp(n)}</span>` +
+      `<span class="track" style="position:relative">` +
+      `<span style="position:absolute;left:50%;top:0;bottom:0;width:1px;background:#c3ccd8"></span>` +
+      `<span style="position:absolute;top:0;bottom:0;${pos};border-radius:3px"></span></span>` +
+      `<span class="val" style="color:${v < 0 ? 'var(--down)' : 'var(--up)'}">${pct(v)}</span></div>`;
+  }).join('') + '<div style="font-size:0.7rem;color:var(--muted);text-align:center;margin-top:6px">← web más barata que SEPA · SEPA más barata que web →</div>';
+
+  $('tabla-web').querySelector('thead').innerHTML = '<tr><th>Producto</th>' + nombres.map(n => `<th class="num">${disp(n)}<br><span style="font-weight:400;text-transform:none">SEPA / web</span></th>`).join('') + '<th class="num">Dif.</th></tr>';
   $('wq').addEventListener('input', aplicarWeb);
   $('worden').addEventListener('change', aplicarWeb);
   aplicarWeb();
@@ -484,14 +510,14 @@ function aplicarWeb() {
 function pintarWeb() {
   $('tabla-web').querySelector('tbody').innerHTML = webFiltrados.slice(0, 80).map(r => {
     const celdas = nombres.map(n => {
-      const s = r.sepa[n], w = r.web[n];
+      const s = r.sepa[n], w = r.web[n], lk = r.links[n];
       const cmp = (s && w) ? (w > s ? 'up' : (w < s ? 'down' : '')) : '';
-      return `<td class="num">${s ? peso(s) : '—'} <span style="color:var(--muted)">/</span> <span class="var ${cmp}">${w ? peso(w) : '—'}</span></td>`;
+      const webTxt = w ? (lk ? `<a class="prod-link var ${cmp}" href="${lk}" target="_blank" rel="noopener">${peso(w)}</a>` : `<span class="var ${cmp}">${peso(w)}</span>`) : '—';
+      return `<td class="num">${s ? peso(s) : '—'} <span style="color:var(--muted)">/</span> ${webTxt}</td>`;
     }).join('');
     const dp = difPct(r);
     const difc = dp == null ? '<td class="num">—</td>' : `<td class="num"><span class="var ${dp >= 0 ? 'up' : 'down'}">${pct(dp)}</span></td>`;
-    const link = r.link ? `<td><a class="prod-link" href="${r.link}" target="_blank" rel="noopener">web →</a></td>` : '<td>—</td>';
-    return `<tr><td class="desc">${r.descripcion}</td>${celdas}${difc}${link}</tr>`;
+    return `<tr><td class="desc">${r.descripcion}</td>${celdas}${difc}</tr>`;
   }).join('');
   $('web-count').textContent = `${webFiltrados.length.toLocaleString('es-AR')} productos con precio web y SEPA` + (webFiltrados.length > 80 ? ' · mostrando 80' : '');
 }
