@@ -161,8 +161,14 @@
     <div id="resumen-loading" class="loading">Cargando…</div>
     <div id="resumen-cont" style="display:none">
       <div class="headline">
-        <div>
-          <div style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.06em;color:var(--muted)">Variación semanal de precios</div>
+        <div style="flex:1;min-width:250px">
+          <div style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.06em;color:var(--muted)">Variación de precios</div>
+          <div class="segmented" id="h-freq" style="margin:9px 0 6px">
+            <button class="seg" data-h="dia">Diaria</button>
+            <button class="seg active" data-h="semana">Semanal</button>
+            <button class="seg" data-h="mes">Mensual</button>
+            <button class="seg" data-h="anio">Anual</button>
+          </div>
           <div class="big" id="h-var">—</div>
         </div>
         <div class="what" id="h-detalle"></div>
@@ -361,17 +367,15 @@ fetch('../data/ips.json').then(r => r.json()).then(d => {
   $('src').innerHTML = `Fuente: <a href="${SEPA_URL}" target="_blank" rel="noopener">SEPA</a> · datos al <strong>${fechaLarga(d.fecha)}</strong>` +
     (d.fecha_base ? ` (comparado con ${fechaLarga(d.fecha_base)})` : '');
 
-  // headline
+  // headline con selector de período (usa la serie encadenada)
   $('resumen-loading').style.display = 'none';
   $('resumen-cont').style.display = 'block';
-  if (d.var_semanal_total_pct != null) {
-    $('h-var').textContent = pct(d.var_semanal_total_pct);
-    $('h-var').classList.add(d.var_semanal_total_pct >= 0 ? 'up' : 'down');
-    $('h-detalle').textContent = `Variación entre el ${fechaLarga(d.fecha_base)} y el ${fechaLarga(d.fecha)}, sobre ${d.pares_comparados.toLocaleString('es-AR')} pares cadena-producto (índice de Jevons).`;
-  } else {
-    $('h-var').textContent = '—';
-    $('h-detalle').textContent = `Primer relevamiento: ${fechaLarga(d.fecha)}.`;
-  }
+  $('h-freq').addEventListener('click', e => {
+    const b = e.target.closest('.seg'); if (!b) return;
+    document.querySelectorAll('#h-freq .seg').forEach(s => s.classList.toggle('active', s === b));
+    updateHeadline();
+  });
+  fetchSerie().then(updateHeadline).catch(() => updateHeadline());
 
   // kpis
   const barata = principales.slice().sort((a, b) => a.canasta_costo - b.canasta_costo)[0];
@@ -430,12 +434,38 @@ function renderCharts() {
 
 }
 
-// ---- serie temporal (serie.json, lazy) ----
-let SERIE = null;
+// ---- serie temporal (serie.json) ----
+let SERIE = null, seriePromise = null, serieRendered = false;
+function fetchSerie() {
+  if (seriePromise) return seriePromise;
+  seriePromise = fetch('../data/serie.json').then(r => { if (!r.ok) throw new Error('nofile'); return r.json(); }).then(d => { SERIE = d; return d; });
+  return seriePromise;
+}
+const HORIZON_DIAS = { dia: 1, semana: 7, mes: 30, anio: 365 };
+const HORIZON_LBL = { dia: 'diaria', semana: 'semanal', mes: 'mensual', anio: 'anual' };
+function updateHeadline() {
+  const h = (document.querySelector('#h-freq .seg.active') || {}).dataset?.h || 'semana';
+  const lbl = HORIZON_LBL[h];
+  const el = $('h-var'); el.classList.remove('up', 'down');
+  const pts = (SERIE && SERIE.puntos || []).filter(p => p.indice != null);
+  if (pts.length < 2) { el.textContent = '—'; el.style.fontSize = ''; $('h-detalle').textContent = `Primer relevamiento registrado. La variación ${lbl} aparecerá al acumularse más días.`; return; }
+  const last = pts[pts.length - 1], lastT = Date.parse(last.fecha), dias = HORIZON_DIAS[h];
+  const cand = pts.filter(p => p !== last && (lastT - Date.parse(p.fecha)) / 86400000 >= dias * 0.7);
+  if (!cand.length) {
+    el.textContent = 'en preparación'; el.style.fontSize = '1.5rem';
+    $('h-detalle').innerHTML = `Todavía no hay suficiente historia para la variación <strong>${lbl}</strong>. El índice se acumula día a día: en cuanto haya ${h === 'mes' ? 'un mes' : 'un año'} de datos, este número aparecerá acá.`;
+    return;
+  }
+  const target = lastT - dias * 86400000;
+  cand.sort((a, b) => Math.abs(Date.parse(a.fecha) - target) - Math.abs(Date.parse(b.fecha) - target));
+  const base = cand[0], v = (last.indice / base.indice - 1) * 100;
+  el.style.fontSize = ''; el.textContent = pct(v); el.classList.add(v >= 0 ? 'up' : 'down');
+  $('h-detalle').textContent = `Variación ${lbl} entre el ${fechaLarga(base.fecha)} y el ${fechaLarga(last.fecha)} (índice encadenado de Jevons).`;
+}
 function cargarSerie() {
-  if (SERIE !== null) return;
-  fetch('../data/serie.json').then(r => { if (!r.ok) throw new Error('nofile'); return r.json(); }).then(d => {
-    SERIE = d;
+  if (serieRendered) return;
+  fetchSerie().then(d => {
+    serieRendered = true;
     $('serie-loading').style.display = 'none';
     if (!d.puntos || d.puntos.length < 1) { $('serie-vacio').style.display = 'block'; return; }
     $('serie-cont').style.display = 'block';
