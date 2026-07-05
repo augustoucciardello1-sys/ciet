@@ -18,10 +18,10 @@
   {
    "fecha": "2026-06-29",
    "indice": 100.04,
-   "var_pct": 0.037,
+   "var_pct": null,
    "canasta_n": 3250,
-   "se_mantienen": 3250,
-   "pares": 30171
+   "se_mantienen": null,
+   "pares": null
   },
   {
    "fecha": "2026-06-30",
@@ -32,16 +32,24 @@
    "pares": 30028
   },
   {
+   "fecha": "2026-07-01",
+   "indice": 99.74,
+   "var_pct": -0.358,
+   "canasta_n": 3234,
+   "se_mantienen": 3197,
+   "pares": 29984
+  },
+  {
    "fecha": "2026-07-02",
    "indice": 100.16,
-   "var_pct": 0.063,
+   "var_pct": 0.423,
    "canasta_n": 3232,
-   "se_mantienen": 3171,
-   "pares": 29895
+   "se_mantienen": 3206,
+   "pares": 30113
   },
   {
    "fecha": "2026-07-03",
-   "indice": 99.83,
+   "indice": 99.84,
    "var_pct": -0.326,
    "canasta_n": 3216,
    "se_mantienen": 3178,
@@ -54,6 +62,14 @@
    "canasta_n": 3193,
    "se_mantienen": 3180,
    "pares": 30062
+  },
+  {
+   "fecha": "2026-07-05",
+   "indice": 99.88,
+   "var_pct": 0.0,
+   "canasta_n": 3233,
+   "se_mantienen": 3140,
+   "pares": 29951
   }
  ]
 }
