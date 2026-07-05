@@ -1,0 +1,59 @@
+{
+ "actualizado": "2026-07-05",
+ "base": "índice encadenado (Jevons por tramo), base 100 en el primer día registrado",
+ "cadenas": [
+  "Hipermercado Carrefour",
+  "Jumbo",
+  "Vea"
+ ],
+ "puntos": [
+  {
+   "fecha": "2026-06-28",
+   "indice": 100.0,
+   "var_pct": null,
+   "canasta_n": 3289,
+   "se_mantienen": null,
+   "pares": null
+  },
+  {
+   "fecha": "2026-06-29",
+   "indice": 100.04,
+   "var_pct": 0.037,
+   "canasta_n": 3250,
+   "se_mantienen": 3250,
+   "pares": 30171
+  },
+  {
+   "fecha": "2026-06-30",
+   "indice": 100.1,
+   "var_pct": 0.059,
+   "canasta_n": 3228,
+   "se_mantienen": 3212,
+   "pares": 30028
+  },
+  {
+   "fecha": "2026-07-02",
+   "indice": 100.16,
+   "var_pct": 0.063,
+   "canasta_n": 3232,
+   "se_mantienen": 3171,
+   "pares": 29895
+  },
+  {
+   "fecha": "2026-07-03",
+   "indice": 99.83,
+   "var_pct": -0.326,
+   "canasta_n": 3216,
+   "se_mantienen": 3178,
+   "pares": 30067
+  },
+  {
+   "fecha": "2026-07-04",
+   "indice": 99.88,
+   "var_pct": 0.042,
+   "canasta_n": 3193,
+   "se_mantienen": 3180,
+   "pares": 30062
+  }
+ ]
+}

@@ -144,6 +144,7 @@
 
   <div class="tabs" id="tabs">
     <button class="tab active" data-tab="resumen">Resumen</button>
+    <button class="tab" data-tab="evolucion">Evolución</button>
     <button class="tab" data-tab="cadenas">Cadenas</button>
     <button class="tab" data-tab="productos">Productos</button>
     <button class="tab" data-tab="web">Precios web</button>
@@ -176,6 +177,30 @@
           <p class="chart-note">De los productos de la canasta, en qué porcentaje cada cadena tiene el precio más barato (o empata en el más barato). Como muchos productos cuestan lo mismo en dos cadenas, los porcentajes se superponen y suman más de 100%.</p>
         </div>
       </div>
+    </div>
+  </section>
+
+  <!-- EVOLUCIÓN -->
+  <section class="panel-tab" id="tab-evolucion">
+    <div id="serie-loading" class="loading">Cargando serie…</div>
+    <div id="serie-vacio" style="display:none" class="callout">La serie temporal se está construyendo (se acumula día a día a partir de los últimos dumps de SEPA). Vuelve pronto.</div>
+    <div id="serie-cont" style="display:none">
+      <p class="note" id="serie-desc"></p>
+      <div class="controls">
+        <span style="font-size:0.82rem;color:var(--muted)">Frecuencia:</span>
+        <select id="serie-freq">
+          <option value="dia">Diaria</option>
+          <option value="semana">Semanal</option>
+          <option value="mes">Mensual</option>
+        </select>
+      </div>
+      <div class="chart"><div class="chart-title">Índice de precios en el tiempo (base 100)</div>
+        <div id="chart-serie"></div>
+        <p class="chart-note" id="serie-nota"></p>
+      </div>
+      <h2 class="sec">Rotación de la canasta</h2>
+      <p class="note">La canasta no es fija: cada día se compara la intersección de productos disponibles en las tres cadenas. Acá se ve cuántos productos tiene y cuántos se mantienen respecto del período anterior.</p>
+      <div class="tablewrap"><table id="tabla-serie"><thead></thead><tbody></tbody></table></div>
     </div>
   </section>
 
@@ -264,8 +289,14 @@
     <h3>6. Precios de las tiendas online</h3>
     <p>Aparte de SEPA, consultamos las <strong>páginas web</strong> de cada cadena para ver si el precio que declaran al Estado coincide con el que cobran online. Buscamos cada producto por su código de barras en la tienda de cada cadena. En <strong>Carrefour</strong> el precio se geolocaliza en Tucumán; <strong>Vea</strong> y <strong>Jumbo</strong> (grupo Cencosud) publican un precio online único, así que ahí comparamos web nacional contra SEPA-Tucumán. Es un <strong>contraste sobre una muestra</strong> de la canasta, no sobre todos los productos.</p>
 
-    <h3>7. Qué cadenas entran</h3>
-    <p>El índice cubre <strong>Carrefour, Vea y Jumbo</strong>, las de mayor presencia en la provincia. Otras cadenas informan a SEPA de forma marginal en Tucumán (pocas sucursales o catálogos incompletos) y quedan fuera del cálculo para no distorsionar la comparación.</p>
+    <h3>7. Qué cadenas entran (y por qué faltan otras)</h3>
+    <p>El índice cubre <strong>Carrefour, Vea y Jumbo</strong>, las únicas con catálogo completo informado para Tucumán. Revisando el propio SEPA surge un dato llamativo sobre el cumplimiento: varias cadenas grandes que operan en la provincia <strong>no aparecen bien reportadas</strong>.</p>
+    <ul>
+      <li><strong>Comodín</strong> informa sus sucursales a SEPA, pero <strong>ninguna figura en Tucumán</strong> (las etiqueta en otras provincias o no las informa).</li>
+      <li><strong>Hiperlibertad</strong> sí registra 2 sucursales en Tucumán, pero reporta un <strong>catálogo casi vacío</strong> (apenas un puñado de productos), por lo que no puede compararse.</li>
+      <li>Otras nacionales (La Anónima, Coto, DIA, Cooperativa Obrera) directamente <strong>no informan sucursales en Tucumán</strong>.</li>
+    </ul>
+    <p>Que estas cadenas no publiquen bien sus precios es, en sí mismo, un problema de transparencia — no una limitación de este índice.</p>
 
     <h3>8. Limitaciones honestas</h3>
     <ul>
@@ -286,7 +317,7 @@
 
     <h3>10. Reproducibilidad y actualización</h3>
     <p id="metodo-detalle"></p>
-    <p>Todo el procesamiento son <strong>scripts abiertos</strong> que parten de fuentes públicas: cualquiera puede reejecutarlos y obtener los mismos números. Código y datos: <a href="https://github.com/augustoucciardello1-sys/ciet" target="_blank" rel="noopener">repositorio del proyecto</a>. El relevamiento se irá actualizando para construir una serie histórica.</p>
+    <p>Todo el procesamiento son <strong>scripts abiertos</strong> que parten de fuentes públicas: cualquiera puede reejecutarlos y obtener los mismos números. Código y datos: <a href="https://github.com/cietucuman/ciet" target="_blank" rel="noopener">repositorio del proyecto</a>. El relevamiento se irá actualizando para construir una serie histórica.</p>
   </section>
 </div>
 
@@ -311,6 +342,7 @@ $('tabs').addEventListener('click', e => {
   document.querySelectorAll('.panel-tab').forEach(p => p.classList.toggle('active', p.id === 'tab-' + id));
   if (id === 'productos') cargarCatalogo();
   if (id === 'web') cargarWeb();
+  if (id === 'evolucion') cargarSerie();
 });
 
 // ---- resumen + cadenas (ips.json) ----
@@ -392,6 +424,68 @@ function renderCharts() {
     return `<div class="bar-row"><span class="lbl">${disp(x.cadena)}</span><span class="track"><span class="fill" style="width:${Math.max(w, 3)}%"></span></span><span class="val">${p}%</span></div>`;
   }).join('');
 
+}
+
+// ---- serie temporal (serie.json, lazy) ----
+let SERIE = null;
+function cargarSerie() {
+  if (SERIE !== null) return;
+  fetch('../data/serie.json').then(r => { if (!r.ok) throw new Error('nofile'); return r.json(); }).then(d => {
+    SERIE = d;
+    $('serie-loading').style.display = 'none';
+    if (!d.puntos || d.puntos.length < 1) { $('serie-vacio').style.display = 'block'; return; }
+    $('serie-cont').style.display = 'block';
+    $('serie-desc').innerHTML = `Índice encadenado de precios (Jevons por tramo) sobre ${d.cadenas.map(disp).join(', ')}. Base 100 en el primer día registrado. Actualizado al ${fechaLarga(d.actualizado)}.`;
+    $('serie-freq').addEventListener('change', pintarSerie);
+    pintarSerie();
+  }).catch(() => { $('serie-loading').style.display = 'none'; $('serie-vacio').style.display = 'block'; });
+}
+function isoSemana(f) { const dt = new Date(f + 'T12:00:00'); const on = new Date(Date.UTC(dt.getFullYear(), dt.getMonth(), dt.getDate())); const dn = on.getUTCDay() || 7; on.setUTCDate(on.getUTCDate() + 4 - dn); const ys = new Date(Date.UTC(on.getUTCFullYear(), 0, 1)); const wk = Math.ceil((((on - ys) / 86400000) + 1) / 7); return on.getUTCFullYear() + '-S' + String(wk).padStart(2, '0'); }
+function agrupar(puntos, freq) {
+  if (freq === 'dia') return puntos.slice();
+  const key = freq === 'semana' ? isoSemana : (f => f.slice(0, 7));
+  const grupos = {};
+  for (const p of puntos) { const k = key(p.fecha); (grupos[k] = grupos[k] || []).push(p); }
+  return Object.entries(grupos).sort().map(([k, arr]) => {
+    const last = arr[arr.length - 1];
+    return { fecha: last.fecha, etiqueta: k, indice: last.indice, canasta_n: last.canasta_n,
+             se_mantienen: arr.reduce((a, p) => a + (p.se_mantienen || 0), 0) || null };
+  });
+}
+function pintarSerie() {
+  const freq = $('serie-freq').value;
+  const pts = agrupar(SERIE.puntos, freq);
+  // variación punto a punto del índice agregado
+  for (let i = 0; i < pts.length; i++) pts[i].var = i === 0 ? null : (pts[i].indice / pts[i - 1].indice - 1) * 100;
+
+  // gráfico de línea SVG
+  const W = 620, H = 200, pad = 34;
+  const vals = pts.map(p => p.indice).filter(v => v != null);
+  const min = Math.min(...vals), max = Math.max(...vals), rng = (max - min) || 1;
+  const n = pts.length;
+  const X = i => pad + (n === 1 ? (W - 2 * pad) / 2 : (i / (n - 1)) * (W - 2 * pad));
+  const Y = v => H - pad - ((v - min) / rng) * (H - 2 * pad);
+  const linea = pts.map((p, i) => `${i === 0 ? 'M' : 'L'}${X(i).toFixed(1)},${Y(p.indice).toFixed(1)}`).join(' ');
+  const dots = pts.map((p, i) => `<circle cx="${X(i).toFixed(1)}" cy="${Y(p.indice).toFixed(1)}" r="3.5" fill="#1c6fb8"/>`).join('');
+  const labels = pts.map((p, i) => `<text x="${X(i).toFixed(1)}" y="${H - 10}" font-size="9" fill="#5d6b7a" text-anchor="middle">${freq === 'dia' ? p.fecha.slice(5) : (p.etiqueta || p.fecha)}</text>`).join('');
+  const yTop = `<text x="4" y="${Y(max) + 3}" font-size="9" fill="#5d6b7a">${max.toFixed(1)}</text>`;
+  const yBot = `<text x="4" y="${Y(min) + 3}" font-size="9" fill="#5d6b7a">${min.toFixed(1)}</text>`;
+  $('chart-serie').innerHTML = `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto">` +
+    `<line x1="${pad}" y1="${H - pad}" x2="${W - 10}" y2="${H - pad}" stroke="#e3e9f1"/>` +
+    `<path d="${linea}" fill="none" stroke="#1c6fb8" stroke-width="2"/>${dots}${labels}${yTop}${yBot}</svg>`;
+
+  const ultimo = pts[pts.length - 1];
+  $('serie-nota').textContent = n < 2
+    ? `Por ahora hay ${n} punto${n === 1 ? '' : 's'}. La serie se irá completando a medida que se acumulen días.`
+    : `Del ${fechaLarga(pts[0].fecha)} al ${fechaLarga(ultimo.fecha)} el índice pasó de 100 a ${ultimo.indice} (${pct((ultimo.indice / 100 - 1) * 100)}).`;
+
+  $('tabla-serie').querySelector('thead').innerHTML = '<tr><th>Período</th><th class="num">Índice</th><th class="num">Var.</th><th class="num">Productos</th><th class="num">Se mantienen</th></tr>';
+  $('tabla-serie').querySelector('tbody').innerHTML = pts.slice().reverse().map(p =>
+    `<tr><td>${freq === 'dia' ? fechaLarga(p.fecha) : (p.etiqueta || p.fecha)}</td>` +
+    `<td class="num">${p.indice ?? '—'}</td>` +
+    `<td class="num">${p.var == null ? '—' : `<span class="var ${p.var >= 0 ? 'up' : 'down'}">${pct(p.var)}</span>`}</td>` +
+    `<td class="num">${p.canasta_n?.toLocaleString('es-AR') ?? '—'}</td>` +
+    `<td class="num">${p.se_mantienen?.toLocaleString('es-AR') ?? '—'}</td></tr>`).join('');
 }
 
 // ---- catálogo (productos.json, lazy) ----

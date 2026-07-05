@@ -1,6 +1,6 @@
 # CIET — Centro de Investigación Económica de Tucumán
 
-Sitio del CIET, centro independiente de investigación y divulgación económica centrado en Tucumán. Publicado en https://augustoucciardello1-sys.github.io/ciet/
+Sitio del CIET, centro independiente de investigación y divulgación económica centrado en Tucumán. Publicado en https://cietucuman.github.io/ciet/
 
 ## Producto insignia: Índice de Precios de Supermercados de Tucumán (IPS)
 
