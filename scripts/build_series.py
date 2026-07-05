@@ -29,11 +29,19 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from build_index import procesar_dia, CADENAS_OBJETIVO, MIN_PRODUCTOS, PROVINCIA, leer_csv
 
 CKAN = "https://datos.produccion.gob.ar/api/3/action/package_show?id=sepa-precios"
-UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/120"
+UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+      "(KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36")
+HEADERS = {
+    "User-Agent": UA,
+    "Accept": "application/json,text/html,application/xhtml+xml,*/*;q=0.8",
+    "Accept-Language": "es-AR,es;q=0.9,en;q=0.8",
+    "Referer": "https://datos.produccion.gob.ar/dataset/sepa-precios",
+    "Connection": "keep-alive",
+}
 
 
 def get_json(url):
-    req = urllib.request.Request(url, headers={"User-Agent": UA})
+    req = urllib.request.Request(url, headers=HEADERS)
     with urllib.request.urlopen(req, timeout=40) as r:
         return json.load(r)
 
@@ -54,8 +62,8 @@ def daily_urls():
 def descargar_y_extraer(url, destino):
     """Baja el zip diario y lo extrae; devuelve la carpeta-fecha interna."""
     zpath = destino / "dump.zip"
-    req = urllib.request.Request(url, headers={"User-Agent": UA})
-    with urllib.request.urlopen(req, timeout=180) as r, open(zpath, "wb") as f:
+    req = urllib.request.Request(url, headers=HEADERS)
+    with urllib.request.urlopen(req, timeout=300) as r, open(zpath, "wb") as f:
         shutil.copyfileobj(r, f)
     with zipfile.ZipFile(zpath) as z:
         z.extractall(destino)
