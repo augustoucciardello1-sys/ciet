@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Índice de Precios de Supermercados de Tucumán — CIET</title>
+<link rel="icon" type="image/svg+xml" href="/ciet/favicon.svg">
 <meta name="description" content="IPS-CIET: variación de precios, comparación entre cadenas, catálogo completo y contraste con las tiendas online. Datos abiertos SEPA.">
 <style>
   :root {
@@ -245,28 +246,39 @@
   <!-- METODOLOGÍA -->
   <section class="panel-tab metodo" id="tab-metodo">
     <div class="callout" style="margin-bottom:16px">
-      <strong>En una línea.</strong> Medimos el precio de una canasta fija de productos idénticos en las tres grandes cadenas de supermercados de Tucumán, usando los datos que ellas mismas están obligadas a publicar por ley, y lo contrastamos con lo que cobran en sus tiendas online.
+      <strong>En una línea.</strong> Seguimos, con datos oficiales, cómo evoluciona el precio de una canasta fija de productos idénticos en las grandes cadenas de supermercados de Tucumán. Es un índice de precios de góndola, construido con la metodología estándar de la estadística de precios.
     </div>
 
-    <h3>1. La fuente: qué es SEPA</h3>
+    <h3>0. Qué mide este índice (y qué no)</h3>
+    <p>El IPS-SEPA mide dos cosas distintas que conviene no confundir:</p>
+    <ul>
+      <li>El <strong>nivel</strong> de precios: cuánto cuesta hoy la canasta en cada cadena (permite ver quién es más barato).</li>
+      <li>La <strong>variación</strong>: cuánto cambió el precio de esa canasta en el tiempo (una medida de inflación de supermercado a nivel local).</li>
+    </ul>
+    <p><strong>No es el IPC.</strong> El Índice de Precios al Consumidor del INDEC mide el costo de vida de un hogar representativo: pondera cada producto por cuánto pesa en el gasto familiar y cubre bienes y servicios que no están en el súper (alquiler, transporte, salud, educación). Nuestro índice es más acotado y más transparente: sigue <em>precios de góndola</em> de una canasta fija de almacén, limpieza y perfumería, sin ponderar por consumo. Sirve para tomarle el pulso a los precios de supermercado en Tucumán en tiempo casi real, no para reemplazar la inflación oficial.</p>
+
+    <h3>1. Por qué medir los precios de supermercado</h3>
+    <p>Los supermercados concentran una parte central del gasto de los hogares en alimentos y artículos de primera necesidad, y sus precios reaccionan rápido a la macroeconomía. Medirlos localmente permite: (a) detectar <strong>aceleraciones o desaceleraciones</strong> de la inflación antes de que salga el dato oficial; (b) exponer la <strong>dispersión de precios</strong> entre cadenas —señal de cuánta competencia real hay—; y (c) darle a la gente información para <strong>decidir dónde comprar</strong>. Un mercado con precios muy dispersos para el mismo producto es un mercado con poca competencia efectiva o con consumidores mal informados; transparentarlo, en sí mismo, mejora la competencia.</p>
+
+    <h3>2. La fuente: qué es SEPA</h3>
     <p><strong>SEPA</strong> (Sistema Electrónico de Publicidad de Precios Argentinos) es el sistema oficial creado por la Resolución 678/2020 de la Secretaría de Comercio. Obliga a las grandes cadenas de supermercados a informar <strong>todos los días</strong> el precio de cada producto en cada una de sus sucursales. Esa base es pública y abierta (licencia Creative Commons CC-BY 4.0) y se descarga desde el <a href="https://datos.produccion.gob.ar/dataset/sepa-precios" target="_blank" rel="noopener">portal de datos abiertos del Estado</a>. Cada archivo diario incluye, por cadena, tres tablas: comercios, sucursales (con su provincia) y productos (con código de barras EAN y precio de lista).</p>
 
-    <h3>2. Recorte geográfico: solo Tucumán</h3>
-    <p>De ese universo nacional nos quedamos únicamente con las <strong>sucursales ubicadas en la provincia de Tucumán</strong> (código <span style="font-family:monospace">AR-T</span>). No usamos promedios nacionales: lo que se publica acá son precios efectivamente informados para góndolas tucumanas.</p>
+    <h3>3. Recorte geográfico: solo Tucumán</h3>
+    <p>De ese universo nacional nos quedamos únicamente con las <strong>sucursales ubicadas en la provincia de Tucumán</strong> (código <span style="font-family:monospace">AR-T</span>). No usamos promedios nacionales: lo que se publica acá son precios efectivamente informados para góndolas tucumanas. Esto es clave, porque una misma cadena puede tener precios distintos según la región.</p>
 
-    <h3>3. Precio de cada producto en cada cadena</h3>
-    <p>Una cadena puede tener varias sucursales en la provincia, con precios levemente distintos. Tomamos la <strong>mediana</strong> (el valor del medio) de esas sucursales, no el promedio. ¿Por qué? Porque la mediana no se deja arrastrar por un error de carga puntual: si una sucursal cargó un cero de más, el promedio se dispara, pero la mediana no se mueve.</p>
+    <h3>4. Del dato crudo al precio de cada cadena</h3>
+    <p>Una cadena puede tener varias sucursales en la provincia, con precios levemente distintos. Para tener <strong>un</strong> precio por producto y por cadena tomamos la <strong>mediana</strong> (el valor del medio) entre sus sucursales, no el promedio. La razón es estadística: la mediana es un <em>estimador robusto</em>, no se deja arrastrar por un valor atípico. Si una sucursal cargó un cero de más, el promedio se dispara pero la mediana no se mueve. Además descartamos precios nulos o cero (errores de carga).</p>
 
-    <h3>4. La canasta: comparar peras con peras</h3>
-    <p>Para que la comparación entre cadenas sea justa, la canasta es la <strong>intersección exacta de productos</strong>: nos quedamos solo con los artículos que tienen <strong>el mismo código de barras (EAN)</strong> en las tres cadenas. Así comparamos el mismo producto —misma marca, mismo tamaño—, no productos “parecidos”. Hoy la canasta tiene <span id="m-canasta">—</span> productos.</p>
+    <h3>5. La canasta: fija, comparable y dinámica</h3>
+    <p>Para que la comparación entre cadenas sea justa, la canasta es la <strong>intersección exacta de productos</strong>: solo los artículos con el <strong>mismo código de barras (EAN)</strong> en todas las cadenas. Comparamos el mismo producto —misma marca, mismo tamaño—, nunca “parecidos”. Hoy la canasta tiene <span id="m-canasta">—</span> productos.</p>
+    <p><strong>La canasta no es eterna: se renueva.</strong> Los productos entran y salen del mercado, así que en cada período recalculamos qué EAN están presentes en todas las cadenas. Para medir la inflación sin que ese recambio genere saltos falsos usamos un <strong>índice encadenado</strong>: la variación de cada tramo se calcula solo sobre los productos comunes entre ese período y el anterior, y luego se “encadenan” esas variaciones. Así la serie es continua aunque la canasta cambie. En la pestaña Evolución se ve cuántos productos se mantienen de un período al siguiente.</p>
 
-    <h3>5. La variación de precios: índice de Jevons</h3>
-    <p>Para medir cuánto cambiaron los precios entre dos fechas usamos el <strong>índice de Jevons</strong>, el estándar internacional para datos masivos de precios (<em>scanner data</em>). En vez de promediar los precios, promedia los <em>cambios</em> de precio de cada producto de forma geométrica:</p>
+    <h3>6. El índice de variación: fórmula de Jevons</h3>
+    <p>Para medir cuánto cambiaron los precios entre dos fechas usamos el <strong>índice de Jevons</strong>: la media geométrica de los relativos de precio.</p>
     <div class="formula">variación = media geométrica de (precio&nbsp;hoy ÷ precio&nbsp;antes), sobre cada par cadena-producto</div>
-    <p>Se usa la media geométrica porque trata igual a subas y bajas (un +50% y un −33% se cancelan, como debe ser) y no necesita saber cuánto consume cada hogar de cada producto —un dato que no tenemos—. <strong>Importante:</strong> esto <em>no es el IPC</em>. El IPC mide el costo de vida de un hogar típico con una canasta ponderada por consumo; nosotros medimos la variación del precio de lista de una canasta fija de góndola.</p>
-
-    <h3>6. Precios de las tiendas online</h3>
-    <p>Aparte de SEPA, consultamos las <strong>páginas web</strong> de cada cadena para ver si el precio que declaran al Estado coincide con el que cobran online. Buscamos cada producto por su código de barras en la tienda de cada cadena. En <strong>Carrefour</strong> el precio se geolocaliza en Tucumán; <strong>Vea</strong> y <strong>Jumbo</strong> (grupo Cencosud) publican un precio online único, así que ahí comparamos web nacional contra SEPA-Tucumán. Es un <strong>contraste sobre una muestra</strong> de la canasta, no sobre todos los productos.</p>
+    <p>Es un <strong>índice elemental</strong> (sin ponderar): trata a todos los productos por igual. Se elige la media geométrica y no la aritmética por dos razones técnicas: es <strong>simétrica</strong> (un +50% seguido de un −33% vuelve al punto de partida) y es la forma consistente cuando no se conocen las cantidades consumidas.</p>
+    <p><strong>¿Por qué no Laspeyres o Paasche?</strong> Esos índices —los que usa un IPC— ponderan cada producto por las cantidades que compra un hogar, y para eso hace falta una encuesta de gasto que no existe a nivel de supermercado tucumano. Jevons es justamente el estándar internacional recomendado por el Manual del IPC (OIT/FMI) para el “nivel elemental”: muchos precios, sin ponderaciones —el caso de los datos de <em>scanner</em>.</p>
+    <p style="margin-top:12px"><strong>Otras fuentes.</strong> Este índice usa exclusivamente SEPA. Para lo que cobran las tiendas online está el <a href="web.html">IPS Web</a>, y para el contraste entre lo declarado y lo cobrado, la <a href="comparacion.html">comparación</a>.</p>
 
     <h3>7. Qué cadenas entran (y por qué faltan otras)</h3>
     <p>El índice cubre <strong>Carrefour, Vea y Jumbo</strong>, las únicas con catálogo completo informado para Tucumán. Revisando el propio SEPA surge un dato llamativo sobre el cumplimiento: varias cadenas grandes que operan en la provincia <strong>no aparecen bien reportadas</strong>.</p>
@@ -279,22 +291,29 @@
 
     <h3>8. Limitaciones honestas</h3>
     <ul>
-      <li>Son <strong>precios de lista</strong>: no incluyen descuentos por medio de pago, días de la semana ni programas de fidelización.</li>
-      <li>Cubren solo cadenas obligadas a reportar a SEPA; quedan afuera los comercios de cercanía y mayoristas.</li>
-      <li>La calidad depende de lo que cada cadena carga: un dato mal informado por la cadena entra tal cual (mitigamos con la mediana y comparando solo EAN idénticos).</li>
-      <li>El contraste con la web es una muestra, no un censo de todos los productos.</li>
+      <li>Son <strong>precios de lista</strong>: no incluyen descuentos por medio de pago, días promocionales ni programas de fidelización. El precio efectivo que paga el consumidor puede ser menor.</li>
+      <li>Cubren solo cadenas obligadas a reportar a SEPA; quedan afuera comercios de cercanía, autoservicios de barrio y mayoristas, que también pesan en el gasto real.</li>
+      <li>Es un índice <strong>sin ponderar</strong>: cada producto pesa lo mismo, aunque un hogar compre mucha más leche que, digamos, aceitunas. Por eso no es directamente comparable con el IPC.</li>
+      <li>La calidad depende de lo que cada cadena carga: un dato mal informado entra tal cual. Lo mitigamos con la mediana, descartando ceros y comparando solo EAN idénticos, pero no podemos corregir errores sistemáticos de una cadena.</li>
+      <li>La canasta cubre almacén, bebidas, limpieza y perfumería; no incluye <strong>frescos a granel</strong> (carne, frutas, verduras), que no tienen código de barras estable.</li>
     </ul>
 
-    <h3>9. Glosario</h3>
+    <h3>9. Cómo interpretar los números</h3>
+    <p>Una variación del índice indica cómo se mueve el <em>precio de góndola</em> de esta canasta en Tucumán, en tiempo casi real. Si sube 4% en una semana, significa que la canasta fija cuesta 4% más — no que la inflación de un hogar fue 4% (eso depende de qué y cuánto consume cada uno). Pensalo como un <strong>termómetro adelantado y local</strong>, complementario y no sustituto del IPC del INDEC, que es más amplio, ponderado y de frecuencia mensual. Su valor está en la <strong>frecuencia</strong> (casi diaria), el <strong>recorte geográfico</strong> (Tucumán) y la <strong>transparencia</strong> (todo verificable).</p>
+
+    <h3>10. Glosario</h3>
     <div class="gloss">
       <div><dt>EAN</dt><dd>Código de barras del producto. Garantiza que comparamos exactamente el mismo artículo entre cadenas.</dd></div>
       <div><dt>Canasta</dt><dd>Conjunto fijo de productos idénticos presentes en las tres cadenas, que seguimos en el tiempo.</dd></div>
       <div><dt>Mediana</dt><dd>El valor del medio de un conjunto. Más robusta que el promedio ante valores atípicos.</dd></div>
-      <div><dt>Índice de Jevons</dt><dd>Media geométrica de los cambios de precio. Estándar para medir inflación con muchos precios.</dd></div>
+      <div><dt>Índice de Jevons</dt><dd>Media geométrica de los cambios de precio. Estándar para medir inflación con muchos precios sin ponderar.</dd></div>
+      <div><dt>Índice elemental</dt><dd>Índice de precios en el que todos los productos pesan lo mismo (no ponderado por consumo).</dd></div>
+      <div><dt>Índice encadenado</dt><dd>Se calcula la variación de cada tramo sobre los productos comunes y se enlazan; permite una canasta que cambia sin romper la serie.</dd></div>
       <div><dt>Brecha</dt><dd>Cuántas veces más caro está un producto en la cadena más cara respecto de la más barata.</dd></div>
+      <div><dt>IPC</dt><dd>Índice de Precios al Consumidor (INDEC): mide el costo de vida de un hogar con canasta ponderada. Más amplio que el IPS.</dd></div>
     </div>
 
-    <h3>10. Reproducibilidad y actualización</h3>
+    <h3>11. Reproducibilidad y actualización</h3>
     <p id="metodo-detalle"></p>
     <p>El procesamiento parte de <strong>fuentes públicas</strong> con una metodología transparente: los mismos datos y pasos producen los mismos números. El relevamiento se actualiza a diario para construir una serie histórica.</p>
   </section>
@@ -303,7 +322,7 @@
 <footer>
   <div class="wrap">
     <div style="margin-bottom:8px"><a href="https://x.com/ciettucuman" target="_blank" rel="noopener">𝕏 @ciettucuman</a> · <a href="mailto:ciet.tucuman@gmail.com">ciet.tucuman@gmail.com</a></div>
-    CIET — Centro de Investigación Económica de Tucumán · Datos: <a href="https://datos.produccion.gob.ar/dataset/sepa-precios" target="_blank" rel="noopener">SEPA</a> (CC-BY 4.0) y tiendas online · Elaboración propia. Uso libre citando la fuente.
+    CIET — Centro de Investigación Económica de Tucumán · Datos: <a href="https://datos.produccion.gob.ar/dataset/sepa-precios" target="_blank" rel="noopener">SEPA</a> (Secretaría de Comercio, CC-BY 4.0) · Elaboración propia. Uso libre citando la fuente.
   </div>
 </footer>
 

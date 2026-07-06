@@ -100,6 +100,15 @@ def region_id(dom):
     return d[0].get("id") if isinstance(d, list) and d else None
 
 
+def limpiar_nombre(n):
+    """Nombre legible: colapsa espacios y baja el TODO-MAYÚSCULAS a Título."""
+    n = " ".join((n or "").split())
+    letras = [c for c in n if c.isalpha()]
+    if letras and sum(c.isupper() for c in letras) / len(letras) > 0.75:
+        n = n.title()
+    return n[:90]
+
+
 def productos_termino(dom, termino, region, tope):
     out, frm = [], 0
     ft = urllib.parse.quote(termino)
@@ -114,16 +123,25 @@ def productos_termino(dom, termino, region, tope):
         for p in d:
             try:
                 item = p["items"][0]
-                precio = item["sellers"][0]["commertialOffer"].get("Price")
-                if not precio or precio < 100:  # descarta precios basura (errores de carga)
+                o = item["sellers"][0]["commertialOffer"]
+                precio = o.get("Price")
+                # sólo productos realmente comprables (como los ve un humano)
+                disponible = o.get("IsAvailable") and (o.get("AvailableQuantity") or 0) > 0
+                if not precio or precio < 100 or not disponible:
                     continue
-                out.append({
-                    "n": p.get("productName", "")[:90],
+                prod = {
+                    "n": limpiar_nombre(p.get("productName", "")),
                     "m": (p.get("brand") or "")[:28],
                     "e": item.get("ean") or "",
                     "p": round(precio, 2),
                     "l": p.get("link") or "",
-                })
+                    "i": (item.get("images") or [{}])[0].get("imageUrl") or "",
+                }
+                # oferta: precio de lista mayor, pero con descuento realista (<=60%)
+                lista = o.get("ListPrice") or 0
+                if precio * 1.03 < lista <= precio * 2.5:
+                    prod["op"] = round(lista, 2)
+                out.append(prod)
             except Exception:
                 continue
         if len(d) < 50:
@@ -139,31 +157,45 @@ def main():
     ap.add_argument("-o", "--salida", default="data/buscador.json")
     args = ap.parse_args()
 
-    cadenas_meta, productos = {}, []
+    # agrupar por producto: clave = código de barras (o link si no tiene).
+    # cada grupo junta el precio de todas las cadenas que lo tienen.
+    grupos = {}
+    geoloc = {}
     for nombre, dom in TIENDAS.items():
         region = region_id(dom)
+        geoloc[nombre] = bool(region)
         print(f"{nombre}: geoloc={'sí' if region else 'no'}", file=sys.stderr)
-        vistos, n0 = set(), len(productos)
+        cuenta = 0
         for i, term in enumerate(TERMINOS, 1):
             for pr in productos_termino(dom, term, region, args.tope):
                 clave = pr["e"] or pr["l"]
-                if not clave or clave in vistos:
+                if not clave:
                     continue
-                vistos.add(clave)
-                pr["c"] = nombre
-                productos.append(pr)
+                g = grupos.get(clave)
+                if g is None:
+                    g = grupos[clave] = {"n": pr["n"], "m": pr["m"], "i": pr.get("i", ""), "pr": {}}
+                if not g["i"] and pr.get("i"):
+                    g["i"] = pr["i"]
+                oferta = [pr["p"], pr["l"]]
+                if "op" in pr:
+                    oferta.append(pr["op"])
+                g["pr"][nombre] = oferta
             if i % 30 == 0:
-                print(f"  {nombre}: {i}/{len(TERMINOS)} términos · {len(productos)-n0} productos",
-                      file=sys.stderr)
-        cadenas_meta[nombre] = {"geolocalizado": bool(region), "productos": len(productos) - n0}
-        print(f"  {nombre}: {len(productos)-n0} productos", file=sys.stderr)
+                cuenta = sum(1 for gg in grupos.values() if nombre in gg["pr"])
+                print(f"  {nombre}: {i}/{len(TERMINOS)} términos · {cuenta} productos", file=sys.stderr)
+        cuenta = sum(1 for gg in grupos.values() if nombre in gg["pr"])
+        print(f"  {nombre}: {cuenta} productos", file=sys.stderr)
 
-    for p in productos:  # el EAN sólo servía para deduplicar; no va al archivo final
-        p.pop("e", None)
+    cadenas_meta = {n: {"geolocalizado": geoloc[n],
+                        "productos": sum(1 for g in grupos.values() if n in g["pr"])}
+                    for n in TIENDAS}
+    productos = [{"n": g["n"], "m": g["m"], "i": g["i"], "pr": g["pr"]} for g in grupos.values()]
+    en_varias = sum(1 for g in grupos.values() if len(g["pr"]) > 1)
     out = {
         "fecha": time.strftime("%Y-%m-%d"),
         "cadenas": cadenas_meta,
         "total": len(productos),
+        "en_varias_cadenas": en_varias,
         "productos": productos,
     }
     Path(args.salida).write_text(

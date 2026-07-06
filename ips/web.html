@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>IPS Web — precios de las tiendas online | CIET</title>
+<link rel="icon" type="image/svg+xml" href="/ciet/favicon.svg">
 <meta name="description" content="Índice de Precios de Supermercados de Tucumán a partir de las tiendas online: Carrefour, Vea, Jumbo, Comodín y ChangoMás.">
 <style>
   :root {
@@ -123,6 +124,11 @@
       <div class="chart"><div id="chart-costo"></div>
         <p class="chart-note">Sobreprecio de cada cadena respecto de la más barata, valuando la misma canasta online en todas.</p>
       </div>
+
+      <h2 class="sec">¿Quién tiene el precio más bajo, producto por producto?</h2>
+      <div class="chart"><div id="chart-barato"></div>
+        <p class="chart-note">De la canasta común, en qué porcentaje de productos cada cadena ofrece el precio más bajo (o empata). Suman más de 100% porque muchos productos cuestan lo mismo en dos cadenas.</p>
+      </div>
     </section>
 
     <section class="panel-tab" id="tab-cadenas">
@@ -194,6 +200,22 @@ fetch('../data/web_index.json').then(r => { if (!r.ok) throw new Error('nofile')
     const w = esMin ? 100 : Math.max((prem / maxPrem) * 100, 3);
     const val = esMin ? '<span class="val" style="color:var(--down)">más barata</span>' : `<span class="val">+${(prem * 100).toFixed(1)}%</span>`;
     return `<div class="bar-row"><span class="lbl">${c.cadena}</span><span class="track"><span class="fill ${esMin ? 'best' : ''}" style="width:${w}%"></span></span>${val}</div>`;
+  }).join('');
+
+  // chart "quién es más barato" (calculado producto por producto)
+  const nombresP = principales.map(c => c.cadena);
+  const cuenta = {}; nombresP.forEach(n => cuenta[n] = 0);
+  for (const p of PROD) {
+    const vals = nombresP.map(n => p.precios[n]).filter(v => v != null);
+    if (!vals.length) continue;
+    const piso = Math.min(...vals);
+    for (const n of nombresP) if (p.precios[n] != null && Math.abs(p.precios[n] - piso) < 0.01) cuenta[n]++;
+  }
+  const mb = nombresP.map(n => ({ cadena: n, n: cuenta[n] })).sort((a, b) => b.n - a.n);
+  const maxMb = Math.max(...mb.map(x => x.n), 1);
+  $('chart-barato').innerHTML = mb.map(x => {
+    const w = Math.max((x.n / maxMb) * 100, 3), p = Math.round((x.n / PROD.length) * 100);
+    return `<div class="bar-row"><span class="lbl">${x.cadena}</span><span class="track"><span class="fill" style="width:${w}%"></span></span><span class="val">${p}%</span></div>`;
   }).join('');
 
   // cadenas cards
