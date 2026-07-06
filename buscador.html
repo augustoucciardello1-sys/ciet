@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Buscador de precios online de Tucumán | CIET</title>
+<link rel="icon" type="image/svg+xml" href="/ciet/favicon.svg">
 <meta name="description" content="Buscá un producto y encontrá dónde comprarlo más barato online en los supermercados de Tucumán: Carrefour, Vea, Jumbo, Comodín y ChangoMás.">
 <style>
   :root {
@@ -12,39 +13,48 @@
   }
   * { box-sizing:border-box; margin:0; padding:0; }
   body { background:var(--bg); color:var(--text); font-family:"Segoe UI",-apple-system,Roboto,Arial,sans-serif; line-height:1.5; -webkit-font-smoothing:antialiased; }
-  .wrap { max-width:820px; margin:0 auto; padding:0 20px; }
+  .wrap { max-width:860px; margin:0 auto; padding:0 18px; }
   a { color:var(--blue); }
   .topbar { border-bottom:2px solid var(--navy); }
-  .topbar .inner { max-width:820px; margin:0 auto; padding:14px 20px; display:flex; align-items:center; gap:12px; }
+  .topbar .inner { max-width:860px; margin:0 auto; padding:14px 18px; display:flex; align-items:center; gap:12px; }
   .mark { width:38px; height:38px; flex-shrink:0; display:block; }
   .brand-t { font-weight:700; color:var(--navy); font-size:.92rem; }
   .brand-s { font-size:.74rem; color:var(--muted); }
   .brand-s a { text-decoration:none; }
-  header.page { padding:28px 0 8px; }
-  header.page h1 { font-size:1.7rem; font-weight:800; color:var(--navy); }
-  header.page p { color:var(--muted); font-size:.95rem; margin-top:8px; }
-  .searchbox { position:sticky; top:0; background:var(--bg); padding:16px 0 12px; z-index:5; }
-  #q { width:100%; border:2px solid var(--navy); border-radius:10px; padding:15px 16px; font-size:1.1rem; color:var(--text); }
+  header.page { padding:26px 0 6px; }
+  header.page h1 { font-size:1.6rem; font-weight:800; color:var(--navy); }
+  header.page p { color:var(--muted); font-size:.92rem; margin-top:8px; }
+  .searchbox { position:sticky; top:0; background:var(--bg); padding:14px 0 12px; z-index:5; border-bottom:1px solid var(--border); }
+  #q { width:100%; border:2px solid var(--navy); border-radius:10px; padding:14px 16px; font-size:1.1rem; color:var(--text); }
   #q:focus { outline:none; border-color:var(--blue); }
-  .filtros { display:flex; flex-wrap:wrap; gap:8px; margin-top:10px; align-items:center; }
-  .chip { font-size:.78rem; padding:6px 12px; border-radius:20px; border:1px solid var(--border); background:#fff; color:var(--muted); cursor:pointer; user-select:none; }
+  .filtros { display:flex; flex-wrap:wrap; gap:7px; margin-top:10px; }
+  .chip { font-size:.76rem; padding:5px 11px; border-radius:20px; border:1px solid var(--border); background:#fff; color:var(--muted); cursor:pointer; user-select:none; }
   .chip.on { background:var(--navy); color:#fff; border-color:var(--navy); }
-  .meta { font-size:.8rem; color:var(--muted); margin:4px 0 12px; }
-  .res { display:flex; align-items:center; gap:12px; border:1px solid var(--border); border-radius:10px; padding:12px 14px; margin-bottom:8px; }
-  .res .cad { flex-shrink:0; font-size:.66rem; font-weight:700; text-transform:uppercase; letter-spacing:.03em; padding:4px 8px; border-radius:6px; background:var(--blue-soft); color:var(--blue); width:74px; text-align:center; }
-  .res .info { flex:1; min-width:0; }
-  .res .n { font-size:.92rem; color:var(--text); }
-  .res .m { font-size:.75rem; color:var(--muted); }
-  .res .precio { flex-shrink:0; font-size:1.1rem; font-weight:800; color:var(--navy); font-variant-numeric:tabular-nums; text-align:right; }
-  .res .precio.min { color:var(--down); }
-  .res .buy { flex-shrink:0; }
-  .res .buy a { font-size:.8rem; font-weight:700; text-decoration:none; white-space:nowrap; }
-  .best-tag { font-size:.6rem; color:var(--down); font-weight:700; display:block; }
+  .meta { font-size:.8rem; color:var(--muted); margin:12px 0; }
   .estado { color:var(--muted); padding:26px 0; text-align:center; }
   .ej { font-size:.82rem; color:var(--muted); margin-top:8px; }
   .ej a { cursor:pointer; }
-  footer { border-top:1px solid var(--border); margin-top:36px; }
-  footer .wrap { padding:20px; color:var(--muted); font-size:.77rem; }
+
+  .pcard { display:flex; gap:14px; border:1px solid var(--border); border-radius:12px; padding:12px 14px; margin-bottom:10px; }
+  .pcard .foto { width:72px; height:72px; flex-shrink:0; border:1px solid var(--border); border-radius:8px; background:#fff; display:flex; align-items:center; justify-content:center; overflow:hidden; }
+  .pcard .foto img { max-width:100%; max-height:100%; object-fit:contain; }
+  .pcard .foto.sinfoto { color:var(--muted); font-size:.6rem; text-align:center; }
+  .pcard .cuerpo { flex:1; min-width:0; }
+  .pcard .pn { font-size:.98rem; font-weight:600; color:var(--text); }
+  .pcard .pm { font-size:.76rem; color:var(--muted); margin-bottom:8px; }
+  .precios { display:flex; flex-wrap:wrap; gap:7px; }
+  .ch { display:flex; flex-direction:column; align-items:flex-start; border:1px solid var(--border); border-radius:8px; padding:5px 10px; text-decoration:none; min-width:96px; }
+  .ch:hover { border-color:var(--blue); }
+  .ch.min { border-color:var(--down); background:#f0f8f3; }
+  .ch .chn { font-size:.64rem; text-transform:uppercase; letter-spacing:.03em; color:var(--muted); font-weight:700; }
+  .ch .chp { font-size:1rem; font-weight:800; color:var(--navy); font-variant-numeric:tabular-nums; }
+  .ch.min .chp { color:var(--down); }
+  .ch .best { font-size:.56rem; color:var(--down); font-weight:800; }
+  .ch .off { font-size:.55rem; background:#fdeee4; color:#b3261e; font-weight:800; padding:0 4px; border-radius:3px; }
+  .ch .tacha { font-size:.62rem; color:var(--muted); text-decoration:line-through; }
+
+  footer { border-top:1px solid var(--border); margin-top:32px; }
+  footer .wrap { padding:20px 18px; color:var(--muted); font-size:.77rem; }
 </style>
 </head>
 <body>
@@ -68,7 +78,7 @@
 <div class="wrap">
   <header class="page">
     <h1>¿Dónde está más barato en Tucumán?</h1>
-    <p>Buscá un producto y mirá el precio en las tiendas online de los supermercados de Tucumán, ordenado de más barato a más caro. Con el link para comprarlo.</p>
+    <p>Buscá un producto y compará el precio en las tiendas online de los supermercados de Tucumán. Cada producto muestra su precio en cada cadena, con el más barato marcado y el link para comprarlo.</p>
   </header>
 
   <div class="searchbox">
@@ -85,7 +95,7 @@
 <footer>
   <div class="wrap">
     <div style="margin-bottom:8px"><a href="https://x.com/ciettucuman" target="_blank" rel="noopener">𝕏 @ciettucuman</a> · <a href="mailto:ciet.tucuman@gmail.com">ciet.tucuman@gmail.com</a></div>
-    CIET · Precios de las tiendas online, relevados a diario. Pueden diferir del precio en el local. No incluye descuentos por medio de pago.
+    CIET · Precios de las tiendas online, actualizados a diario. Pueden diferir del precio en el local. No incluye descuentos por medio de pago. En Carrefour, Comodín y ChangoMás el precio es de Tucumán; Vea y Jumbo publican precio online general.
   </div>
 </footer>
 
@@ -93,29 +103,31 @@
 const $ = id => document.getElementById(id);
 const peso = v => '$' + Math.round(v).toLocaleString('es-AR');
 const norm = s => (s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
-const CAD_COLOR = { 'Carrefour':'#e8f0fb', 'Vea':'#eaf2fb', 'Jumbo':'#eaf2fb', 'Comodín':'#e4f3ec', 'ChangoMás':'#fdeee4' };
 
-let DATA = [], INDEX = [], cadenasActivas = new Set(), timer = null;
+let DATA = [], cadenasActivas = new Set(), timer = null;
 
-fetch('data/buscador.json').then(r => { if (!r.ok) throw new Error('nofile'); return r.json(); }).then(d => {
-  DATA = d.productos;
-  INDEX = DATA.map(p => norm(p.n + ' ' + p.m));
-  const cadenas = Object.keys(d.cadenas);
-  cadenasActivas = new Set(cadenas);
-  $('estado').style.display = 'none';
-  $('meta').textContent = `${d.total.toLocaleString('es-AR')} productos de ${cadenas.length} cadenas · datos al ${new Date(d.fecha + 'T12:00:00').toLocaleDateString('es-AR', { day:'numeric', month:'long', year:'numeric' })}`;
-  $('filtros').innerHTML = cadenas.map(c => `<span class="chip on" data-c="${c}">${c}</span>`).join('');
-  $('filtros').addEventListener('click', e => {
-    const ch = e.target.closest('.chip'); if (!ch) return;
-    const c = ch.dataset.c;
-    if (cadenasActivas.has(c)) { cadenasActivas.delete(c); ch.classList.remove('on'); }
-    else { cadenasActivas.add(c); ch.classList.add('on'); }
-    buscar();
-  });
-  $('q').addEventListener('input', () => { clearTimeout(timer); timer = setTimeout(buscar, 180); });
-  $('ejemplos').innerHTML = 'Probá: ' + ['aceite girasol','leche','yerba','coca cola','shampoo','arroz'].map(t => `<a onclick="setBusqueda('${t}')">${t}</a>`).join(' · ');
-  $('q').focus();
-}).catch(() => { $('estado').textContent = 'El buscador se está preparando. Vuelve pronto.'; });
+fetch('https://raw.githubusercontent.com/cietucuman/ciet/datos/buscador.json')
+  .then(r => { if (!r.ok) throw new Error('nofile'); return r.json(); })
+  .then(d => {
+    DATA = d.productos;
+    DATA.forEach(p => p._idx = norm(p.n + ' ' + (p.m || '')));
+    const cadenas = Object.keys(d.cadenas);
+    cadenasActivas = new Set(cadenas);
+    $('estado').style.display = 'none';
+    $('meta').textContent = `${d.total.toLocaleString('es-AR')} productos · ${(d.en_varias_cadenas || 0).toLocaleString('es-AR')} comparables entre cadenas · datos al ${new Date(d.fecha + 'T12:00:00').toLocaleDateString('es-AR', { day:'numeric', month:'long', year:'numeric' })}`;
+    $('filtros').innerHTML = cadenas.map(c => `<span class="chip on" data-c="${c}">${c}</span>`).join('');
+    $('filtros').addEventListener('click', e => {
+      const ch = e.target.closest('.chip'); if (!ch) return;
+      const c = ch.dataset.c;
+      if (cadenasActivas.has(c)) { cadenasActivas.delete(c); ch.classList.remove('on'); }
+      else { cadenasActivas.add(c); ch.classList.add('on'); }
+      buscar();
+    });
+    $('q').addEventListener('input', () => { clearTimeout(timer); timer = setTimeout(buscar, 160); });
+    $('ejemplos').innerHTML = 'Probá: ' + ['aceite girasol','leche','yerba','coca cola','shampoo','arroz'].map(t => `<a onclick="setBusqueda('${t}')">${t}</a>`).join(' · ');
+    $('q').focus();
+  })
+  .catch(() => { $('estado').textContent = 'El buscador se está preparando. Vuelve pronto.'; });
 
 window.setBusqueda = t => { $('q').value = t; buscar(); };
 
@@ -125,27 +137,28 @@ function buscar() {
   if (q.length < 2) { cont.innerHTML = ''; $('meta').style.display = 'block'; return; }
   const toks = q.split(/\s+/);
   const res = [];
-  for (let i = 0; i < DATA.length; i++) {
-    if (!cadenasActivas.has(DATA[i].c)) continue;
-    const txt = INDEX[i];
-    let ok = true;
-    for (const t of toks) if (!txt.includes(t)) { ok = false; break; }
-    if (ok) res.push(DATA[i]);
+  for (const p of DATA) {
+    if (!toks.every(t => p._idx.includes(t))) continue;
+    const entradas = Object.entries(p.pr).filter(([c]) => cadenasActivas.has(c));
+    if (!entradas.length) continue;
+    const min = Math.min(...entradas.map(([, o]) => o[0]));
+    res.push({ p, entradas, min });
   }
-  res.sort((a, b) => a.p - b.p);
-  const min = res.length ? res[0].p : 0;
-  cont.innerHTML = res.slice(0, 120).map((p, i) => {
-    const bg = CAD_COLOR[p.c] || 'var(--blue-soft)';
-    const esMin = i === 0;
-    return `<div class="res">
-      <span class="cad" style="background:${bg};color:var(--navy)">${p.c}</span>
-      <div class="info"><div class="n">${p.n}</div><div class="m">${p.m || ''}</div></div>
-      <div class="precio ${esMin ? 'min' : ''}">${peso(p.p)}${esMin ? '<span class="best-tag">más barato</span>' : ''}</div>
-      <div class="buy">${p.l ? `<a href="${p.l}" target="_blank" rel="noopener">Comprar →</a>` : ''}</div>
-    </div>`;
+  res.sort((a, b) => a.min - b.min);
+  cont.innerHTML = res.slice(0, 60).map(({ p, entradas, min }) => {
+    const precios = entradas.sort((a, b) => a[1][0] - b[1][0]).map(([c, o]) => {
+      const esMin = o[0] === min;
+      const oferta = o[2] ? `<span class="tacha">${peso(o[2])}</span> <span class="off">OFERTA</span>` : '';
+      return `<a class="ch ${esMin ? 'min' : ''}" href="${o[1]}" target="_blank" rel="noopener">
+        <span class="chn">${c}</span>
+        <span class="chp">${peso(o[0])}</span>
+        ${esMin ? '<span class="best">más barato</span>' : ''}${oferta}</a>`;
+    }).join('');
+    const foto = p.i ? `<div class="foto"><img src="${p.i}" loading="lazy" onerror="this.parentNode.classList.add('sinfoto');this.remove();"></div>` : '<div class="foto sinfoto">sin foto</div>';
+    return `<div class="pcard">${foto}<div class="cuerpo"><div class="pn">${p.n}</div><div class="pm">${p.m || ''}</div><div class="precios">${precios}</div></div></div>`;
   }).join('') || '<div class="estado">Sin resultados. Probá con otra palabra.</div>';
   $('meta').style.display = 'none';
-  if (res.length > 120) cont.innerHTML += `<div class="estado">Mostrando los 120 más baratos de ${res.length.toLocaleString('es-AR')} resultados.</div>`;
+  if (res.length > 60) cont.innerHTML += `<div class="estado">Mostrando 60 de ${res.length.toLocaleString('es-AR')} resultados. Afiná la búsqueda.</div>`;
 }
 </script>
 </body>

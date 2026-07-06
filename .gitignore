@@ -3,3 +3,4 @@
 sepa/
 scripts/__pycache__/
 .DS_Store
+data/buscador.json
