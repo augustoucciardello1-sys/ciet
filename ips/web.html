@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IPS Web — precios de las tiendas online | CIET</title>
+<meta name="description" content="Índice de Precios de Supermercados de Tucumán a partir de las tiendas online: Carrefour, Vea, Jumbo, Comodín y ChangoMás.">
+<style>
+  :root {
+    --bg:#fff; --surface:#f6f8fb; --border:#e3e9f1; --navy:#0b3d68; --blue:#1c6fb8;
+    --blue-soft:#eaf2fb; --text:#17232f; --muted:#5d6b7a; --up:#b3261e; --down:#12795a;
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:var(--bg); color:var(--text); font-family:"Segoe UI",-apple-system,Roboto,Arial,sans-serif; line-height:1.55; -webkit-font-smoothing:antialiased; }
+  .wrap { max-width:900px; margin:0 auto; padding:0 24px; }
+  a { color:var(--blue); }
+  .topbar { border-bottom:2px solid var(--navy); }
+  .topbar .inner { max-width:900px; margin:0 auto; padding:14px 24px; display:flex; align-items:center; gap:12px; }
+  .mark { width:38px; height:38px; flex-shrink:0; display:block; }
+  .brand-t { font-weight:700; color:var(--navy); font-size:.92rem; }
+  .brand-s { font-size:.74rem; color:var(--muted); }
+  .brand-s a { text-decoration:none; }
+  header.page { padding:30px 0 8px; }
+  header.page .kicker { font-size:.74rem; text-transform:uppercase; letter-spacing:.12em; color:var(--blue); font-weight:700; }
+  header.page h1 { font-size:1.6rem; font-weight:800; color:var(--navy); margin-top:6px; }
+  header.page .src { font-size:.84rem; color:var(--muted); margin-top:8px; }
+  .tabs { display:flex; flex-wrap:wrap; gap:2px; border-bottom:1px solid var(--border); margin:20px 0 24px; }
+  .tab { padding:11px 16px; font-size:.9rem; font-weight:600; color:var(--muted); background:none; border:none; border-bottom:3px solid transparent; cursor:pointer; }
+  .tab:hover { color:var(--navy); }
+  .tab.active { color:var(--navy); border-bottom-color:var(--blue); }
+  .panel-tab { display:none; } .panel-tab.active { display:block; }
+  .headline { border:1px solid var(--border); border-radius:8px; padding:24px; background:var(--surface); }
+  .headline .lbl { font-size:.72rem; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); }
+  .headline .big { font-size:2rem; font-weight:800; color:var(--navy); margin-top:4px; }
+  .headline .what { color:var(--muted); font-size:.9rem; margin-top:8px; max-width:560px; }
+  h2.sec { font-size:.78rem; text-transform:uppercase; letter-spacing:.1em; color:var(--blue); font-weight:700; margin:28px 0 12px; }
+  .note { font-size:.84rem; color:var(--muted); margin-bottom:12px; }
+  .cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:14px; }
+  .card { border:1px solid var(--border); border-radius:8px; padding:18px; }
+  .card.best { border-color:var(--down); border-width:1.5px; }
+  .card.part { background:var(--surface); }
+  .card .tag { font-size:.72rem; color:var(--muted); }
+  .card h4 { font-size:1.05rem; color:var(--navy); margin:4px 0 8px; }
+  .card .precio { font-size:1.4rem; font-weight:800; color:var(--navy); font-variant-numeric:tabular-nums; }
+  .card .meta { font-size:.8rem; color:var(--muted); margin-top:6px; }
+  .badge { display:inline-block; font-size:.66rem; border-radius:12px; padding:2px 9px; margin-top:9px; font-weight:700; }
+  .badge.g { background:#e4f3ec; color:var(--down); }
+  .badge.b { background:var(--blue-soft); color:var(--blue); }
+  .badge.s { background:#eef1f6; color:var(--muted); }
+  .chart { border:1px solid var(--border); border-radius:8px; padding:18px; }
+  .chart-title { font-size:.92rem; font-weight:700; color:var(--navy); margin-bottom:14px; }
+  .chart-note { font-size:.76rem; color:var(--muted); margin-top:12px; }
+  .bar-row { display:flex; align-items:center; gap:8px; margin-bottom:9px; font-size:.8rem; }
+  .bar-row .lbl { width:96px; flex-shrink:0; color:var(--muted); text-align:right; }
+  .bar-row .track { flex:1; background:var(--surface); border:1px solid var(--border); border-radius:4px; overflow:hidden; height:22px; }
+  .bar-row .fill { height:100%; background:var(--blue); border-radius:4px; } .bar-row .fill.best { background:var(--down); }
+  .bar-row .val { flex-shrink:0; min-width:60px; font-weight:700; font-size:.8rem; color:var(--navy); white-space:nowrap; }
+  .controls { display:flex; flex-wrap:wrap; gap:10px; margin:4px 0 12px; }
+  input[type=search] { flex:1; min-width:200px; background:#fff; border:1px solid var(--border); border-radius:6px; padding:10px 12px; font-size:.9rem; }
+  select { background:#fff; border:1px solid var(--border); border-radius:6px; padding:10px 12px; font-size:.85rem; }
+  .count { font-size:.8rem; color:var(--muted); margin-bottom:10px; }
+  .tablewrap { border:1px solid var(--border); border-radius:8px; overflow-x:auto; }
+  table { width:100%; border-collapse:collapse; font-size:.83rem; }
+  th,td { text-align:left; padding:9px 12px; border-bottom:1px solid var(--border); white-space:nowrap; }
+  th { color:var(--muted); font-size:.7rem; text-transform:uppercase; background:var(--surface); }
+  th.num,td.num { text-align:right; font-variant-numeric:tabular-nums; }
+  td.desc { white-space:normal; min-width:200px; }
+  tr:last-child td { border-bottom:none; }
+  td.min { color:var(--down); font-weight:700; } td.max { color:var(--up); }
+  .gap { color:var(--navy); font-weight:700; }
+  .prod-link { text-decoration:none; }
+  .metodo p { font-size:.9rem; margin-bottom:10px; } .metodo p strong { color:var(--navy); }
+  .metodo ul { margin:6px 0 10px 20px; font-size:.9rem; } .metodo li { margin-bottom:6px; }
+  .callout { border:1px solid var(--border); border-left:4px solid var(--blue); border-radius:6px; padding:16px 18px; background:var(--surface); font-size:.9rem; }
+  .loading { color:var(--muted); padding:30px 0; }
+  footer { border-top:1px solid var(--border); margin-top:40px; }
+  footer .wrap { padding:20px 24px; color:var(--muted); font-size:.77rem; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="inner">
+    <a href="../" style="text-decoration:none">
+      <svg class="mark" viewBox="0 0 44 44" role="img" aria-label="CIET Tucumán">
+        <rect x="0" y="0" width="44" height="44" rx="8" fill="#0b3d68"/>
+        <path transform="translate(8.9,5) scale(0.283)" fill="#ffffff" d="M40.3,112.1 L37.8,114.1 L36.8,114.8 L36.0,116.5 L35.2,117.6 L34.7,118.4 L33.8,119.5 L32.4,119.2 L31.6,119.0 L31.0,118.6 L30.8,117.5 L30.3,117.3 L27.7,115.6 L26.3,111.3 L26.2,109.0 L23.2,104.9 L20.9,106.7 L20.5,107.9 L19.8,108.3 L19.4,109.6 L18.1,103.8 L14.0,97.4 L11.2,87.5 L11.7,80.1 L6.9,75.9 L4.7,71.1 L10.7,63.9 L14.8,57.1 L12.0,49.3 L15.6,40.1 L0.5,30.3 L0.0,25.0 L1.3,19.6 L2.9,13.3 L24.9,14.5 L25.3,11.7 L25.6,8.5 L26.4,6.2 L29.1,3.4 L32.1,3.4 L34.8,2.0 L36.7,2.1 L38.3,2.3 L40.2,2.9 L42.3,2.1 L43.4,1.5 L44.0,0.5 L45.0,0.1 L46.2,0.5 L47.4,1.5 L48.0,2.0 L48.5,3.7 L48.9,4.8 L49.2,5.9 L66.1,9.9 L67.9,14.7 L68.3,14.6 L68.7,14.5 L69.4,14.3 L70.0,13.6 L70.8,13.8 L71.6,13.0 L72.2,11.9 L73.8,11.1 L74.7,10.6 L75.9,10.2 L77.2,10.2 L78.1,10.8 L79.1,11.2 L79.9,11.0 L81.2,11.0 L82.0,11.1 L82.8,11.3 L83.6,11.1 L84.1,10.8 L84.8,10.7 L85.4,10.3 L85.7,10.7 L86.5,10.4 L86.9,10.0 L87.8,10.0 L88.5,10.2 L89.1,10.4 L89.5,10.0 L90.4,10.2 L91.4,9.9 L91.9,11.7 L90.3,23.2 L90.7,28.7 L78.3,54.3 L65.6,87.0 L63.0,104.1 L44.5,109.8 L40.3,112.1 Z"/>
+        <circle cx="23.7" cy="18.3" r="1.7" fill="#1c6fb8"/>
+      </svg>
+    </a>
+    <div>
+      <div class="brand-t">Centro de Investigación Económica de Tucumán</div>
+      <div class="brand-s"><a href="../">Inicio</a> · <a href="./">IPS</a> · Fuente Web</div>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+  <header class="page">
+    <div class="kicker"><a href="./" style="color:var(--blue);text-decoration:none">IPS</a> · Fuente: tiendas online</div>
+    <h1>Precios de supermercados en Tucumán — online</h1>
+    <div class="src" id="src">Cargando…</div>
+  </header>
+
+  <div id="loading" class="loading">Cargando índice online…</div>
+  <div id="vacio" style="display:none" class="callout">El índice online se está construyendo. Vuelve pronto.</div>
+
+  <div id="cont" style="display:none">
+    <div class="tabs" id="tabs">
+      <button class="tab active" data-tab="resumen">Resumen</button>
+      <button class="tab" data-tab="cadenas">Cadenas</button>
+      <button class="tab" data-tab="productos">Productos</button>
+      <button class="tab" data-tab="metodo">Metodología</button>
+    </div>
+
+    <section class="panel-tab active" id="tab-resumen">
+      <div class="headline">
+        <div class="lbl">Canasta online más barata</div>
+        <div class="big" id="h-barata">—</div>
+        <div class="what" id="h-detalle"></div>
+      </div>
+      <h2 class="sec">¿Cuál es la cadena más cara online?</h2>
+      <div class="chart"><div id="chart-costo"></div>
+        <p class="chart-note">Sobreprecio de cada cadena respecto de la más barata, valuando la misma canasta online en todas.</p>
+      </div>
+    </section>
+
+    <section class="panel-tab" id="tab-cadenas">
+      <p class="note" id="cadenas-desc"></p>
+      <div class="cards" id="cadenas"></div>
+    </section>
+
+    <section class="panel-tab" id="tab-productos">
+      <div class="controls">
+        <input type="search" id="q" placeholder="Buscar producto…">
+        <select id="orden">
+          <option value="brecha">Ordenar: mayor brecha</option>
+          <option value="max">Mayor precio</option>
+          <option value="min">Menor precio</option>
+          <option value="alfa">Alfabético</option>
+        </select>
+      </div>
+      <div class="count" id="prod-count"></div>
+      <div class="tablewrap"><table id="tabla"><thead></thead><tbody></tbody></table></div>
+    </section>
+
+    <section class="panel-tab metodo" id="tab-metodo">
+      <div class="callout" style="margin-bottom:14px"><strong>En una línea.</strong> Medimos el precio de una canasta de productos idénticos comprando <strong>online</strong> en los supermercados que venden por internet en Tucumán.</div>
+      <p><strong>Fuente.</strong> Las tiendas online de cada cadena (plataforma VTEX): Carrefour, Vea, Jumbo, Comodín y ChangoMás. Se consulta cada producto por su código de barras (EAN).</p>
+      <p><strong>Geolocalización.</strong> En Carrefour, Comodín y ChangoMás el precio se pide para Tucumán (código postal 4000). Vea y Jumbo no exponen la geolocalización, así que ahí es el precio online general (Cencosud).</p>
+      <p><strong>Canasta.</strong> Intersección de productos (mismo EAN) presentes en las cadenas con buena cobertura online. Las cadenas con catálogo online más chico se muestran igual, marcadas como cobertura parcial.</p>
+      <p><strong>Diferencia con el IPS SEPA.</strong> Este índice mide lo que <em>se paga comprando online</em>; el <a href="sepa.html">IPS SEPA</a> mide lo que las cadenas <em>declaran al Estado</em>. La <a href="comparacion.html">comparación</a> muestra cuánto difieren.</p>
+      <p><strong>Limitaciones.</strong> Es un relevamiento sobre una muestra de la canasta, no un censo. Los precios online pueden diferir de los de la sucursal física. No incluye descuentos por medio de pago.</p>
+    </section>
+  </div>
+</div>
+
+<footer>
+  <div class="wrap">
+    <div style="margin-bottom:8px"><a href="https://x.com/ciettucuman" target="_blank" rel="noopener">𝕏 @ciettucuman</a> · <a href="mailto:ciet.tucuman@gmail.com">ciet.tucuman@gmail.com</a></div>
+    CIET — Centro de Investigación Económica de Tucumán · Datos: tiendas online · Elaboración propia.
+  </div>
+</footer>
+
+<script>
+const $ = id => document.getElementById(id);
+const peso = v => '$' + Math.round(v).toLocaleString('es-AR');
+const pct = v => (v > 0 ? '+' : '') + v.toLocaleString('es-AR', { maximumFractionDigits: 1 }) + '%';
+const fechaLarga = iso => new Date(iso + 'T12:00:00').toLocaleDateString('es-AR', { day: 'numeric', month: 'long', year: 'numeric' });
+let D = null, principales = [], minCosto = 0, PROD = [], filtrados = [];
+
+$('tabs').addEventListener('click', e => {
+  const b = e.target.closest('.tab'); if (!b) return;
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t === b));
+  document.querySelectorAll('.panel-tab').forEach(p => p.classList.toggle('active', p.id === 'tab-' + b.dataset.tab));
+});
+
+fetch('../data/web_index.json').then(r => { if (!r.ok) throw new Error('nofile'); return r.json(); }).then(d => {
+  D = d; PROD = d.productos;
+  principales = d.resumen.filter(c => c.en_indice);
+  minCosto = Math.min(...principales.map(c => c.canasta_costo));
+  $('loading').style.display = 'none';
+  $('cont').style.display = 'block';
+  $('src').innerHTML = `${d.fuente} Canasta de ${d.canasta_n} productos comparables, relevada el ${fechaLarga(d.fecha)}.`;
+
+  const barata = principales.slice().sort((a, b) => a.canasta_costo - b.canasta_costo)[0];
+  $('h-barata').textContent = barata.cadena;
+  $('h-detalle').textContent = `Comprando online la misma canasta de ${d.canasta_n} productos, ${barata.cadena} es la más económica de las ${principales.length} cadenas con catálogo completo en Tucumán.`;
+
+  // chart costo
+  const maxPrem = Math.max(...principales.map(c => c.canasta_costo / minCosto - 1));
+  $('chart-costo').innerHTML = principales.slice().sort((a, b) => a.canasta_costo - b.canasta_costo).map(c => {
+    const prem = c.canasta_costo / minCosto - 1, esMin = prem < 1e-9;
+    const w = esMin ? 100 : Math.max((prem / maxPrem) * 100, 3);
+    const val = esMin ? '<span class="val" style="color:var(--down)">más barata</span>' : `<span class="val">+${(prem * 100).toFixed(1)}%</span>`;
+    return `<div class="bar-row"><span class="lbl">${c.cadena}</span><span class="track"><span class="fill ${esMin ? 'best' : ''}" style="width:${w}%"></span></span>${val}</div>`;
+  }).join('');
+
+  // cadenas cards
+  $('cadenas-desc').textContent = `Canasta de ${d.canasta_n} productos idénticos comprados online, al ${fechaLarga(d.fecha)}. Las cadenas con catálogo online más chico aparecen como cobertura parcial.`;
+  $('cadenas').innerHTML = d.resumen.map(c => {
+    const geo = c.geolocalizado ? '<span class="badge b">Precio Tucumán</span>' : '<span class="badge s">Precio online nacional</span>';
+    if (!c.en_indice) return `<div class="card part"><div class="tag">${c.productos_hallados} productos hallados</div><h4>${c.cadena}</h4><div class="precio" style="font-size:1.05rem">cobertura parcial</div><div class="meta">catálogo online chico para la canasta común</div>${geo}</div>`;
+    const rel = c.canasta_costo !== minCosto ? `<div class="meta">canasta <span style="color:var(--up);font-weight:700">${pct((c.canasta_costo / minCosto - 1) * 100)}</span> más cara que la más barata</div>` : '';
+    return `<div class="card ${c.canasta_costo === minCosto ? 'best' : ''}"><div class="tag">${c.productos_hallados} productos · canasta ${d.canasta_n}</div><h4>${c.cadena}</h4><div class="precio">${peso(c.canasta_costo)}</div>${rel}${geo}${c.canasta_costo === minCosto ? '<br><span class="badge g">MÁS BARATA</span>' : ''}</div>`;
+  }).join('');
+
+  // productos
+  const cad = principales.map(c => c.cadena);
+  $('tabla').querySelector('thead').innerHTML = '<tr><th>Producto</th>' + cad.map(c => `<th class="num">${c}</th>`).join('') + '<th class="num">Brecha</th></tr>';
+  $('q').addEventListener('input', aplicar);
+  $('orden').addEventListener('change', aplicar);
+  aplicar();
+}).catch(() => { $('loading').style.display = 'none'; $('vacio').style.display = 'block'; });
+
+function aplicar() {
+  const q = $('q').value.trim().toLowerCase();
+  filtrados = q ? PROD.filter(p => p.descripcion.toLowerCase().includes(q)) : PROD.slice();
+  const cmp = { brecha:(a,b)=>b.brecha-a.brecha, max:(a,b)=>b.max-a.max, min:(a,b)=>a.min-b.min, alfa:(a,b)=>a.descripcion.localeCompare(b.descripcion,'es') }[$('orden').value];
+  filtrados.sort(cmp); pintar();
+}
+function pintar() {
+  const cad = principales.map(c => c.cadena);
+  $('tabla').querySelector('tbody').innerHTML = filtrados.slice(0, 80).map(p => {
+    const celdas = cad.map(c => {
+      const v = p.precios[c], lk = p.links[c];
+      if (v == null) return '<td class="num">—</td>';
+      const cls = v === p.min ? 'num min' : (v === p.max ? 'num max' : 'num');
+      const txt = lk ? `<a class="prod-link" href="${lk}" target="_blank" rel="noopener">${peso(v)}</a>` : peso(v);
+      return `<td class="${cls}">${txt}</td>`;
+    }).join('');
+    return `<tr><td class="desc">${p.descripcion}</td>${celdas}<td class="num"><span class="gap">×${p.brecha.toLocaleString('es-AR',{maximumFractionDigits:1})}</span></td></tr>`;
+  }).join('');
+  $('prod-count').textContent = `${filtrados.length.toLocaleString('es-AR')} productos` + (filtrados.length > 80 ? ' · mostrando 80' : '');
+}
+</script>
+</body>
+</html>
