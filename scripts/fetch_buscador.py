@@ -123,6 +123,41 @@ def region_id(dom):
     return d[0].get("id") if isinstance(d, list) and d else None
 
 
+def post_json(url, body, intentos=2):
+    data = json.dumps(body).encode()
+    for i in range(intentos):
+        try:
+            req = urllib.request.Request(url, data=data, method="POST",
+                                         headers={"User-Agent": UA, "Content-Type": "application/json"})
+            with urllib.request.urlopen(req, timeout=25) as r:
+                return json.load(r)
+        except Exception:
+            if i == intentos - 1:
+                return None
+            time.sleep(0.6)
+    return None
+
+
+def precios_tucuman(dom, region, items):
+    """Precio REAL de entrega en Tucumán vía simulación de checkout (sin login).
+    items: lista de (sku, seller). Devuelve {sku: precio}."""
+    if not region or not items:
+        return {}
+    url = f"https://{dom}/api/checkout/pub/orderForms/simulation?RnbBehavior=0&regionId={urllib.parse.quote(region)}"
+    out = {}
+    for i in range(0, len(items), 40):
+        body = {"items": [{"id": s, "quantity": 1, "seller": v} for s, v in items[i:i + 40]],
+                "country": "ARG", "postalCode": CP}
+        d = post_json(url, body)
+        if d and d.get("items"):
+            for it in d["items"]:
+                sp = it.get("sellingPrice")
+                if sp and it.get("id"):
+                    out[str(it["id"])] = round(sp / 100, 2)
+        time.sleep(0.2)
+    return out
+
+
 def limpiar_nombre(n):
     """Nombre legible: colapsa espacios y baja el TODO-MAYÚSCULAS a Título."""
     n = " ".join((n or "").split())
@@ -159,6 +194,8 @@ def productos_termino(dom, termino, region, tope):
                     "p": round(precio, 2),
                     "l": p.get("link") or "",
                     "i": (item.get("images") or [{}])[0].get("imageUrl") or "",
+                    "sku": item.get("itemId"),
+                    "sel": item["sellers"][0].get("sellerId"),
                 }
                 # oferta: precio de lista mayor, pero con descuento realista (<=60%)
                 lista = o.get("ListPrice") or 0
@@ -188,26 +225,42 @@ def main():
         region = region_id(dom)
         geoloc[nombre] = bool(region)
         print(f"{nombre}: geoloc={'sí' if region else 'no'}", file=sys.stderr)
-        cuenta = 0
+        # 1) juntar los productos de la cadena (dedup por clave)
+        chain = {}
         for i, term in enumerate(TERMINOS, 1):
             for pr in productos_termino(dom, term, region, args.tope):
                 clave = pr["e"] or pr["l"]
-                if not clave:
-                    continue
-                g = grupos.get(clave)
-                if g is None:
-                    g = grupos[clave] = {"n": pr["n"], "m": pr["m"], "i": pr.get("i", ""), "pr": {}}
-                if not g["i"] and pr.get("i"):
-                    g["i"] = pr["i"]
-                oferta = [pr["p"], pr["l"]]
-                if "op" in pr:
-                    oferta.append(pr["op"])
-                g["pr"][nombre] = oferta
+                if clave and clave not in chain:
+                    chain[clave] = pr
             if i % 30 == 0:
-                cuenta = sum(1 for gg in grupos.values() if nombre in gg["pr"])
-                print(f"  {nombre}: {i}/{len(TERMINOS)} términos · {cuenta} productos", file=sys.stderr)
-        cuenta = sum(1 for gg in grupos.values() if nombre in gg["pr"])
-        print(f"  {nombre}: {cuenta} productos", file=sys.stderr)
+                print(f"  {nombre}: {i}/{len(TERMINOS)} términos · {len(chain)} productos", file=sys.stderr)
+        # 2) precio REAL de entrega en Tucumán (simulación de checkout, sin login)
+        if region:
+            porsku = {}
+            for pr in chain.values():
+                if pr.get("sku"):
+                    porsku.setdefault(pr["sku"], (pr["sel"], []))[1].append(pr)
+            items = [(sku, sel) for sku, (sel, _) in porsku.items()]
+            sim = precios_tucuman(dom, region, items)
+            for sku, (_, prs) in porsku.items():
+                if sku in sim:
+                    for pr in prs:
+                        pr["p"] = sim[sku]
+                        pr.pop("op", None)  # el precio simulado ya es el efectivo
+            print(f"  {nombre}: precio Tucumán aplicado a {len(sim)}/{len(items)}", file=sys.stderr)
+        # 3) volcar al agrupado global
+        for pr in chain.values():
+            clave = pr["e"] or pr["l"]
+            g = grupos.get(clave)
+            if g is None:
+                g = grupos[clave] = {"n": pr["n"], "m": pr["m"], "i": pr.get("i", ""), "pr": {}}
+            if not g["i"] and pr.get("i"):
+                g["i"] = pr["i"]
+            oferta = [pr["p"], pr["l"]]
+            if "op" in pr:
+                oferta.append(pr["op"])
+            g["pr"][nombre] = oferta
+        print(f"  {nombre}: {len(chain)} productos", file=sys.stderr)
 
     # 2º agrupado: unir productos idénticos con distinto EAN (por nombre normalizado)
     fusion = {}

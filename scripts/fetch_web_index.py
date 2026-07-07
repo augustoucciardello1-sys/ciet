@@ -73,12 +73,46 @@ def precio_por_ean(dominio, ean, region):
                 (prod.get("items") or [None])[0])
     if not item:
         return None
-    ofertas = [s.get("commertialOffer", {}) for s in item.get("sellers", [])]
-    ofertas = [o for o in ofertas if o.get("Price")]
-    if not ofertas:
+    seller = item["sellers"][0]
+    precio = seller.get("commertialOffer", {}).get("Price")
+    if not precio:
         return None
-    mejor = min(ofertas, key=lambda o: o["Price"])
-    return {"precio": round(mejor["Price"], 2), "link": prod.get("link")}
+    return {"precio": round(precio, 2), "link": prod.get("link"),
+            "sku": item.get("itemId"), "sel": seller.get("sellerId")}
+
+
+def post_json(url, body, intentos=2):
+    data = json.dumps(body).encode()
+    for i in range(intentos):
+        try:
+            req = urllib.request.Request(url, data=data, method="POST",
+                                         headers={"User-Agent": UA, "Content-Type": "application/json"})
+            with urllib.request.urlopen(req, timeout=25) as r:
+                return json.load(r)
+        except Exception:
+            if i == intentos - 1:
+                return None
+            time.sleep(0.6)
+    return None
+
+
+def precios_tucuman(dominio, region, items):
+    """Precio real de entrega en Tucumán (simulación de checkout). items: (sku,seller)."""
+    if not region or not items:
+        return {}
+    url = f"https://{dominio}/api/checkout/pub/orderForms/simulation?RnbBehavior=0&regionId={urllib.parse.quote(region)}"
+    out = {}
+    for i in range(0, len(items), 40):
+        body = {"items": [{"id": s, "quantity": 1, "seller": v} for s, v in items[i:i + 40]],
+                "country": "ARG", "postalCode": CP_TUCUMAN}
+        d = post_json(url, body)
+        if d and d.get("items"):
+            for it in d["items"]:
+                sp = it.get("sellingPrice")
+                if sp and it.get("id"):
+                    out[str(it["id"])] = round(sp / 100, 2)
+        time.sleep(0.2)
+    return out
 
 
 def main():
@@ -108,6 +142,7 @@ def main():
     # precios por cadena por EAN
     precios = defaultdict(dict)   # cadena -> ean -> precio
     links = defaultdict(dict)
+    skus = defaultdict(dict)      # cadena -> ean -> (sku, seller)
     desc = {}
     total = len(muestra)
     for i, p in enumerate(muestra, 1):
@@ -118,10 +153,27 @@ def main():
             if res:
                 precios[n][ean] = res["precio"]
                 links[n][ean] = res["link"]
+                if res.get("sku"):
+                    skus[n][ean] = (res["sku"], res["sel"])
             time.sleep(0.18)
         if i % 25 == 0 or i == total:
             hall = {n: len(precios[n]) for n in TIENDAS}
             print(f"  {i}/{total} · hallados {hall}", file=sys.stderr)
+
+    # precio REAL de entrega en Tucumán (simulación de checkout, sin login)
+    for n, dom in TIENDAS.items():
+        if not regiones[n] or not skus[n]:
+            continue
+        eans = list(skus[n])
+        sim = precios_tucuman(dom, regiones[n], [skus[n][e] for e in eans])
+        cambiados = 0
+        for e in eans:
+            sku = skus[n][e][0]
+            if sku in sim:
+                if sim[sku] != precios[n][e]:
+                    cambiados += 1
+                precios[n][e] = sim[sku]
+        print(f"  {n}: precio Tucumán aplicado ({cambiados} cambios)", file=sys.stderr)
 
     # canasta: intersección de las cadenas con buena cobertura (>=25% de la
     # muestra). Las de cobertura parcial se muestran igual, sin costo de canasta.
