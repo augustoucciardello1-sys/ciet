@@ -109,7 +109,7 @@ def get(url, intentos=2):
     for i in range(intentos):
         try:
             req = urllib.request.Request(url, headers={"User-Agent": UA})
-            with urllib.request.urlopen(req, timeout=25) as r:
+            with urllib.request.urlopen(req, timeout=12) as r:
                 return json.load(r)
         except Exception:
             if i == intentos - 1:
@@ -129,7 +129,7 @@ def post_json(url, body, intentos=2):
         try:
             req = urllib.request.Request(url, data=data, method="POST",
                                          headers={"User-Agent": UA, "Content-Type": "application/json"})
-            with urllib.request.urlopen(req, timeout=25) as r:
+            with urllib.request.urlopen(req, timeout=12) as r:
                 return json.load(r)
         except Exception:
             if i == intentos - 1:
