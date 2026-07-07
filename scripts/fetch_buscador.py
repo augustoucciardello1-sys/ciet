@@ -11,11 +11,34 @@ Uso:
 """
 import argparse
 import json
+import re
 import sys
 import time
+import unicodedata
 import urllib.request
 import urllib.parse
 from pathlib import Path
+
+# palabras "ruido" que se ignoran al emparejar productos por nombre
+STOP = {"gaseosa", "bebida", "lt", "lts", "l", "ml", "cc", "cm3", "grs", "gr", "g",
+        "kg", "un", "u", "x", "de", "pack", "bot", "pet", "botella", "lata", "sabor",
+        "the", "el", "la", "doypack", "sachet", "pouch"}
+
+
+def _norm(s):
+    return "".join(c for c in unicodedata.normalize("NFD", (s or "").lower())
+                   if unicodedata.category(c) != "Mn")
+
+
+def clave_fuzzy(nombre, marca):
+    """Firma normalizada de un producto, para unir el mismo artículo aunque
+    distintas cadenas usen otro código de barras o escriban el nombre distinto."""
+    s = _norm(nombre + " " + marca).replace(",", ".")
+    s = re.sub(r"(\d)([a-z])", r"\1 \2", s)   # separa "2.25l" -> "2.25 l"
+    s = re.sub(r"([a-z])(\d)", r"\1 \2", s)
+    s = re.sub(r"[^a-z0-9. ]", " ", s)
+    toks = [t for t in s.split() if (t not in STOP and len(t) > 1) or t.isdigit()]
+    return " ".join(sorted(set(toks)))
 
 UA = ("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 "
       "(KHTML, like Gecko) Chrome/126 Safari/537.36")
@@ -186,11 +209,28 @@ def main():
         cuenta = sum(1 for gg in grupos.values() if nombre in gg["pr"])
         print(f"  {nombre}: {cuenta} productos", file=sys.stderr)
 
+    # 2º agrupado: unir productos idénticos con distinto EAN (por nombre normalizado)
+    fusion = {}
+    for g in grupos.values():
+        k = clave_fuzzy(g["n"], g["m"])
+        f = fusion.get(k)
+        if f is None:
+            fusion[k] = g
+            continue
+        for cad, o in g["pr"].items():
+            if cad not in f["pr"] or o[0] < f["pr"][cad][0]:
+                f["pr"][cad] = o
+        if not f.get("i") and g.get("i"):
+            f["i"] = g["i"]
+        if len(g["pr"]) > len(f["pr"]):   # nombre del que aparece en más cadenas
+            f["n"], f["m"] = g["n"], g["m"]
+    finales = list(fusion.values())
+
     cadenas_meta = {n: {"geolocalizado": geoloc[n],
-                        "productos": sum(1 for g in grupos.values() if n in g["pr"])}
+                        "productos": sum(1 for g in finales if n in g["pr"])}
                     for n in TIENDAS}
-    productos = [{"n": g["n"], "m": g["m"], "i": g["i"], "pr": g["pr"]} for g in grupos.values()]
-    en_varias = sum(1 for g in grupos.values() if len(g["pr"]) > 1)
+    productos = [{"n": g["n"], "m": g["m"], "i": g["i"], "pr": g["pr"]} for g in finales]
+    en_varias = sum(1 for g in finales if len(g["pr"]) > 1)
     out = {
         "fecha": time.strftime("%Y-%m-%d"),
         "cadenas": cadenas_meta,
