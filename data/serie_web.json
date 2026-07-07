@@ -1,19 +1,19 @@
 {
- "actualizado": "2026-07-06",
+ "actualizado": "2026-07-07",
  "base": "índice de precios online encadenado (Jevons), base 100 en el primer día",
  "cadenas": [
-  "Comodín",
-  "Vea",
   "Carrefour",
-  "ChangoMás",
-  "Jumbo"
+  "Vea",
+  "Jumbo",
+  "Comodín",
+  "ChangoMás"
  ],
  "puntos": [
   {
-   "fecha": "2026-07-06",
+   "fecha": "2026-07-07",
    "indice": 100.0,
    "var_pct": null,
-   "canasta_n": 113,
+   "canasta_n": 59,
    "pares": null
   }
  ]
