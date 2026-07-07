@@ -109,6 +109,7 @@
   <div id="cont" style="display:none">
     <div class="tabs" id="tabs">
       <button class="tab active" data-tab="resumen">Resumen</button>
+      <button class="tab" data-tab="evolucion">Evolución</button>
       <button class="tab" data-tab="cadenas">Cadenas</button>
       <button class="tab" data-tab="productos">Productos</button>
       <button class="tab" data-tab="metodo">Metodología</button>
@@ -128,6 +129,14 @@
       <h2 class="sec">¿Quién tiene el precio más bajo, producto por producto?</h2>
       <div class="chart"><div id="chart-barato"></div>
         <p class="chart-note">De la canasta común, en qué porcentaje de productos cada cadena ofrece el precio más bajo (o empata). Suman más de 100% porque muchos productos cuestan lo mismo en dos cadenas.</p>
+      </div>
+    </section>
+
+    <section class="panel-tab" id="tab-evolucion">
+      <p class="note">Evolución del índice de precios online (base 100 en el primer día registrado), con el mismo método encadenado que el IPS SEPA. La serie se construye día a día a partir de hoy.</p>
+      <div class="chart"><div class="chart-title">Índice de precios online en el tiempo (base 100)</div>
+        <div id="chart-serie"></div>
+        <p class="chart-note" id="serie-nota"></p>
       </div>
     </section>
 
@@ -179,7 +188,32 @@ $('tabs').addEventListener('click', e => {
   const b = e.target.closest('.tab'); if (!b) return;
   document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t === b));
   document.querySelectorAll('.panel-tab').forEach(p => p.classList.toggle('active', p.id === 'tab-' + b.dataset.tab));
+  if (b.dataset.tab === 'evolucion') cargarSerieWeb();
 });
+
+let serieCargada = false;
+function cargarSerieWeb() {
+  if (serieCargada) return; serieCargada = true;
+  fetch('../data/serie_web.json').then(r => r.json()).then(s => {
+    const pts = (s.puntos || []).filter(p => p.indice != null);
+    const W = 620, H = 200, pad = 34;
+    const vals = pts.map(p => p.indice), min = Math.min(...vals, 99.5), max = Math.max(...vals, 100.5), rng = (max - min) || 1;
+    const n = pts.length, X = i => pad + (n === 1 ? (W - 2 * pad) / 2 : (i / (n - 1)) * (W - 2 * pad));
+    const Y = v => H - pad - ((v - min) / rng) * (H - 2 * pad);
+    const linea = pts.map((p, i) => `${i ? 'L' : 'M'}${X(i).toFixed(1)},${Y(p.indice).toFixed(1)}`).join(' ');
+    const dots = pts.map((p, i) => `<circle cx="${X(i).toFixed(1)}" cy="${Y(p.indice).toFixed(1)}" r="3.5" fill="#1c6fb8"/>`).join('');
+    const labels = pts.map((p, i) => `<text x="${X(i).toFixed(1)}" y="${H - 10}" font-size="9" fill="#5d6b7a" text-anchor="middle">${p.fecha.slice(5)}</text>`).join('');
+    $('chart-serie').innerHTML = `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto">` +
+      `<line x1="${pad}" y1="${H - pad}" x2="${W - 10}" y2="${H - pad}" stroke="#e3e9f1"/>` +
+      `<text x="4" y="${Y(max) + 3}" font-size="9" fill="#5d6b7a">${max.toFixed(1)}</text>` +
+      `<text x="4" y="${Y(min) + 3}" font-size="9" fill="#5d6b7a">${min.toFixed(1)}</text>` +
+      `<path d="${linea}" fill="none" stroke="#1c6fb8" stroke-width="2"/>${dots}${labels}</svg>`;
+    const u = pts[pts.length - 1];
+    $('serie-nota').textContent = n < 2
+      ? `Por ahora hay ${n} punto (${fechaLarga(u.fecha)}). Mañana se suma el siguiente y el índice empieza a mostrar su tendencia.`
+      : `Del ${fechaLarga(pts[0].fecha)} al ${fechaLarga(u.fecha)} el índice online pasó de 100 a ${u.indice} (${(u.indice - 100).toFixed(1)}%).`;
+  }).catch(() => { $('serie-nota').textContent = 'La serie se está construyendo.'; });
+}
 
 fetch('../data/web_index.json').then(r => { if (!r.ok) throw new Error('nofile'); return r.json(); }).then(d => {
   D = d; PROD = d.productos;

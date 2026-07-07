@@ -15,6 +15,7 @@ sobre endpoints públicos. Sin uso comercial.
 """
 import argparse
 import json
+import math
 import statistics
 import sys
 import time
@@ -162,8 +163,9 @@ def main():
             "min": min(vals), "max": max(vals), "brecha": round(max(vals) / min(vals), 3),
         })
 
+    fecha = time.strftime("%Y-%m-%d")
     out = {
-        "fecha": time.strftime("%Y-%m-%d"),
+        "fecha": fecha,
         "fuente": "Tiendas online (VTEX) de supermercados con venta en Tucumán.",
         "cadenas": PRINCIPALES,
         "geolocalizado": geoloc,
@@ -173,8 +175,39 @@ def main():
         "productos": prod_out,
     }
     Path(args.salida).write_text(json.dumps(out, ensure_ascii=False), encoding="utf-8")
-    print(f"OK → {args.salida} ({len(canasta)} en canasta, {len(presentes)} cadenas)",
-          file=sys.stderr)
+
+    # --- serie temporal encadenada del índice online (acumula hacia adelante) ---
+    dcarpeta = Path(args.salida).parent
+    hoy_precios = {f"{n}|{e}": precios[n][e] for n in presentes for e in canasta}
+    last_path = dcarpeta / "web_last.json"
+    serie_path = dcarpeta / "serie_web.json"
+    prev = json.loads(last_path.read_text(encoding="utf-8")) if last_path.exists() else {}
+    puntos = (json.loads(serie_path.read_text(encoding="utf-8")).get("puntos", [])
+              if serie_path.exists() else [])
+    puntos = [p for p in puntos if p["fecha"] != fecha]  # reemplaza el de hoy si existe
+    if not puntos or not prev:
+        indice, var, npares = (puntos[-1]["indice"] if puntos else 100.0), None, None
+    else:
+        comunes = [k for k in hoy_precios.keys() & prev.keys() if prev[k] > 0 and hoy_precios[k] > 0]
+        if comunes:
+            ratio = math.exp(sum(math.log(hoy_precios[k] / prev[k]) for k in comunes) / len(comunes))
+            var, npares = round((ratio - 1) * 100, 3), len(comunes)
+            indice = round(puntos[-1]["indice"] * ratio, 4)
+        else:
+            indice, var, npares = puntos[-1]["indice"], None, 0
+    puntos.append({"fecha": fecha, "indice": round(indice, 2), "var_pct": var,
+                   "canasta_n": len(canasta), "pares": npares})
+    puntos.sort(key=lambda p: p["fecha"])
+    serie_path.write_text(json.dumps({
+        "actualizado": fecha,
+        "base": "índice de precios online encadenado (Jevons), base 100 en el primer día",
+        "cadenas": presentes,
+        "puntos": puntos,
+    }, ensure_ascii=False, indent=1), encoding="utf-8")
+    last_path.write_text(json.dumps(hoy_precios, ensure_ascii=False), encoding="utf-8")
+
+    print(f"OK → {args.salida} ({len(canasta)} en canasta, {len(presentes)} cadenas) "
+          f"· serie_web {len(puntos)} pto(s)", file=sys.stderr)
 
 
 if __name__ == "__main__":

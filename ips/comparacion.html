@@ -87,6 +87,12 @@
   <div id="vacio" style="display:none" class="callout">La comparación se está preparando. Vuelve pronto.</div>
 
   <div id="cont" style="display:none">
+    <div class="headline" id="headline" style="border:1px solid var(--border);border-radius:8px;padding:22px;background:var(--surface);margin-bottom:8px">
+      <div style="font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)">Brecha entre los dos índices</div>
+      <div class="big" id="h-brecha" style="font-size:2.4rem;font-weight:800;color:var(--navy);margin-top:4px">—</div>
+      <div class="what" id="h-brecha-det" style="color:var(--muted);font-size:.9rem;margin-top:8px;max-width:560px"></div>
+    </div>
+
     <h2 class="sec">Diferencia entre el precio web y el declarado a SEPA, por cadena</h2>
     <div class="chart"><div id="chart-webdif"></div>
       <p class="chart-note">Cuánto difiere en promedio el precio de la tienda online respecto del que la cadena informa al Estado (SEPA), sobre la canasta comparable. Un valor negativo significa que la web es más barata que lo declarado.</p>
@@ -166,6 +172,15 @@ function render() {
     kpis.push(`<div class="kpi"><div class="label">${disp(n)} · web vs. SEPA</div><div class="value">${pct(difC[n])}</div></div>`);
   }
   $('kpis').innerHTML = kpis.join('');
+
+  // brecha agregada entre los dos índices: nivel web total vs nivel SEPA total (todas las cadenas)
+  let sepaTot = 0, webTot = 0;
+  for (const r of comunes) for (const n of nombres) { sepaTot += r.sepa[n]; webTot += r.web[n]; }
+  const brechaGlobal = (webTot / sepaTot - 1) * 100;
+  $('h-brecha').textContent = pct(brechaGlobal);
+  $('h-brecha').style.color = brechaGlobal < 0 ? 'var(--down)' : 'var(--up)';
+  $('h-brecha-det').innerHTML = `En conjunto, el <strong>índice online (IPS Web)</strong> está ${pct(brechaGlobal)} respecto del <strong>índice declarado al Estado (IPS SEPA)</strong>, sobre ${comunes.length} productos comparables en las ${nombres.length} cadenas. ` +
+    (brechaGlobal < 0 ? 'Es decir: en promedio se paga <strong>menos</strong> online que lo que las cadenas declaran a SEPA.' : 'Es decir: en promedio se paga <strong>más</strong> online que lo declarado a SEPA.');
 
   const maxAbs = Math.max(...nombres.map(n => Math.abs(difC[n])), 1);
   $('chart-webdif').innerHTML = nombres.map(n => {
