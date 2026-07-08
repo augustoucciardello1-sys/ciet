@@ -12,6 +12,7 @@ Uso:
 import argparse
 import json
 import re
+import statistics
 import sys
 import time
 import unicodedata
@@ -22,7 +23,8 @@ from pathlib import Path
 # palabras "ruido" que se ignoran al emparejar productos por nombre
 STOP = {"gaseosa", "bebida", "lt", "lts", "l", "ml", "cc", "cm3", "grs", "gr", "g",
         "kg", "un", "u", "x", "de", "pack", "bot", "pet", "botella", "lata", "sabor",
-        "the", "el", "la", "doypack", "sachet", "pouch"}
+        "the", "el", "la", "doypack", "sachet", "pouch",
+        "energizante", "energy", "sin", "azucar", "en", "con"}
 
 
 def _norm(s):
@@ -36,6 +38,7 @@ def clave_fuzzy(nombre, marca):
     s = _norm(nombre + " " + marca).replace(",", ".")
     s = re.sub(r"(\d)([a-z])", r"\1 \2", s)   # separa "2.25l" -> "2.25 l"
     s = re.sub(r"([a-z])(\d)", r"\1 \2", s)
+    s = re.sub(r"\.(?!\d)", "", s)            # "cc." -> "cc", pero deja "2.25"
     s = re.sub(r"[^a-z0-9. ]", " ", s)
     toks = [t for t in s.split() if (t not in STOP and len(t) > 1) or t.isdigit()]
     return " ".join(sorted(set(toks)))
@@ -207,8 +210,10 @@ def productos_termino(dom, termino, region, tope, cookie=None):
                 item = p["items"][0]
                 o = item["sellers"][0]["commertialOffer"]
                 precio = o.get("Price")
-                # sólo productos realmente comprables (como los ve un humano)
-                disponible = o.get("IsAvailable") and (o.get("AvailableQuantity") or 0) > 0
+                # sólo productos realmente comprables (como los ve un humano).
+                # qty>=3: las góndolas reales reportan 10/100/99999; qty 1-2 son
+                # listados fantasma (p. ej. una Coca a $164 que no existe).
+                disponible = o.get("IsAvailable") and (o.get("AvailableQuantity") or 0) >= 3
                 if not precio or precio < 100 or not disponible:
                     continue
                 prod = {
@@ -304,6 +309,18 @@ def main():
         if len(g["pr"]) > len(f["pr"]):   # nombre del que aparece en más cadenas
             f["n"], f["m"] = g["n"], g["m"]
     finales = list(fusion.values())
+
+    # descartar precios absurdos por producto: si una cadena queda muy por debajo
+    # de la mediana del mismo artículo en las demás, es un dato erróneo (no existe).
+    for g in finales:
+        precios_cad = {c: o[0] for c, o in g["pr"].items()}
+        if len(precios_cad) < 3:
+            continue
+        med = statistics.median(precios_cad.values())
+        for c, p in list(precios_cad.items()):
+            if p < 0.4 * med or p > 2.6 * med:
+                del g["pr"][c]
+    finales = [g for g in finales if g["pr"]]
 
     cadenas_meta = {n: {"geolocalizado": geoloc[n],
                         "productos": sum(1 for g in finales if n in g["pr"])}
