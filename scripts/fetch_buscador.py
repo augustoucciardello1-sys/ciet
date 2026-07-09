@@ -456,15 +456,25 @@ def main():
                 porsku.setdefault(pr["sku"], (pr["sel"], []))[1].append(pr)
         items = [(sku, sel) for sku, (sel, _) in porsku.items()]
         if region:
-            # cadenas de región: el precio real de Tucumán es el simulado (batch OK)
+            # cadenas de región: precio real de Tucumán + disponibilidad. Acá el
+            # batch NO falsea la disponibilidad (verificado: coincide con de a 1),
+            # así que se descarta lo sin stock / no entregable sin pedidos extra.
             sim = precios_tucuman(dom, region, items)
+            no_entregable = set()
             for sku, (_, prs) in porsku.items():
                 info = sim.get(sku)
-                if info and info[0]:
+                if info is None:
+                    continue                # sin respuesta (error de red): se conserva
+                precio_sim, entregable = info
+                if not entregable:
+                    no_entregable.add(sku)
+                elif precio_sim:
                     for pr in prs:
-                        pr["p"] = info[0]
+                        pr["p"] = precio_sim
                         pr.pop("op", None)  # el precio simulado ya es el efectivo
-            print(f"  {nombre}: precio Tucumán aplicado a {len(sim)}/{len(items)}", file=sys.stderr)
+            chain = {k: pr for k, pr in chain.items() if pr.get("sku") not in no_entregable}
+            print(f"  {nombre}: {len(chain)} entregables · {len(no_entregable)} descartados "
+                  f"(sin stock / no entregable)", file=sys.stderr)
         elif seg and region_sim and items:
             # Cencosud (Vea/Jumbo): descarta lo NO entregable a Tucumán (de a 1).
             disp, sin_rpta = disponibles_cencosud(dom, region_sim, items, tp, seg)
