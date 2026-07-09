@@ -26,6 +26,24 @@ STOP = {"gaseosa", "bebida", "lt", "lts", "l", "ml", "cc", "cm3", "grs", "gr", "
         "the", "el", "la", "doypack", "sachet", "pouch",
         "energizante", "energy", "sin", "azucar", "en", "con"}
 
+# sinónimos multi-palabra: se reemplazan ANTES de tokenizar (frase -> canónico).
+# Unifican el mismo producto cuando cada cadena usa otra denominación.
+SINONIMOS = {
+    "white pineapple": "anana", "pipeline punch": "pipeline",
+    "peachy keen": "peachy", "mango loco": "mango", "energy vr": "vr",
+}
+
+# traducciones/variantes palabra->canónico (inglés->español, formas alternativas).
+# Es 1:1: nunca fusiona productos distintos, sólo unifica el idioma/la variante.
+TRAD = {
+    "pineapple": "anana", "watermelon": "sandia", "watermel": "sandia",
+    "grape": "uva", "apple": "manzana", "orange": "naranja", "lemon": "limon",
+    "peach": "durazno", "strawberry": "frutilla", "cherry": "cereza",
+    "vanilla": "vainilla", "coffee": "cafe", "chocolate": "chocolate",
+    "coconut": "coco", "banana": "banana", "mango": "mango",
+    "original": "original", "sugarfree": "zero", "light": "light",
+}
+
 
 def _norm(s):
     return "".join(c for c in unicodedata.normalize("NFD", (s or "").lower())
@@ -34,13 +52,16 @@ def _norm(s):
 
 def clave_fuzzy(nombre, marca):
     """Firma normalizada de un producto, para unir el mismo artículo aunque
-    distintas cadenas usen otro código de barras o escriban el nombre distinto."""
+    distintas cadenas usen otro código de barras, idioma o nombre distinto."""
     s = _norm(nombre + " " + marca).replace(",", ".")
+    for frase, canon in SINONIMOS.items():   # "white pineapple" -> "anana"
+        s = s.replace(frase, canon)
     s = re.sub(r"(\d)([a-z])", r"\1 \2", s)   # separa "2.25l" -> "2.25 l"
     s = re.sub(r"([a-z])(\d)", r"\1 \2", s)
     s = re.sub(r"\.(?!\d)", "", s)            # "cc." -> "cc", pero deja "2.25"
     s = re.sub(r"[^a-z0-9. ]", " ", s)
-    toks = [t for t in s.split() if (t not in STOP and len(t) > 1) or t.isdigit()]
+    toks = [TRAD.get(t, t) for t in s.split()]   # traduce inglés->español
+    toks = [t for t in toks if (t not in STOP and len(t) > 1) or t.isdigit()]
     return " ".join(sorted(set(toks)))
 
 UA = ("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 "
