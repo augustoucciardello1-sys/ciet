@@ -1,5 +1,5 @@
 {
- "actualizado": "2026-07-08",
+ "actualizado": "2026-07-09",
  "base": "índice encadenado (Jevons por tramo), base 100 en el primer día registrado",
  "cadenas": [
   "Hipermercado Carrefour",
@@ -50,14 +50,14 @@
   {
    "fecha": "2026-07-03",
    "indice": 99.83,
-   "var_pct": -0.326,
+   "var_pct": null,
    "canasta_n": 3216,
-   "se_mantienen": 3178,
-   "pares": 30067
+   "se_mantienen": null,
+   "pares": null
   },
   {
    "fecha": "2026-07-04",
-   "indice": 99.88,
+   "indice": 99.87,
    "var_pct": 0.042,
    "canasta_n": 3193,
    "se_mantienen": 3180,
@@ -65,7 +65,7 @@
   },
   {
    "fecha": "2026-07-05",
-   "indice": 99.88,
+   "indice": 99.87,
    "var_pct": 0.0,
    "canasta_n": 3233,
    "se_mantienen": 3140,
@@ -82,18 +82,26 @@
   {
    "fecha": "2026-07-07",
    "indice": 99.85,
-   "var_pct": 0.025,
+   "var_pct": -0.02,
    "canasta_n": 3168,
-   "se_mantienen": 3131,
-   "pares": 30064
+   "se_mantienen": 3139,
+   "pares": 30081
   },
   {
    "fecha": "2026-07-08",
-   "indice": 99.93,
-   "var_pct": 0.095,
+   "indice": 99.92,
+   "var_pct": 0.068,
    "canasta_n": 3160,
-   "se_mantienen": 3104,
-   "pares": 29981
+   "se_mantienen": 3135,
+   "pares": 30086
+  },
+  {
+   "fecha": "2026-07-09",
+   "indice": 99.95,
+   "var_pct": 0.031,
+   "canasta_n": 3155,
+   "se_mantienen": 3120,
+   "pares": 30015
   }
  ]
 }
