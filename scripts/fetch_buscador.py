@@ -237,27 +237,33 @@ def post_json(url, body, intentos=2, cookie=None):
 def precios_tucuman(dom, region, items, sc=None, cookie=None):
     """Simulación de checkout (sin login): la prueba real de si un producto se
     puede comprar y recibir en Tucumán. items: [(sku, seller)].
-    Devuelve {sku: (precio, entregable)} — 'entregable' viene del propio checkout
-    (availability='available'); lo demás es cannotBeDelivered/withoutStock/etc."""
+    Devuelve {sku: (precio, availability)} — availability es el estado crudo del
+    checkout: 'available', 'withoutStock', 'cannotBeDelivered', etc."""
     if not region or not items:
         return {}
     url = f"https://{dom}/api/checkout/pub/orderForms/simulation?RnbBehavior=0&regionId={urllib.parse.quote(region)}"
     if sc:
         url += f"&sc={sc}"
     out = {}
-    for i in range(0, len(items), 40):
-        body = {"items": [{"id": s, "quantity": 1, "seller": v} for s, v in items[i:i + 40]],
-                "country": "ARG", "postalCode": CP}
-        d = post_json(url, body, cookie=cookie)
-        if d and d.get("items"):
-            for it in d["items"]:
-                sid = str(it.get("id") or "")
-                if not sid:
-                    continue
-                sp = it.get("sellingPrice")
-                out[sid] = (round(sp / 100, 2) if sp else None,
-                            it.get("availability") == "available")
-        time.sleep(0.2)
+    # dos pasadas: la 2ª reintenta sólo los que quedaron sin respuesta (lote que
+    # falló por throttling). Así ningún producto queda sin verificar disponibilidad.
+    for pasada in range(2):
+        faltan = [it for it in items if str(it[0]) not in out]
+        if not faltan:
+            break
+        for i in range(0, len(faltan), 40):
+            body = {"items": [{"id": s, "quantity": 1, "seller": v} for s, v in faltan[i:i + 40]],
+                    "country": "ARG", "postalCode": CP}
+            d = post_json(url, body, cookie=cookie)
+            if d and d.get("items"):
+                for it in d["items"]:
+                    sid = str(it.get("id") or "")
+                    if not sid:
+                        continue
+                    sp = it.get("sellingPrice")
+                    out[sid] = (round(sp / 100, 2) if sp else None,
+                                it.get("availability"))
+            time.sleep(0.2)
     return out
 
 
@@ -425,6 +431,11 @@ def main():
     # cada grupo junta el precio de todas las cadenas que lo tienen.
     grupos = {}
     geoloc = {}
+    # señal de stock de las cadenas de REGIÓN (Carrefour/Comodín/ChangoMás), que
+    # tienen el inventario de Tucumán bien. Cencosud a veces marca "disponible" un
+    # producto discontinuado (p. ej. Coca Light); si una cadena de región confiable
+    # lo da sin stock y ninguna lo tiene disponible, se descarta de todas.
+    region_ok_eans, region_bad_eans = set(), set()
     for nombre, dom in TIENDAS.items():
         region = region_id(dom)
         seg = segmento_tucuman(dom) if not region else None
@@ -465,13 +476,18 @@ def main():
                 info = sim.get(sku)
                 if info is None:
                     continue                # sin respuesta (error de red): se conserva
-                precio_sim, entregable = info
-                if not entregable:
+                precio_sim, avail = info
+                eans_pr = {e for pr in prs for e in (pr.get("eans") or [])}
+                if avail != "available":
                     no_entregable.add(sku)
-                elif precio_sim:
-                    for pr in prs:
-                        pr["p"] = precio_sim
-                        pr.pop("op", None)  # el precio simulado ya es el efectivo
+                    if avail == "withoutStock":   # sin stock = candidato a discontinuado
+                        region_bad_eans |= eans_pr
+                else:
+                    region_ok_eans |= eans_pr      # confirmado disponible en región
+                    if precio_sim:
+                        for pr in prs:
+                            pr["p"] = precio_sim
+                            pr.pop("op", None)  # el precio simulado ya es el efectivo
             chain = {k: pr for k, pr in chain.items() if pr.get("sku") not in no_entregable}
             print(f"  {nombre}: {len(chain)} entregables · {len(no_entregable)} descartados "
                   f"(sin stock / no entregable)", file=sys.stderr)
@@ -531,6 +547,16 @@ def main():
             if p < 0.4 * med or p > 2.6 * med:
                 del g["pr"][c]
     finales = [g for g in finales if g["pr"]]
+
+    # descartar discontinuados: si una cadena de región (stock confiable) marcó el
+    # producto SIN stock y ninguna de región lo tiene disponible, se cae de todas
+    # las cadenas —incluso de Vea/Jumbo, que a veces lo dan "disponible" por error.
+    descartar = region_bad_eans - region_ok_eans
+    antes = len(finales)
+    if descartar:
+        finales = [g for g in finales if not (set(g.get("eans") or ()) & descartar)]
+    print(f"Discontinuados (sin stock en región): {antes - len(finales)} productos descartados",
+          file=sys.stderr)
 
     cadenas_meta = {n: {"geolocalizado": geoloc[n],
                         "productos": sum(1 for g in finales if n in g["pr"])}
