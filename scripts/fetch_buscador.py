@@ -27,7 +27,8 @@ from pathlib import Path
 STOP = {"gaseosa", "bebida", "lt", "lts", "l", "ml", "cc", "cm3", "grs", "gr", "g",
         "kg", "un", "u", "x", "de", "pack", "bot", "pet", "botella", "lata", "sabor",
         "the", "el", "la", "doypack", "sachet", "pouch",
-        "energizante", "energy", "sin", "azucar", "en", "con"}
+        "energizante", "energy", "sin", "azucar", "en", "con",
+        "tableta", "para", "unidad", "unidades"}
 
 # sinónimos multi-palabra: se reemplazan ANTES de tokenizar (frase -> canónico).
 # Unifican el mismo producto cuando cada cadena usa otra denominación.
@@ -44,6 +45,7 @@ SINONIMOS = {
 # Para sumar un caso: agregá una línea acá.
 ALIAS_CADENAS = {
     "monster rossi": "monster vr",
+    "golsch": "grolsch",          # typo de una cadena (cerveza Grolsch)
 }
 
 # traducciones/variantes palabra->canónico (inglés->español, formas alternativas).
@@ -76,6 +78,9 @@ def clave_fuzzy(nombre, marca):
     s = re.sub(r"\.(?!\d)", "", s)            # "cc." -> "cc", pero deja "2.25"
     s = re.sub(r"[^a-z0-9. ]", " ", s)
     toks = [TRAD.get(t, t) for t in s.split()]   # traduce inglés->español
+    # plural -> singular (nuggets == nugget), sólo palabras (no números)
+    toks = [t[:-1] if (len(t) > 3 and t.endswith("s") and not any(ch.isdigit() for ch in t)) else t
+            for t in toks]
     toks = [t for t in toks if (t not in STOP and len(t) > 1) or t.isdigit()]
     return " ".join(sorted(set(toks)))
 
