@@ -52,24 +52,6 @@ def _norm(s):
                    if unicodedata.category(c) != "Mn")
 
 
-# LISTA NEGRA: productos que NO se venden en Tucumán aunque las webs de Cencosud
-# (Vea/Jumbo) los listen como "disponibles" y su carrito recién avise "no
-# disponible" al final. Como ninguna API expone ese estado, se excluyen a mano.
-# Cada entrada es un conjunto de palabras que deben aparecer TODAS en el nombre.
-# Para sumar un caso nuevo, agregá otra tupla. (Verificado: Coca Cola Light /
-# "sabor liviano" / Life están discontinuadas en Tucumán.)
-LISTA_NEGRA = [
-    ("coca", "light"),
-    ("coca", "liviano"),
-    ("coca", "life"),
-]
-
-
-def en_lista_negra(nombre, marca=""):
-    s = _norm(nombre + " " + marca)
-    return any(all(pal in s for pal in grupo) for grupo in LISTA_NEGRA)
-
-
 def clave_fuzzy(nombre, marca):
     """Firma normalizada de un producto, para unir el mismo artículo aunque
     distintas cadenas usen otro código de barras, idioma o nombre distinto."""
@@ -449,11 +431,12 @@ def main():
     # cada grupo junta el precio de todas las cadenas que lo tienen.
     grupos = {}
     geoloc = {}
-    # señal de stock de las cadenas de REGIÓN (Carrefour/Comodín/ChangoMás), que
-    # tienen el inventario de Tucumán bien. Cencosud a veces marca "disponible" un
-    # producto discontinuado (p. ej. Coca Light); si una cadena de región confiable
-    # lo da sin stock y ninguna lo tiene disponible, se descarta de todas.
-    region_ok_eans, region_bad_eans = set(), set()
+    # cadenas con stock de Tucumán CONFIABLE (las de región: Carrefour/Comodín/
+    # ChangoMás). Cencosud (Vea/Jumbo) marca "disponible" cosas que no se venden en
+    # Tucumán y su stock real no está en ninguna API. Por eso sólo se muestra un
+    # producto si alguna cadena confiable lo tiene; los precios de Vea/Jumbo se
+    # muestran al lado, para comparar, pero no habilitan por sí solos un producto.
+    cadenas_confiables = set()
     for nombre, dom in TIENDAS.items():
         region = region_id(dom)
         seg = segmento_tucuman(dom) if not region else None
@@ -461,6 +444,8 @@ def main():
         # región de checkout para la simulación: directa en las de región; para
         # Cencosud (Vea/Jumbo) hace falta el canal de ventas (sc) y el segmento.
         region_sim = region or (region_id(dom, sc=tp, cookie=seg) if seg else None)
+        if region:                       # las de región tienen stock de Tucumán fiable
+            cadenas_confiables.add(nombre)
         geoloc[nombre] = bool(region or seg)
         modo = "región" if region else ("intelligent-search" if seg else "nacional")
         print(f"{nombre}: geoloc={modo}", file=sys.stderr)
@@ -495,17 +480,12 @@ def main():
                 if info is None:
                     continue                # sin respuesta (error de red): se conserva
                 precio_sim, avail = info
-                eans_pr = {e for pr in prs for e in (pr.get("eans") or [])}
                 if avail != "available":
                     no_entregable.add(sku)
-                    if avail == "withoutStock":   # sin stock = candidato a discontinuado
-                        region_bad_eans |= eans_pr
-                else:
-                    region_ok_eans |= eans_pr      # confirmado disponible en región
-                    if precio_sim:
-                        for pr in prs:
-                            pr["p"] = precio_sim
-                            pr.pop("op", None)  # el precio simulado ya es el efectivo
+                elif precio_sim:
+                    for pr in prs:
+                        pr["p"] = precio_sim
+                        pr.pop("op", None)  # el precio simulado ya es el efectivo
             chain = {k: pr for k, pr in chain.items() if pr.get("sku") not in no_entregable}
             print(f"  {nombre}: {len(chain)} entregables · {len(no_entregable)} descartados "
                   f"(sin stock / no entregable)", file=sys.stderr)
@@ -566,20 +546,15 @@ def main():
                 del g["pr"][c]
     finales = [g for g in finales if g["pr"]]
 
-    # descartar discontinuados: si una cadena de región (stock confiable) marcó el
-    # producto SIN stock y ninguna de región lo tiene disponible, se cae de todas
-    # las cadenas —incluso de Vea/Jumbo, que a veces lo dan "disponible" por error.
-    descartar = region_bad_eans - region_ok_eans
+    # REGLA DE CADENA CONFIABLE: sólo se muestra un producto si alguna cadena con
+    # stock de Tucumán fiable (Carrefour/Comodín/ChangoMás) lo tiene disponible.
+    # Así no aparecen fantasmas exclusivos de Vea/Jumbo (que su API da como
+    # "disponibles" aunque no se vendan). Los precios de Vea/Jumbo igual se muestran
+    # al lado, para comparar, cuando el producto ya está habilitado por una confiable.
     antes = len(finales)
-    if descartar:
-        finales = [g for g in finales if not (set(g.get("eans") or ()) & descartar)]
-    print(f"Discontinuados (sin stock en región): {antes - len(finales)} productos descartados",
-          file=sys.stderr)
-
-    # lista negra: casos conocidos que ninguna API delata (Coca Light, etc.)
-    antes = len(finales)
-    finales = [g for g in finales if not en_lista_negra(g["n"], g.get("m", ""))]
-    print(f"Lista negra: {antes - len(finales)} productos descartados", file=sys.stderr)
+    finales = [g for g in finales if set(g["pr"]) & cadenas_confiables]
+    print(f"Regla cadena confiable: {antes - len(finales)} productos descartados "
+          f"(sólo en Vea/Jumbo)", file=sys.stderr)
 
     cadenas_meta = {n: {"geolocalizado": geoloc[n],
                         "productos": sum(1 for g in finales if n in g["pr"])}
