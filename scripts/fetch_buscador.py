@@ -215,9 +215,25 @@ def get(url, intentos=2, cookie=None):
     return None
 
 
+# Sucursal REAL de Tucumán por cadena (descubierta del segmento de una sesión con
+# dirección de San Miguel de Tucumán). Se usa sólo donde el método por código
+# postal da precios de otra sucursal. Jumbo: verificado que da los precios reales
+# (Powerade $2.600). Vea NO va acá: su método por CP ya da bien ($2.000).
+CENCOSUD_SUCURSAL = {
+    "www.jumbo.com.ar": ("jumboargentinaj5227tucuman", "32"),
+}
+
+
 def segmento_tucuman(dom):
-    """Cencosud (Vea/Jumbo): precio de Tucumán vía la cookie vtex_segment que
-    setea la API de sesión con el CP 4000 (su /regions no funciona)."""
+    """Cencosud (Vea/Jumbo): cookie vtex_segment con la región de Tucumán."""
+    conf = CENCOSUD_SUCURSAL.get(dom)
+    if conf:
+        store, canal = conf
+        rid = base64.b64encode(("SW#" + store).encode()).decode()
+        seg = {"channel": canal, "regionId": rid, "currencyCode": "ARS",
+               "currencySymbol": "$", "countryCode": "ARG", "cultureInfo": "es-AR",
+               "channelPrivacy": "public"}
+        return base64.b64encode(json.dumps(seg).encode()).decode()
     import http.cookiejar
     cj = http.cookiejar.CookieJar()
     op = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(cj))
