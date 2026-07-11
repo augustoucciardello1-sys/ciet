@@ -43,6 +43,8 @@
   .chip { font-size:.76rem; padding:5px 11px; border-radius:20px; border:1px solid var(--border); background:#fff; color:var(--muted); cursor:pointer; user-select:none; }
   .chip.on { background:var(--navy); color:#fff; border-color:var(--navy); }
   .meta { font-size:.8rem; color:var(--muted); margin:12px 0; }
+  .meta .actu { display:block; font-size:.92rem; color:var(--navy); font-weight:700; }
+  .meta .stats { display:block; font-size:.8rem; color:var(--muted); margin-top:3px; }
   .estado { color:var(--muted); padding:26px 0; text-align:center; }
   .ej { font-size:.82rem; color:var(--muted); margin-top:8px; }
   .ej a { cursor:pointer; }
@@ -107,7 +109,7 @@
 <footer>
   <div class="wrap">
     <div style="margin-bottom:8px"><a href="https://x.com/ciettucuman" target="_blank" rel="noopener">𝕏 @ciettucuman</a> · <a href="mailto:ciet.tucuman@gmail.com">ciet.tucuman@gmail.com</a></div>
-    CIET · Precios de las tiendas online, actualizados a diario. Pueden diferir del precio en el local. No incluye descuentos por medio de pago. Solo mostramos productos disponibles en Tucumán según Carrefour, Comodín, ChangoMás o Tuchanguito (cadenas con stock local confiable). El precio de Vea y Jumbo se muestra al lado para comparar, pero puede no estar disponible en Tucumán.
+    CIET · Precios de las tiendas online, actualizados varias veces al día. Pueden diferir del precio en el local. No incluye descuentos por medio de pago. Carrefour, Comodín y ChangoMás muestran el precio geolocalizado en Tucumán; Vea y Jumbo, su precio online (puede no coincidir con el del local en Tucumán). Solo listamos productos que se pueden comprar online.
   </div>
 </footer>
 
@@ -128,9 +130,10 @@ fetch('https://raw.githubusercontent.com/cietucuman/ciet/datos/buscador.json')
     $('estado').style.display = 'none';
     const _fmt = f => new Date(f + 'T12:00:00').toLocaleDateString('es-AR', { day:'numeric', month:'long', year:'numeric' });
     const actu = d.actualizado
-      ? `${_fmt(d.actualizado.split(' ')[0])}, ${d.actualizado.split(' ')[1]} h`
+      ? `${_fmt(d.actualizado.split(' ')[0])} a las ${d.actualizado.split(' ')[1]} h`
       : _fmt(d.fecha);
-    $('meta').textContent = `${d.total.toLocaleString('es-AR')} productos · ${(d.en_varias_cadenas || 0).toLocaleString('es-AR')} comparables entre cadenas · última actualización: ${actu}`;
+    $('meta').innerHTML = `<span class="actu">Actualizado: ${actu}</span>`
+      + `<span class="stats">${d.total.toLocaleString('es-AR')} productos · ${(d.en_varias_cadenas || 0).toLocaleString('es-AR')} comparables entre cadenas</span>`;
     $('filtros').innerHTML = cadenas.map(c => `<span class="chip on" data-c="${c}">${c}</span>`).join('');
     $('filtros').addEventListener('click', e => {
       const ch = e.target.closest('.chip'); if (!ch) return;
