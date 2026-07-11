@@ -126,7 +126,11 @@ fetch('https://raw.githubusercontent.com/cietucuman/ciet/datos/buscador.json')
     const cadenas = Object.keys(d.cadenas);
     cadenasActivas = new Set(cadenas);
     $('estado').style.display = 'none';
-    $('meta').textContent = `${d.total.toLocaleString('es-AR')} productos · ${(d.en_varias_cadenas || 0).toLocaleString('es-AR')} comparables entre cadenas · datos al ${new Date(d.fecha + 'T12:00:00').toLocaleDateString('es-AR', { day:'numeric', month:'long', year:'numeric' })}`;
+    const _fmt = f => new Date(f + 'T12:00:00').toLocaleDateString('es-AR', { day:'numeric', month:'long', year:'numeric' });
+    const actu = d.actualizado
+      ? `${_fmt(d.actualizado.split(' ')[0])}, ${d.actualizado.split(' ')[1]} h`
+      : _fmt(d.fecha);
+    $('meta').textContent = `${d.total.toLocaleString('es-AR')} productos · ${(d.en_varias_cadenas || 0).toLocaleString('es-AR')} comparables entre cadenas · última actualización: ${actu}`;
     $('filtros').innerHTML = cadenas.map(c => `<span class="chip on" data-c="${c}">${c}</span>`).join('');
     $('filtros').addEventListener('click', e => {
       const ch = e.target.closest('.chip'); if (!ch) return;

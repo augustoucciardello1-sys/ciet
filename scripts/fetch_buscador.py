@@ -334,51 +334,74 @@ def promos_cencosud(dom, skus, cookie=None):
     return out
 
 
-def precios_tucuman(dom, region, items, sc=None, cookie=None):
-    """Simulación de checkout (sin login): la prueba real de si un producto se
-    puede comprar y recibir en Tucumán. items: [(sku, seller)].
-    Devuelve {sku: (precio, availability)} — availability es el estado crudo del
-    checkout: 'available', 'withoutStock', 'cannotBeDelivered', etc."""
+def precios_tucuman(dom, region, items, sc=None, cookie=None, workers=6):
+    """Simulación de checkout (sin login): prueba real de si un producto se puede
+    comprar en Tucumán, y a qué precio. items: [(sku, seller)].
+    Devuelve {sku: (precio, availability)}.
+      - Disponibilidad y precio base: simulación a cantidad 1.
+      - Promos de cantidad (2do al X%, 4x3, 3x2…): se simula además a cantidad 4 y se
+        toma el MENOR precio por unidad. A qty 4 tanto "2do al X%" como "4x3" dan su
+        precio unitario correcto; cubre las dos cadenas (ChangoMás no expone teasers).
+      - 'cannotBeDelivered' se reintenta SIN postalCode (cadenas que dejaron de enviar
+        al CP pero venden en Tucumán, p. ej. Comodín).
+    Los lotes se corren en paralelo (pool chico) para que sea rápido."""
     if not region or not items:
         return {}
     url = f"https://{dom}/api/checkout/pub/orderForms/simulation?RnbBehavior=0&regionId={urllib.parse.quote(region)}"
     if sc:
         url += f"&sc={sc}"
-    out = {}
 
-    def procesar(lote, con_cp):
-        body = {"items": [{"id": s, "quantity": 1, "seller": v} for s, v in lote],
+    def simular_lote(lote, qty, con_cp):
+        body = {"items": [{"id": s, "quantity": qty, "seller": v} for s, v in lote],
                 "country": "ARG"}
         if con_cp:
             body["postalCode"] = CP
         d = post_json(url, body, cookie=cookie)
+        res = {}
         if d and d.get("items"):
             for it in d["items"]:
                 sid = str(it.get("id") or "")
-                if not sid:
-                    continue
-                sp = it.get("sellingPrice")
-                out[sid] = (round(sp / 100, 2) if sp else None, it.get("availability"))
+                if sid:
+                    sp = it.get("sellingPrice")
+                    res[sid] = (round(sp / 100, 2) if sp else None, it.get("availability"))
+        return res
 
-    # dos pasadas con postalCode: la 2ª reintenta sólo los que quedaron sin
-    # respuesta (lote que falló por throttling). Así ninguno queda sin verificar.
-    for pasada in range(2):
-        faltan = [it for it in items if str(it[0]) not in out]
-        if not faltan:
-            break
-        for i in range(0, len(faltan), 40):
-            procesar(faltan[i:i + 40], con_cp=True)
-            time.sleep(0.2)
+    def correr(its, qty, con_cp):
+        """Simula 'its' en lotes de 40, en paralelo. Devuelve {sku: (precio, avail)}."""
+        salida = {}
+        lotes = [its[i:i + 40] for i in range(0, len(its), 40)]
+        with concurrent.futures.ThreadPoolExecutor(max_workers=workers) as ex:
+            for r in ex.map(lambda L: simular_lote(L, qty, con_cp), lotes):
+                salida.update(r)
+        return salida
 
-    # RESCATE: algunas cadenas (p. ej. Comodín) dejaron de ENVIAR al código postal
-    # pero SÍ venden en Tucumán (retiro/tienda). El regionId ya geolocaliza en la
-    # provincia; los 'cannotBeDelivered' se reintentan SIN postalCode para no
-    # descartarlos de más. No afecta a las que ya dan 'available' con el CP (mantiene
-    # su precio, p. ej. ChangoMás, que con y sin CP cotiza distinto).
-    rescatar = [it for it in items if out.get(str(it[0]), (None, None))[1] == "cannotBeDelivered"]
-    for i in range(0, len(rescatar), 40):
-        procesar(rescatar[i:i + 40], con_cp=False)
-        time.sleep(0.2)
+    # --- qty 1: disponibilidad + precio base (con reintento de los que no responden) ---
+    q1 = correr(items, 1, True)
+    faltan = [it for it in items if str(it[0]) not in q1]
+    if faltan:
+        q1.update(correr(faltan, 1, True))
+    # rescate de 'cannotBeDelivered' sin postalCode
+    resc_skus = {str(it[0]) for it in items
+                 if q1.get(str(it[0]), (None, None))[1] == "cannotBeDelivered"}
+    if resc_skus:
+        q1.update(correr([it for it in items if str(it[0]) in resc_skus], 1, False))
+
+    # --- qty 4: precio con promo de cantidad (sólo los disponibles) ---
+    disp = [it for it in items if q1.get(str(it[0]), (None, None))[1] == "available"]
+    disp_cp = [it for it in disp if str(it[0]) not in resc_skus]
+    disp_sincp = [it for it in disp if str(it[0]) in resc_skus]
+    q4 = correr(disp_cp, 4, True) if disp_cp else {}
+    if disp_sincp:
+        q4.update(correr(disp_sincp, 4, False))
+
+    # combinar: precio = menor por unidad entre qty1 y qty4 (captura la promo)
+    out = {}
+    for it in items:
+        sid = str(it[0])
+        p1, av = q1.get(sid, (None, None))
+        p4 = q4.get(sid, (None, None))[0]
+        precio = min(p1, p4) if (p1 and p4) else (p1 or p4)
+        out[sid] = (precio, av)
     return out
 
 
@@ -669,17 +692,14 @@ def main():
             chain = {k: pr for k, pr in chain.items() if pr.get("sku") not in no_entregable}
             print(f"  {nombre}: {len(chain)} entregables · {len(no_entregable)} descartados "
                   f"(sin stock / no entregable)", file=sys.stderr)
-        elif seg and region_sim and items:
-            # Cencosud (Vea/Jumbo): descarta lo NO entregable a Tucumán (de a 1).
-            disp, sin_rpta = disponibles_cencosud(dom, region_sim, items, tp, seg)
-            chain = {k: pr for k, pr in chain.items()
-                     if not pr.get("sku") or pr["sku"] in disp}
-            print(f"  {nombre}: {len(chain)} entregables · {len(items) - len(disp)} descartados "
-                  f"(no-comprables) · {sin_rpta} sin respuesta", file=sys.stderr)
-        # 2.5) PROMOS DEL DÍA (Vea/Jumbo): el precio con descuento no viene en la
-        # API (lo calcula el front). Se pide el descuento público a search-promotions
-        # y se aplica: precio_final = Price*(1-desc); el precio de lista queda como
-        # "op" (tachado). Así el buscador refleja la oferta que ve el cliente.
+        # Cencosud (Vea/Jumbo): NO se filtra por simulación de checkout. La
+        # intelligent-search ya trae sólo lo disponible (hideUnavailableItems = lo que
+        # ve el cliente) y la regla de cadena confiable valida el producto. La
+        # simulación daba FALSOS NEGATIVOS —tiraba productos reales (varias Monster de
+        # Vea)— y era el paso más lento (miles de consultas de a una). El disclaimer ya
+        # aclara que el precio de Vea/Jumbo es para comparar y puede no estar en Tucumán.
+        # 2.5) PROMOS DEL DÍA (Vea/Jumbo): el precio con descuento no viene en la API
+        # (lo calcula el front). Se pide a search-promotions y se aplica como precio.
         if seg and dom in SEARCH_PROMO_SELLER:
             skus_promo = [pr["sku"] for pr in chain.values() if pr.get("sku")]
             promos = promos_cencosud(dom, skus_promo, cookie=seg)
@@ -786,6 +806,7 @@ def main():
     en_varias = sum(1 for g in finales if len(g["pr"]) > 1)
     out = {
         "fecha": time.strftime("%Y-%m-%d"),
+        "actualizado": time.strftime("%Y-%m-%d %H:%M"),   # fecha + hora (local Tucumán)
         "cadenas": cadenas_meta,
         "total": len(productos),
         "en_varias_cadenas": en_varias,
