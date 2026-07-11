@@ -283,6 +283,47 @@ def post_json(url, body, intentos=2, cookie=None):
     return None
 
 
+# Seller (sucursal) de Tucumán para pedir las PROMOS del día a /_v/search-promotions.
+# Cencosud (Vea/Jumbo) NO manda el precio con descuento en la API: lo calcula el
+# front como Price*(1-effectiveDiscount). Ese descuento SÍ es público (no requiere
+# login), pero el endpoint sólo lo devuelve si se le pasa el seller REAL de la
+# tienda de Tucumán — con el seller genérico "1" viene vacío.
+SEARCH_PROMO_SELLER = {
+    "www.vea.com.ar": "jumboargentinav125sarmientotucuman",
+    "www.jumbo.com.ar": "jumboargentinaj5227tucuman",
+}
+
+
+def promos_cencosud(dom, skus, cookie=None):
+    """Descuentos del día (Vea/Jumbo) del bucket 'generic' de search-promotions —
+    la oferta pública que ve cualquiera (no la de socios, que va en jumbo_prime/sgc).
+    Devuelve {sku: descuento(0..1)}; el precio final es Price*(1-descuento)."""
+    seller = SEARCH_PROMO_SELLER.get(dom)
+    if not seller or not skus:
+        return {}
+    out = {}
+    url = f"https://{dom}/_v/search-promotions"
+    # el endpoint devuelve HTTP 500 si el lote supera ~25 SKUs → se mandan de a 20.
+    for i in range(0, len(skus), 20):
+        lote = [str(s) for s in skus[i:i + 20]]
+        d = None
+        for intento in range(3):         # reintenta ante error puntual (500/throttle)
+            d = post_json(url, {"seller": seller, "skus": lote}, cookie=cookie)
+            if d is not None:
+                break
+            time.sleep(1.5 * (intento + 1))
+        gen = ((d or {}).get("promotions", {}).get("generic", {}) or {}).get("promotions", {}) or {}
+        for sku, pr in gen.items():
+            try:
+                desc = float(pr.get("effectiveDiscount") or 0)
+            except (TypeError, ValueError):
+                desc = 0
+            if 0 < desc < 0.95:          # descuento realista (evita datos absurdos)
+                out[str(sku)] = desc
+        time.sleep(0.12)
+    return out
+
+
 def precios_tucuman(dom, region, items, sc=None, cookie=None):
     """Simulación de checkout (sin login): la prueba real de si un producto se
     puede comprar y recibir en Tucumán. items: [(sku, seller)].
@@ -610,6 +651,20 @@ def main():
                      if not pr.get("sku") or pr["sku"] in disp}
             print(f"  {nombre}: {len(chain)} entregables · {len(items) - len(disp)} descartados "
                   f"(no-comprables) · {sin_rpta} sin respuesta", file=sys.stderr)
+        # 2.5) PROMOS DEL DÍA (Vea/Jumbo): el precio con descuento no viene en la
+        # API (lo calcula el front). Se pide el descuento público a search-promotions
+        # y se aplica: precio_final = Price*(1-desc); el precio de lista queda como
+        # "op" (tachado). Así el buscador refleja la oferta que ve el cliente.
+        if seg and dom in SEARCH_PROMO_SELLER:
+            skus_promo = [pr["sku"] for pr in chain.values() if pr.get("sku")]
+            promos = promos_cencosud(dom, skus_promo, cookie=seg)
+            for pr in chain.values():
+                desc = promos.get(str(pr.get("sku")))
+                if desc:
+                    pr["op"] = pr["p"]
+                    pr["p"] = round(pr["p"] * (1 - desc), 2)
+            print(f"  {nombre}: {len(promos)} con promo del día (search-promotions)",
+                  file=sys.stderr)
         # 3) volcar al agrupado global
         for pr in chain.values():
             clave = pr["e"] or pr["l"]
