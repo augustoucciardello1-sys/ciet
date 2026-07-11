@@ -187,8 +187,8 @@
       </div>
       <div class="kpis" id="kpis"></div>
 
+      <div id="panorama-dia" style="display:none">
       <h2 class="sec">Panorama de hoy</h2>
-      <p class="note" style="margin-top:-6px">Foto del día: comparación entre cadenas al día de la fecha. Estos dos gráficos <strong>no cambian con el selector de período de arriba</strong> —ese controla solo la variación del titular—. La evolución en el tiempo está en la pestaña <strong>Evolución</strong>.</p>
       <div class="charts">
         <div class="chart">
           <div class="chart-title">¿Cuál es la cadena más cara hoy?</div>
@@ -200,6 +200,7 @@
           <div id="chart-barato"></div>
           <p class="chart-note">De los productos de la canasta, en qué porcentaje cada cadena tiene el precio más barato (o empata en el más barato). Como muchos productos cuestan lo mismo en dos cadenas, los porcentajes se superponen y suman más de 100%.</p>
         </div>
+      </div>
       </div>
     </div>
   </section>
@@ -377,6 +378,7 @@ fetch('../data/ips.json').then(r => r.json()).then(d => {
     const b = e.target.closest('.seg'); if (!b) return;
     document.querySelectorAll('#h-freq .seg').forEach(s => s.classList.toggle('active', s === b));
     updateHeadline();
+    togglePanorama();
   });
   fetchSerie().then(updateHeadline).catch(() => updateHeadline());
 
@@ -395,7 +397,16 @@ fetch('../data/ips.json').then(r => r.json()).then(d => {
 
   renderCadenas();
   renderCharts();
+  togglePanorama();
 }).catch(e => { $('resumen-loading').textContent = 'No se pudieron cargar los datos (' + e.message + ').'; });
+
+// El "Panorama de hoy" es una foto del día → sólo tiene sentido en la vista Diaria.
+// En Semanal/Mensual/Anual se oculta (el titular ya muestra la variación del período).
+function togglePanorama() {
+  const dia = ((document.querySelector('#h-freq .seg.active') || {}).dataset || {}).h === 'dia';
+  const el = $('panorama-dia');
+  if (el) el.style.display = dia ? '' : 'none';
+}
 
 function renderCadenas() {
   const d = D;
