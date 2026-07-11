@@ -345,25 +345,40 @@ def precios_tucuman(dom, region, items, sc=None, cookie=None):
     if sc:
         url += f"&sc={sc}"
     out = {}
-    # dos pasadas: la 2ª reintenta sólo los que quedaron sin respuesta (lote que
-    # falló por throttling). Así ningún producto queda sin verificar disponibilidad.
+
+    def procesar(lote, con_cp):
+        body = {"items": [{"id": s, "quantity": 1, "seller": v} for s, v in lote],
+                "country": "ARG"}
+        if con_cp:
+            body["postalCode"] = CP
+        d = post_json(url, body, cookie=cookie)
+        if d and d.get("items"):
+            for it in d["items"]:
+                sid = str(it.get("id") or "")
+                if not sid:
+                    continue
+                sp = it.get("sellingPrice")
+                out[sid] = (round(sp / 100, 2) if sp else None, it.get("availability"))
+
+    # dos pasadas con postalCode: la 2ª reintenta sólo los que quedaron sin
+    # respuesta (lote que falló por throttling). Así ninguno queda sin verificar.
     for pasada in range(2):
         faltan = [it for it in items if str(it[0]) not in out]
         if not faltan:
             break
         for i in range(0, len(faltan), 40):
-            body = {"items": [{"id": s, "quantity": 1, "seller": v} for s, v in faltan[i:i + 40]],
-                    "country": "ARG", "postalCode": CP}
-            d = post_json(url, body, cookie=cookie)
-            if d and d.get("items"):
-                for it in d["items"]:
-                    sid = str(it.get("id") or "")
-                    if not sid:
-                        continue
-                    sp = it.get("sellingPrice")
-                    out[sid] = (round(sp / 100, 2) if sp else None,
-                                it.get("availability"))
+            procesar(faltan[i:i + 40], con_cp=True)
             time.sleep(0.2)
+
+    # RESCATE: algunas cadenas (p. ej. Comodín) dejaron de ENVIAR al código postal
+    # pero SÍ venden en Tucumán (retiro/tienda). El regionId ya geolocaliza en la
+    # provincia; los 'cannotBeDelivered' se reintentan SIN postalCode para no
+    # descartarlos de más. No afecta a las que ya dan 'available' con el CP (mantiene
+    # su precio, p. ej. ChangoMás, que con y sin CP cotiza distinto).
+    rescatar = [it for it in items if out.get(str(it[0]), (None, None))[1] == "cannotBeDelivered"]
+    for i in range(0, len(rescatar), 40):
+        procesar(rescatar[i:i + 40], con_cp=False)
+        time.sleep(0.2)
     return out
 
 
