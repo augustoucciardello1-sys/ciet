@@ -367,8 +367,7 @@ fetch('../data/ips.json').then(r => r.json()).then(d => {
   nombres = principales.map(c => c.cadena);
   minCosto = Math.min(...principales.map(c => c.canasta_costo));
 
-  $('src').innerHTML = `Fuente: <a href="${SEPA_URL}" target="_blank" rel="noopener">SEPA</a> · datos al <strong>${fechaLarga(d.fecha)}</strong>` +
-    (d.fecha_base ? ` (comparado con ${fechaLarga(d.fecha_base)})` : '');
+  $('src').innerHTML = `Fuente: <a href="${SEPA_URL}" target="_blank" rel="noopener">SEPA</a> · datos al <strong>${fechaLarga(d.fecha)}</strong>`;
 
   // headline con selector de período (usa la serie encadenada)
   $('resumen-loading').style.display = 'none';
@@ -438,7 +437,7 @@ function renderCharts() {
 }
 
 // ---- serie temporal (serie.json) ----
-let SERIE = null, seriePromise = null, serieRendered = false;
+let SERIE = null, seriePromise = null, serieRendered = false, CAN = null;
 function fetchSerie() {
   if (seriePromise) return seriePromise;
   seriePromise = fetch('../data/serie.json').then(r => { if (!r.ok) throw new Error('nofile'); return r.json(); }).then(d => { SERIE = d; return d; });
@@ -467,7 +466,11 @@ function updateHeadline() {
 }
 function cargarSerie() {
   if (serieRendered) return;
-  fetchSerie().then(d => {
+  Promise.all([
+    fetchSerie(),
+    fetch('../data/canastas.json').then(r => r.ok ? r.json() : null).catch(() => null),
+  ]).then(([d, can]) => {
+    CAN = can;
     serieRendered = true;
     $('serie-loading').style.display = 'none';
     if (!d.puntos || d.puntos.length < 1) { $('serie-vacio').style.display = 'block'; return; }
@@ -522,19 +525,27 @@ function pintarSerie() {
     ? `Por ahora hay ${n} punto${n === 1 ? '' : 's'}. La serie se irá completando a medida que se acumulen días.`
     : `Del ${fechaLarga(pts[0].fecha)} al ${fechaLarga(ultimo.fecha)} el índice pasó de 100 a ${ultimo.indice} (${pct((ultimo.indice / 100 - 1) * 100)}).`;
 
-  $('tabla-serie').querySelector('thead').innerHTML = '<tr><th>Período</th><th class="num">Índice</th><th class="num">Var.</th><th class="num">Productos</th><th class="num">Se mantienen<br><span style="font-weight:400;text-transform:none">vs. día previo</span></th></tr>';
-  $('tabla-serie').querySelector('tbody').innerHTML = pts.slice().reverse().map(p => {
-    // "se mantienen" como fracción X / Y: de la canasta de ese día, cuántos ya
-    // estaban el día anterior. Sólo tiene sentido en la vista diaria.
-    const mant = (freq === 'dia' && p.se_mantienen != null && p.canasta_n)
-      ? `${p.se_mantienen.toLocaleString('es-AR')} / ${p.canasta_n.toLocaleString('es-AR')}`
-      : '—';
-    return `<tr><td>${freq === 'dia' ? fechaLarga(p.fecha) : (p.etiqueta || p.fecha)}</td>` +
-      `<td class="num">${p.indice ?? '—'}</td>` +
-      `<td class="num">${p.var == null ? '—' : `<span class="var ${p.var >= 0 ? 'up' : 'down'}">${pct(p.var)}</span>`}</td>` +
-      `<td class="num">${p.canasta_n?.toLocaleString('es-AR') ?? '—'}</td>` +
-      `<td class="num">${mant}</td></tr>`;
-  }).join('');
+  // persistencia por período REAL: de la canasta del período, cuántos ya estaban en
+  // el período previo. Usa canastas.json (EANs por día); sirve para toda frecuencia:
+  // día vs día, semana vs semana, mes vs mes.
+  const PREVLBL = { dia: 'día previo', semana: 'semana previa', mes: 'mes previo', anio: 'año previo' };
+  for (let i = 0; i < pts.length; i++) {
+    pts[i].mantTxt = '—';
+    if (i === 0 || !CAN) continue;
+    const a = CAN[pts[i].fecha], b = CAN[pts[i - 1].fecha];
+    if (a && b) {
+      const setB = new Set(b);
+      const inter = a.reduce((c, e) => c + (setB.has(e) ? 1 : 0), 0);
+      pts[i].mantTxt = `${inter.toLocaleString('es-AR')} / ${a.length.toLocaleString('es-AR')}`;
+    }
+  }
+  $('tabla-serie').querySelector('thead').innerHTML = `<tr><th>Período</th><th class="num">Índice</th><th class="num">Var.</th><th class="num">Productos</th><th class="num">Se mantienen<br><span style="font-weight:400;text-transform:none">vs. ${PREVLBL[freq]}</span></th></tr>`;
+  $('tabla-serie').querySelector('tbody').innerHTML = pts.slice().reverse().map(p =>
+    `<tr><td>${freq === 'dia' ? fechaLarga(p.fecha) : (p.etiqueta || p.fecha)}</td>` +
+    `<td class="num">${p.indice ?? '—'}</td>` +
+    `<td class="num">${p.var == null ? '—' : `<span class="var ${p.var >= 0 ? 'up' : 'down'}">${pct(p.var)}</span>`}</td>` +
+    `<td class="num">${p.canasta_n?.toLocaleString('es-AR') ?? '—'}</td>` +
+    `<td class="num">${p.mantTxt}</td></tr>`).join('');
 }
 
 // ---- catálogo (productos.json, lazy) ----

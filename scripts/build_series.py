@@ -165,11 +165,13 @@ def main():
     # construir/actualizar índice encadenado sobre las fechas disponibles hoy
     fechas = sorted(dias)
     puntos = dict(prev)
+    canastas_dia = {}   # fecha -> [eans] de la intersección (persistencia por período)
     indice = None
     for j, fecha in enumerate(fechas):
         precios = dias[fecha]
         eans_cadena = {c: set(p) for c, p in precios.items()}
         canasta = set.intersection(*eans_cadena.values()) if len(eans_cadena) >= 2 else set()
+        canastas_dia[fecha] = sorted(canasta)
         prevpt = puntos.get(fecha, {})
         if j == 0:
             indice = prevpt.get("indice", 100.0)
@@ -218,6 +220,16 @@ def main():
     sp.parent.mkdir(parents=True, exist_ok=True)
     sp.write_text(json.dumps(serie, ensure_ascii=False, indent=1), encoding="utf-8")
     print(f"OK → {sp} ({len(serie['puntos'])} puntos)", file=sys.stderr)
+
+    # canastas por día (EANs de la intersección de las 3 cadenas): permiten calcular
+    # en el sitio cuántos productos se mantienen respecto del período previo REAL
+    # (semana vs semana, mes vs mes). Se acumulan y se podan a los últimos 60 días.
+    cpath = sp.parent / "canastas.json"
+    canastas = json.loads(cpath.read_text(encoding="utf-8")) if cpath.exists() else {}
+    canastas.update(canastas_dia)
+    canastas = {f: canastas[f] for f in sorted(canastas)[-60:]}
+    cpath.write_text(json.dumps(canastas, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
+    print(f"OK → {cpath} ({len(canastas)} días)", file=sys.stderr)
 
     # --- ips.json + productos.json (pestañas Resumen/Cadenas/Productos del sitio) ---
     # Se regeneran ACÁ, con los mismos dumps ya descargados, para que no queden
