@@ -221,7 +221,7 @@
         <p class="chart-note" id="serie-nota"></p>
       </div>
       <h2 class="sec">Rotación de la canasta</h2>
-      <p class="note">La canasta no es fija: cada día se compara la intersección de productos disponibles en las tres cadenas. Acá se ve cuántos productos tiene y cuántos se mantienen respecto del período anterior.</p>
+      <p class="note">La canasta no es fija: cada día se compara la intersección de productos disponibles en las tres cadenas. Acá se ve cuántos productos tiene y, en la vista diaria, cuántos ya estaban el día anterior (la persistencia sólo es comparable día a día).</p>
       <div class="tablewrap"><table id="tabla-serie"><thead></thead><tbody></tbody></table></div>
     </div>
   </section>
@@ -288,6 +288,7 @@
     <h3>6. El índice de variación: fórmula de Jevons</h3>
     <p>Para medir cuánto cambiaron los precios entre dos fechas usamos el <strong>índice de Jevons</strong>: la media geométrica de los relativos de precio.</p>
     <div class="formula">variación = media geométrica de (precio&nbsp;hoy ÷ precio&nbsp;antes), sobre cada par cadena-producto</div>
+    <p><strong>Dos universos distintos (no confundir).</strong> La <em>canasta</em> —la intersección de productos que están en las tres cadenas (~3.200)— se usa para comparar el <strong>nivel</strong> de precios: quién es más barato. La <strong>variación</strong> (la inflación) se mide sobre un conjunto más amplio: <strong>cada par cadena-producto</strong> con precio en ambas fechas (unos 30.000, el número que figura como “pares comparados”), no sólo los compartidos. Usar todas las cotizaciones disponibles hace la medición más robusta.</p>
     <p>Es un <strong>índice elemental</strong> (sin ponderar): trata a todos los productos por igual. Se elige la media geométrica y no la aritmética por dos razones técnicas: es <strong>simétrica</strong> (un +50% seguido de un −33% vuelve al punto de partida) y es la forma consistente cuando no se conocen las cantidades consumidas.</p>
     <p><strong>¿Por qué no Laspeyres o Paasche?</strong> Esos índices —los que usa un IPC— ponderan cada producto por las cantidades que compra un hogar, y para eso hace falta una encuesta de gasto que no existe a nivel de supermercado tucumano. Jevons es justamente el estándar internacional recomendado por el Manual del IPC (OIT/FMI) para el “nivel elemental”: muchos precios, sin ponderaciones —el caso de los datos de <em>scanner</em>.</p>
     <p style="margin-top:12px"><strong>Otras fuentes.</strong> Este índice usa exclusivamente SEPA. Un segundo índice a partir de los precios de las tiendas online —y su contraste con lo declarado— está en desarrollo.</p>
@@ -488,8 +489,10 @@ function agrupar(puntos, freq) {
   for (const p of puntos) { const k = key(p.fecha); (grupos[k] = grupos[k] || []).push(p); }
   return Object.entries(grupos).sort().map(([k, arr]) => {
     const last = arr[arr.length - 1];
+    // La persistencia de la canasta sólo es comparable día a día (no se puede sumar
+    // entre días: daría un número sin sentido). En vistas agregadas no se muestra.
     return { fecha: last.fecha, etiqueta: k, indice: last.indice, canasta_n: last.canasta_n,
-             se_mantienen: arr.reduce((a, p) => a + (p.se_mantienen || 0), 0) || null };
+             se_mantienen: null };
   });
 }
 function pintarSerie() {
@@ -519,13 +522,19 @@ function pintarSerie() {
     ? `Por ahora hay ${n} punto${n === 1 ? '' : 's'}. La serie se irá completando a medida que se acumulen días.`
     : `Del ${fechaLarga(pts[0].fecha)} al ${fechaLarga(ultimo.fecha)} el índice pasó de 100 a ${ultimo.indice} (${pct((ultimo.indice / 100 - 1) * 100)}).`;
 
-  $('tabla-serie').querySelector('thead').innerHTML = '<tr><th>Período</th><th class="num">Índice</th><th class="num">Var.</th><th class="num">Productos</th><th class="num">Se mantienen</th></tr>';
-  $('tabla-serie').querySelector('tbody').innerHTML = pts.slice().reverse().map(p =>
-    `<tr><td>${freq === 'dia' ? fechaLarga(p.fecha) : (p.etiqueta || p.fecha)}</td>` +
-    `<td class="num">${p.indice ?? '—'}</td>` +
-    `<td class="num">${p.var == null ? '—' : `<span class="var ${p.var >= 0 ? 'up' : 'down'}">${pct(p.var)}</span>`}</td>` +
-    `<td class="num">${p.canasta_n?.toLocaleString('es-AR') ?? '—'}</td>` +
-    `<td class="num">${p.se_mantienen?.toLocaleString('es-AR') ?? '—'}</td></tr>`).join('');
+  $('tabla-serie').querySelector('thead').innerHTML = '<tr><th>Período</th><th class="num">Índice</th><th class="num">Var.</th><th class="num">Productos</th><th class="num">Se mantienen<br><span style="font-weight:400;text-transform:none">vs. día previo</span></th></tr>';
+  $('tabla-serie').querySelector('tbody').innerHTML = pts.slice().reverse().map(p => {
+    // "se mantienen" como fracción X / Y: de la canasta de ese día, cuántos ya
+    // estaban el día anterior. Sólo tiene sentido en la vista diaria.
+    const mant = (freq === 'dia' && p.se_mantienen != null && p.canasta_n)
+      ? `${p.se_mantienen.toLocaleString('es-AR')} / ${p.canasta_n.toLocaleString('es-AR')}`
+      : '—';
+    return `<tr><td>${freq === 'dia' ? fechaLarga(p.fecha) : (p.etiqueta || p.fecha)}</td>` +
+      `<td class="num">${p.indice ?? '—'}</td>` +
+      `<td class="num">${p.var == null ? '—' : `<span class="var ${p.var >= 0 ? 'up' : 'down'}">${pct(p.var)}</span>`}</td>` +
+      `<td class="num">${p.canasta_n?.toLocaleString('es-AR') ?? '—'}</td>` +
+      `<td class="num">${mant}</td></tr>`;
+  }).join('');
 }
 
 // ---- catálogo (productos.json, lazy) ----

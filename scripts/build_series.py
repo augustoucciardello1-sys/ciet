@@ -26,7 +26,8 @@ from collections import Counter, defaultdict
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from build_index import procesar_dia, CADENAS_OBJETIVO, MIN_PRODUCTOS, PROVINCIA, leer_csv
+from build_index import (procesar_dia, CADENAS_OBJETIVO, MIN_PRODUCTOS, PROVINCIA,
+                         leer_csv, construir, escribir_ips)
 
 CKAN = "https://datos.produccion.gob.ar/api/3/action/package_show?id=sepa-precios"
 UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
@@ -76,11 +77,13 @@ def descargar_y_extraer(url, destino):
 
 
 def canasta_dia(dir_dia):
-    """{fecha, precios:{cadena:{ean:precio}}} para las cadenas objetivo."""
+    """Devuelve (full, filtrado): `full` es el procesar_dia completo (todas las
+    banderas, con descripciones y sucursales, para regenerar ips.json); `filtrado`
+    es {cadena: {ean: precio}} sólo de las cadenas objetivo principales (para la serie)."""
     hoy = procesar_dia(dir_dia)
     principales = [n for n, d in hoy.items()
                    if len(d["precios"]) >= MIN_PRODUCTOS and n in CADENAS_OBJETIVO]
-    return {n: hoy[n]["precios"] for n in principales}
+    return hoy, {n: hoy[n]["precios"] for n in principales}
 
 
 def auditar_cobertura(dir_dia, salida):
@@ -126,7 +129,8 @@ def main():
     urls = daily_urls()
     print(f"{len(urls)} recursos diarios en SEPA", file=sys.stderr)
 
-    dias = {}  # fecha -> {cadena: {ean: precio}}
+    dias = {}       # fecha -> {cadena: {ean: precio}}  (sólo cadenas principales)
+    dias_full = {}  # fecha -> procesar_dia completo (para regenerar ips.json)
     audit_hecho = False
     for i, url in enumerate(urls[: args.dias], 1):
         tmp = Path(tempfile.mkdtemp(prefix="sepa_"))
@@ -142,7 +146,9 @@ def main():
                     f"{x['cadena']}={x['tucuman']}T/{x['total_sucursales']}" for x in fil[:8]),
                     file=sys.stderr)
                 audit_hecho = True
-            dias[fecha] = canasta_dia(dir_dia)
+            full, filtrado = canasta_dia(dir_dia)
+            dias_full[fecha] = full
+            dias[fecha] = filtrado
             print(f"  {fecha}: {len(dias[fecha])} cadenas", file=sys.stderr)
         except Exception as e:
             print(f"  error: {e}", file=sys.stderr)
@@ -164,29 +170,44 @@ def main():
         precios = dias[fecha]
         eans_cadena = {c: set(p) for c, p in precios.items()}
         canasta = set.intersection(*eans_cadena.values()) if len(eans_cadena) >= 2 else set()
+        prevpt = puntos.get(fecha, {})
         if j == 0:
-            base_indice = puntos.get(fecha, {}).get("indice", 100.0)
-            indice = base_indice
-            var = None
-            mant = None
+            indice = prevpt.get("indice", 100.0)
+            # el día más viejo de la ventana de hoy no tiene predecesor descargado
+            # para recalcular su variación: se CONSERVA lo ya calculado en corridas
+            # previas (cuando este día no era el más viejo), no se pisa con null.
+            var = prevpt.get("var_pct")
+            mant = prevpt.get("se_mantienen")
+            pares_val = prevpt.get("pares")
         else:
             prevp = dias[fechas[j - 1]]
             a = {(c, e): precios[c][e] for c in precios for e in precios[c]}
             b = {(c, e): prevp[c][e] for c in prevp for e in prevp[c]}
-            ratio, n = jevons(a, b)
+            ratio, npares = jevons(a, b)
             var = round((ratio - 1) * 100, 3) if ratio else None
             if ratio and indice is not None:
                 indice = round(indice * ratio, 4)
             cprev = set.intersection(*[set(p) for p in prevp.values()]) if len(prevp) >= 2 else set()
             mant = len(canasta & cprev)
+            pares_val = npares
         puntos[fecha] = {
             "fecha": fecha,
             "indice": round(indice, 2) if indice is not None else None,
             "var_pct": var,
             "canasta_n": len(canasta),
             "se_mantienen": mant,
-            "pares": n if j > 0 else None,
+            "pares": pares_val,
         }
+
+    # rellenar huecos de variación: si un día tiene índice pero var_pct quedó en
+    # null (por el deslizamiento de ventana en corridas viejas, cuyo día previo ya
+    # no está para recalcular Jevons), se reconstruye del propio índice encadenado:
+    # var = índice_hoy / índice_ayer − 1. Deja la serie sin huecos y consistente.
+    orden = [puntos[f] for f in sorted(puntos)]
+    for k in range(1, len(orden)):
+        cur, ant = orden[k], orden[k - 1]
+        if cur.get("var_pct") is None and cur.get("indice") and ant.get("indice"):
+            cur["var_pct"] = round((cur["indice"] / ant["indice"] - 1) * 100, 3)
 
     serie = {
         "actualizado": time.strftime("%Y-%m-%d"),
@@ -197,6 +218,22 @@ def main():
     sp.parent.mkdir(parents=True, exist_ok=True)
     sp.write_text(json.dumps(serie, ensure_ascii=False, indent=1), encoding="utf-8")
     print(f"OK → {sp} ({len(serie['puntos'])} puntos)", file=sys.stderr)
+
+    # --- ips.json + productos.json (pestañas Resumen/Cadenas/Productos del sitio) ---
+    # Se regeneran ACÁ, con los mismos dumps ya descargados, para que no queden
+    # congelados. Antes build_index no estaba en la automatización y estos archivos
+    # quedaban pegados en una fecha vieja. Comparación "semana previa" = día más
+    # antiguo disponible en la ventana (~7 días atrás).
+    fechas_full = sorted(dias_full)
+    if len(fechas_full) >= 2:
+        f_act, f_base = fechas_full[-1], fechas_full[0]
+        resumen, catalogo = construir(dias_full[f_act], dias_full[f_base], f_act, f_base)
+        if resumen:
+            escribir_ips(resumen, catalogo, sp.parent / "ips.json")
+            print(f"OK → {sp.parent / 'ips.json'} ({f_base} → {f_act}, "
+                  f"{len(catalogo['productos'])} productos)", file=sys.stderr)
+        else:
+            print("ips.json: sin dos cadenas con canasta, no se regenera", file=sys.stderr)
 
 
 if __name__ == "__main__":

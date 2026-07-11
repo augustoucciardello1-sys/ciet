@@ -127,19 +127,11 @@ def jevons(actual, base):
     return math.exp(sum(ratios) / len(ratios)), len(ratios)
 
 
-def main():
-    ap = argparse.ArgumentParser()
-    ap.add_argument("dia_actual")
-    ap.add_argument("dia_base", nargs="?")
-    ap.add_argument("-o", "--salida", default="data/ips.json")
-    args = ap.parse_args()
-
-    fecha = Path(args.dia_actual).name
-    print(f"Procesando día actual ({fecha})…", file=sys.stderr)
-    hoy = procesar_dia(args.dia_actual)
-    if not hoy:
-        sys.exit("Ninguna cadena con sucursales en Tucumán.")
-
+def construir(hoy, base, fecha, fecha_base=None):
+    """De los datos ya procesados de dos días (formato procesar_dia) arma el
+    (resumen, catalogo) del IPS. `base` puede ser {} si no hay día de comparación.
+    Devuelve (None, None) si no hay dos cadenas principales con canasta.
+    Reutilizable desde build_series.py para no re-descargar los dumps."""
     # cadenas principales: las de la lista objetivo con catálogo completo; la
     # canasta es la intersección exacta de sus EANs, para que el costo sea
     # directamente comparable
@@ -149,20 +141,13 @@ def main():
         and (not CADENAS_OBJETIVO or n in CADENAS_OBJETIVO)
     ]
     if len(principales) < 2:
-        sys.exit("Menos de dos cadenas objetivo con catálogo completo en Tucumán.")
+        return None, None
     canasta = set(hoy[principales[0]]["precios"])
     for n in principales[1:]:
         canasta &= set(hoy[n]["precios"])
     canasta = sorted(canasta)
     if not canasta:
-        sys.exit("Canasta vacía: ningún EAN compartido entre cadenas principales.")
-
-    base = {}
-    fecha_base = None
-    if args.dia_base:
-        fecha_base = Path(args.dia_base).name
-        print(f"Procesando día base ({fecha_base})…", file=sys.stderr)
-        base = procesar_dia(args.dia_base)
+        return None, None
 
     cadenas_out = []
     pares_actual, pares_base = {}, {}
@@ -280,13 +265,46 @@ def main():
         "cadenas_principales": principales,
         "productos": productos,
     }
+    return resumen, catalogo
 
-    salida = Path(args.salida)
+
+def escribir_ips(resumen, catalogo, salida):
+    """Escribe ips.json (resumen) y productos.json (catálogo) al lado."""
+    salida = Path(salida)
     salida.parent.mkdir(parents=True, exist_ok=True)
     salida.write_text(json.dumps(resumen, ensure_ascii=False, indent=1), encoding="utf-8")
     cat_path = salida.parent / "productos.json"
     cat_path.write_text(json.dumps(catalogo, ensure_ascii=False), encoding="utf-8")
-    print(f"OK → {salida} ({len(productos)} productos → {cat_path})", file=sys.stderr)
+    return cat_path
+
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("dia_actual")
+    ap.add_argument("dia_base", nargs="?")
+    ap.add_argument("-o", "--salida", default="data/ips.json")
+    args = ap.parse_args()
+
+    fecha = Path(args.dia_actual).name
+    print(f"Procesando día actual ({fecha})…", file=sys.stderr)
+    hoy = procesar_dia(args.dia_actual)
+    if not hoy:
+        sys.exit("Ninguna cadena con sucursales en Tucumán.")
+
+    base = {}
+    fecha_base = None
+    if args.dia_base:
+        fecha_base = Path(args.dia_base).name
+        print(f"Procesando día base ({fecha_base})…", file=sys.stderr)
+        base = procesar_dia(args.dia_base)
+
+    resumen, catalogo = construir(hoy, base, fecha, fecha_base)
+    if resumen is None:
+        sys.exit("Menos de dos cadenas objetivo con catálogo completo, o canasta vacía.")
+
+    cat_path = escribir_ips(resumen, catalogo, args.salida)
+    print(f"OK → {args.salida} ({len(catalogo['productos'])} productos → {cat_path})",
+          file=sys.stderr)
 
 
 if __name__ == "__main__":

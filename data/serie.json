@@ -18,7 +18,7 @@
   {
    "fecha": "2026-06-29",
    "indice": 100.04,
-   "var_pct": null,
+   "var_pct": 0.04,
    "canasta_n": 3250,
    "se_mantienen": null,
    "pares": null
@@ -26,7 +26,7 @@
   {
    "fecha": "2026-06-30",
    "indice": 100.1,
-   "var_pct": null,
+   "var_pct": 0.06,
    "canasta_n": 3228,
    "se_mantienen": null,
    "pares": null
@@ -42,7 +42,7 @@
   {
    "fecha": "2026-07-02",
    "indice": 100.16,
-   "var_pct": null,
+   "var_pct": 0.421,
    "canasta_n": 3232,
    "se_mantienen": null,
    "pares": null
@@ -50,7 +50,7 @@
   {
    "fecha": "2026-07-03",
    "indice": 99.83,
-   "var_pct": null,
+   "var_pct": -0.329,
    "canasta_n": 3216,
    "se_mantienen": null,
    "pares": null
@@ -58,7 +58,7 @@
   {
    "fecha": "2026-07-04",
    "indice": 99.87,
-   "var_pct": null,
+   "var_pct": 0.04,
    "canasta_n": 3193,
    "se_mantienen": null,
    "pares": null
