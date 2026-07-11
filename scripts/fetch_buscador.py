@@ -295,9 +295,13 @@ SEARCH_PROMO_SELLER = {
 
 
 def promos_cencosud(dom, skus, cookie=None):
-    """Descuentos del día (Vea/Jumbo) del bucket 'generic' de search-promotions —
+    """Ofertas del día (Vea/Jumbo) del bucket 'generic' de search-promotions —
     la oferta pública que ve cualquiera (no la de socios, que va en jumbo_prime/sgc).
-    Devuelve {sku: descuento(0..1)}; el precio final es Price*(1-descuento)."""
+    Devuelve {sku: (tipo, valor)}:
+      - ("fixed", precio)   → precio de oferta FIJO (usar tal cual; el effectiveDiscount
+                              es sólo una aproximación y da mal si se aplica como %).
+      - ("pct", descuento)  → descuento por unidad (0..1); precio final = Price*(1-desc).
+                              Cubre % y nxm (4x3, etc.): el descuento ya es el efectivo."""
     seller = SEARCH_PROMO_SELLER.get(dom)
     if not seller or not skus:
         return {}
@@ -318,8 +322,14 @@ def promos_cencosud(dom, skus, cookie=None):
                 desc = float(pr.get("effectiveDiscount") or 0)
             except (TypeError, ValueError):
                 desc = 0
-            if 0 < desc < 0.95:          # descuento realista (evita datos absurdos)
-                out[str(sku)] = desc
+            try:
+                valor = float(pr.get("value") or 0)
+            except (TypeError, ValueError):
+                valor = 0
+            if pr.get("discountType") == "fixed_price" and valor > 0:
+                out[str(sku)] = ("fixed", round(valor, 2))     # precio de oferta fijo
+            elif 0 < desc < 0.95:          # descuento realista (evita datos absurdos)
+                out[str(sku)] = ("pct", desc)
         time.sleep(0.12)
     return out
 
@@ -658,12 +668,19 @@ def main():
         if seg and dom in SEARCH_PROMO_SELLER:
             skus_promo = [pr["sku"] for pr in chain.values() if pr.get("sku")]
             promos = promos_cencosud(dom, skus_promo, cookie=seg)
+            n_promo = 0
             for pr in chain.values():
-                desc = promos.get(str(pr.get("sku")))
-                if desc:
-                    pr["op"] = pr["p"]
-                    pr["p"] = round(pr["p"] * (1 - desc), 2)
-            print(f"  {nombre}: {len(promos)} con promo del día (search-promotions)",
+                info = promos.get(str(pr.get("sku")))
+                if not info:
+                    continue
+                tipo, val = info
+                nuevo = val if tipo == "fixed" else round(pr["p"] * (1 - val), 2)
+                # el precio con oferta ES el precio: se reemplaza directo, sin cartel
+                # (sin "op"), como las demás cadenas. Sólo si realmente abarata.
+                if nuevo and nuevo < pr["p"]:
+                    pr["p"] = nuevo
+                    n_promo += 1
+            print(f"  {nombre}: {n_promo} con promo del día (search-promotions)",
                   file=sys.stderr)
         # 3) volcar al agrupado global
         for pr in chain.values():
