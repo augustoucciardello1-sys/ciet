@@ -797,6 +797,26 @@ def main():
                 del g["pr"][c]
     finales = [g for g in finales if g["pr"]]
 
+    # ANCLA CONFIABLE (caza fantasmas de precio de Vea/Jumbo en grupos de 2 cadenas):
+    # Cencosud a veces carga un producto con el EAN de OTRA variante (p. ej. un
+    # "120 gr" con el código del 170 gr) y un precio basura que TODAS sus APIs dan
+    # como disponible —ni la simulación de checkout lo caza—. El merge por EAN lo une
+    # al producto real de una confiable y ese precio irracional aparece como el más
+    # barato (verde). Las confiables SÍ tienen precio real de Tucumán (verificado por
+    # simulación), así que son el ancla: si una cadena NO confiable queda por debajo de
+    # la mitad del precio confiable del MISMO grupo, es dato erróneo → se le saca ese
+    # precio (el producto queda con las confiables). Cubre el caso de 2 cadenas, que el
+    # filtro por mediana (requiere >=3) no toca.
+    for g in finales:
+        anclas = [o[0] for c, o in g["pr"].items() if c in cadenas_confiables]
+        if not anclas:
+            continue
+        ancla = min(anclas)
+        for c in list(g["pr"]):
+            if c not in cadenas_confiables and g["pr"][c][0] < 0.5 * ancla:
+                del g["pr"][c]
+    finales = [g for g in finales if g["pr"]]
+
     # REGLA DE CADENA CONFIABLE: sólo se muestra un producto si alguna cadena con
     # stock de Tucumán fiable (Carrefour/Comodín/ChangoMás) lo tiene disponible.
     # Así no aparecen fantasmas exclusivos de Vea/Jumbo (que su API da como
