@@ -904,6 +904,13 @@ def main():
         for e in (g.get("eans") or ()):
             ean2g.setdefault(e, g)
     for nombre, cfg in chaincfg.items():
+        # SÓLO se completan las cadenas de REGIÓN (Carrefour/Comodín/ChangoMás): la
+        # simulación de checkout confirma precio real + disponibilidad. Cencosud NO se
+        # completa por catálogo: trae precios VIEJOS de listados que ni aparecen en la
+        # búsqueda de Vea/Jumbo (ej. tostadas $150 vs $1600 en las demás). Vea/Jumbo se
+        # quedan con lo que captura su intelligent-search (visible y con precio actual).
+        if not cfg["region"]:
+            continue
         faltan = list({e for e, g in ean2g.items() if nombre not in g["pr"]})
         if not faltan:
             continue
