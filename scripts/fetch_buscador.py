@@ -301,16 +301,16 @@ SEARCH_PROMO_SELLER = {
 
 
 def promos_cencosud(dom, skus, cookie=None, workers=6):
-    """Ofertas del día (Vea/Jumbo) del bucket 'generic' de search-promotions —
-    la oferta pública que ve cualquiera (no la de socios, que va en jumbo_prime/sgc).
-    Devuelve {sku: (tipo, valor)}:
-      - ("fixed", precio)   → precio de oferta FIJO (usar tal cual; el effectiveDiscount
-                              es sólo una aproximación y da mal si se aplica como %).
-      - ("pct", descuento)  → descuento por unidad (0..1); precio final = Price*(1-desc).
-                              Cubre % y nxm (4x3, etc.): el descuento ya es el efectivo.
-    Los lotes se piden EN PARALELO (pool chico, mismo patrón que precios_tucuman).
-    Medido sobre SKUs reales: el endpoint responde ~0,3s/lote y tolera 6 en simultáneo
-    sin un solo fallo, dando el MISMO resultado que en secuencial (~7x más rápido)."""
+    """Ofertas del día (Vea/Jumbo) de search-promotions que aparecen en el PRECIO PÚBLICO
+    de la web (las ve cualquiera sin login). Lee DOS buckets: 'generic' (oferta del día,
+    4x3…) y 'jumbo_prime' (2do al 70%, etc. — verificado que se muestran a todos; el
+    "2do al 70%" del pan salía justo de acá y por eso antes no lo capturábamos). Se ignora
+    'sgc' (socios). Devuelve {sku: [ (tipo, valor), … ]} — un SKU puede tener varias promos;
+    el caller aplica la que MÁS abarate:
+      - ("fixed", precio)   → precio de oferta FIJO (usar tal cual).
+      - ("pct", descuento)  → descuento por unidad (0..1); precio final = base*(1-desc).
+                              Cubre % y nxm (4x3, 2do al 70%): el descuento ya es el efectivo.
+    Lotes EN PARALELO (pool chico). El endpoint responde ~0,3s/lote y tolera 6 en simultáneo."""
     seller = SEARCH_PROMO_SELLER.get(dom)
     if not seller or not skus:
         return {}
@@ -326,20 +326,21 @@ def promos_cencosud(dom, skus, cookie=None, workers=6):
                 break
             time.sleep(1.5 * (intento + 1))
         res = {}
-        gen = ((d or {}).get("promotions", {}).get("generic", {}) or {}).get("promotions", {}) or {}
-        for sku, pr in gen.items():
-            try:
-                desc = float(pr.get("effectiveDiscount") or 0)
-            except (TypeError, ValueError):
-                desc = 0
-            try:
-                valor = float(pr.get("value") or 0)
-            except (TypeError, ValueError):
-                valor = 0
-            if pr.get("discountType") == "fixed_price" and valor > 0:
-                res[str(sku)] = ("fixed", round(valor, 2))     # precio de oferta fijo
-            elif 0 < desc < 0.95:          # descuento realista (evita datos absurdos)
-                res[str(sku)] = ("pct", desc)
+        proms = (d or {}).get("promotions", {}) or {}
+        for bucket in ("generic", "jumbo_prime"):     # públicas; 'sgc' (socios) se ignora
+            for sku, pr in ((proms.get(bucket, {}) or {}).get("promotions", {}) or {}).items():
+                try:
+                    desc = float(pr.get("effectiveDiscount") or 0)
+                except (TypeError, ValueError):
+                    desc = 0
+                try:
+                    valor = float(pr.get("value") or 0)
+                except (TypeError, ValueError):
+                    valor = 0
+                if pr.get("discountType") == "fixed_price" and valor > 0:
+                    res.setdefault(str(sku), []).append(("fixed", round(valor, 2)))
+                elif 0 < desc < 0.95:      # descuento realista (evita datos absurdos)
+                    res.setdefault(str(sku), []).append(("pct", desc))
         return res
 
     out = {}
@@ -835,11 +836,11 @@ def main():
                 # Powerade max(sim 2350, idx 3750)=3750 (×promo 0.75 = $2813 = página).
                 precio = max(precio_sim, prs[0]["p"]) if precio_sim else prs[0]["p"]
                 pinfo = promos.get(str(sku))
-                if pinfo:
-                    tipo, val = pinfo
-                    nuevo = val if tipo == "fixed" else round(precio * (1 - val), 2)
-                    if nuevo and nuevo < precio:
-                        precio = nuevo
+                if pinfo:      # aplica la promo que MÁS abarate (cada una sobre la base, sin apilar)
+                    mejor = min([val if t == "fixed" else round(precio * (1 - val), 2)
+                                 for t, val in pinfo])
+                    if mejor and mejor < precio:
+                        precio = mejor
                         n_promo += 1
                 for pr in prs:
                     pr["p"] = precio

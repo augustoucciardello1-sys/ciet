@@ -128,16 +128,25 @@ def precio_real_tucuman(dom, viv):
     cadenas de región = simulación de checkout. Devuelve (precio, nota)."""
     c = ctx(dom)
     if dom in CENCOSUD:
-        base = viv["price"]
+        base = viv["price"] or 0                      # índice/catálogo
+        # base de LISTA = max(simulación qty1, índice), igual que el pipeline
+        if c["region_sim"]:
+            simc = fb.precios_cencosud(dom, c["region_sim"], [(viv["sku"], viv["seller"])],
+                                       sc=c["sc"], cookie=c["seg"]).get(str(viv["sku"]))
+            if simc:
+                psim, avail = simc
+                if avail and avail != "available":
+                    return None, f"no disponible ({avail})"
+                if psim:
+                    base = max(psim, base)
         if not base:
-            return None, "sin precio catálogo"
-        info = fb.promos_cencosud(dom, [viv["sku"]], cookie=c["seg"]).get(str(viv["sku"]))
-        if info:
-            tipo, val = info
-            nuevo = val if tipo == "fixed" else round(base * (1 - val), 2)
-            if nuevo and nuevo < base:
-                return nuevo, "catálogo+promo"
-        return base, "catálogo"
+            return None, "sin precio"
+        pinfo = fb.promos_cencosud(dom, [viv["sku"]], cookie=c["seg"]).get(str(viv["sku"]))
+        precio = base
+        if pinfo:                                     # mejor promo pública (generic+jumbo_prime)
+            precio = min([base] + [v if t == "fixed" else round(base * (1 - v), 2)
+                                   for t, v in pinfo])
+        return precio, "max(sim,índice)+promo"
     if not c["region_sim"]:
         return viv["price"], "sin región (fallback catálogo)"
     sim = fb.precios_tucuman(dom, c["region_sim"], [(viv["sku"], viv["seller"])],
