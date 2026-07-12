@@ -829,7 +829,11 @@ def main():
                 if avail != "available":
                     no_ent.add(sku)
                     continue
-                precio = precio_sim or prs[0]["p"]   # base = simulación (fallback índice)
+                # precio de LISTA = el mayor entre simulación e índice: el que está viejo
+                # suele ser el más bajo (inflación), el fresco es el mayor y es el que
+                # muestra la página. Verificado: Pan max(sim 4822, idx 3454)=4822=página;
+                # Powerade max(sim 2350, idx 3750)=3750 (×promo 0.75 = $2813 = página).
+                precio = max(precio_sim, prs[0]["p"]) if precio_sim else prs[0]["p"]
                 pinfo = promos.get(str(sku))
                 if pinfo:
                     tipo, val = pinfo
