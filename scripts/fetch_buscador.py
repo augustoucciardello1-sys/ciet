@@ -743,36 +743,29 @@ def main():
             chain = {k: pr for k, pr in chain.items() if pr.get("sku") not in no_entregable}
             print(f"  {nombre}: {len(chain)} entregables · {len(no_entregable)} descartados "
                   f"(sin stock / no entregable)", file=sys.stderr)
-        # Cencosud (Vea/Jumbo): el precio del ÍNDICE de búsqueda viene DESACTUALIZADO
-        # (verificado: Powerade índice $2250 vs real $3699; ~10 de 11 diferían). El
-        # precio correcto es el de la SIMULACIÓN de checkout —lo que realmente se cobra
-        # en Tucumán—, igual que en las cadenas de región (que por eso salían bien).
-        # Se usa la simulación SÓLO para el precio: NO se filtra por disponibilidad (para
-        # Cencosud daba falsos negativos y tiraba productos reales); si no responde para
-        # un SKU se conserva el precio del índice como fallback. Reemplaza al viejo paso
-        # de promos (search-promotions), que aplicaba el descuento sobre el precio VIEJO
-        # y daba doblemente mal; la simulación ya trae el efectivo (incluidas nxm).
-        elif seg and region_sim:
-            # Cencosud: simulación de a 2 (3+ ítems falsea) → precio real + disponibilidad.
-            # Se descarta lo no entregable a Tucumán (fantasmas incluidos), MISMO estándar
-            # que las cadenas de región. Si la simulación no responde para un SKU, se
-            # conserva con el precio del índice (fallback ante error de red).
-            sim = precios_cencosud(dom, region_sim, items, sc=tp, cookie=seg)
-            no_entregable = set()
-            for sku, (_, prs) in porsku.items():
-                info = sim.get(str(sku))
-                if info is None:
-                    continue                # sin respuesta (error de red): se conserva
-                precio_sim, avail = info
-                if avail != "available":
-                    no_entregable.add(sku)
-                elif precio_sim:
-                    for pr in prs:
-                        pr["p"] = precio_sim
-                        pr.pop("op", None)  # el precio simulado ya es el efectivo
-            chain = {k: pr for k, pr in chain.items() if pr.get("sku") not in no_entregable}
-            print(f"  {nombre}: {len(chain)} entregables · {len(no_entregable)} descartados "
-                  f"(no entregable a Tucumán / fantasma)", file=sys.stderr)
+        # Cencosud (Vea/Jumbo): se muestra el precio del ÍNDICE de intelligent-search
+        # (lo que ve el cliente cuando busca en Vea/Jumbo) CON la promo del día aplicada.
+        # NO se usa la simulación de checkout: sus precios/disponibilidad NO coinciden de
+        # forma confiable con lo que muestra la web (las fuentes de Cencosud son volátiles y
+        # se contradicen; a veces coincide el índice, a veces la simulación), y encima el
+        # camino por simulación PERDÍA las promos. La promo (search-promotions) se aplica
+        # sobre el precio del índice: "fixed" = precio de oferta; "pct" = base*(1-desc).
+        # Ej.: Monster índice $3400 → promo fija $2600.
+        elif seg and dom in SEARCH_PROMO_SELLER:
+            promos = promos_cencosud(dom, [pr["sku"] for pr in chain.values() if pr.get("sku")],
+                                     cookie=seg)
+            n_promo = 0
+            for pr in chain.values():
+                info = promos.get(str(pr.get("sku")))
+                if not info:
+                    continue
+                tipo, val = info
+                nuevo = val if tipo == "fixed" else round(pr["p"] * (1 - val), 2)
+                if nuevo and nuevo < pr["p"]:   # el precio con oferta ES el precio
+                    pr["p"] = nuevo
+                    n_promo += 1
+            print(f"  {nombre}: {len(chain)} productos · {n_promo} con promo del día",
+                  file=sys.stderr)
         # 3) volcar al agrupado global
         for pr in chain.values():
             clave = pr["e"] or pr["l"]
