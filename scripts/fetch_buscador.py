@@ -421,27 +421,23 @@ def precios_tucuman(dom, region, items, sc=None, cookie=None, workers=6):
 
 
 def precios_cencosud(dom, region, items, sc=None, cookie=None, workers=6):
-    """Precio REAL + disponibilidad de Tucumán para Vea/Jumbo por simulación de checkout,
-    igual estándar que las cadenas de región. Resuelve DOS problemas de Cencosud a la vez:
-      1) el índice de búsqueda trae precios DESACTUALIZADOS (más baratos que la góndola);
-         el precio efectivo es el `sellingPrice` del checkout.
-      2) distingue lo comprable/entregable en Tucumán: los fantasmas (SKUs viejos que no
-         se venden) dan availability='cannotBeDelivered' al CP 4000 (verificado: el atún
-         120g fantasma da cannotBeDelivered; la Veneziana real da 'available').
-    OJO: el checkout de Cencosud FALSEA el precio y la disponibilidad si el carrito tiene
-    3+ ítems (devuelve datos viejos cacheados). Verificado que con <=2 ítems da lo real
-    (Powerade en lote>=3 = $2250 viejo vs de a 2 = $3699 real). Por eso se simula DE A 2,
-    en paralelo (pool chico) → ~10-15 min para Vea+Jumbo, sin throttling a workers=6.
-    NO se hace el rescate sin código postal (haría 'available' hasta a los fantasmas).
-    items: [(sku, seller)]. Devuelve {sku: (precio, availability)}."""
+    """Precio EFECTIVO + disponibilidad de Tucumán para Vea/Jumbo por simulación de checkout.
+    Simula cada producto a qty 1 Y qty 4 y toma el MENOR precio por unidad → capta promos de
+    cantidad (2do al 70%, 4x3). Verificado: Pan Lacteado Vea qty1 = $4822 = página (el índice
+    daba $3454, viejo). availability='available' = se puede añadir al carrito para Tucumán
+    (el atún 120g fantasma da 'cannotBeDelivered'; la Veneziana real 'available').
+    OJO: el checkout de Cencosud FALSEA precio y disponibilidad con 3+ ítems (datos viejos
+    cacheados). Con <=2 ítems da lo real → se simula DE A 2, en paralelo (workers=6, sin
+    throttling). NO se hace rescate sin código postal (haría 'available' a los fantasmas).
+    items: [(sku, seller)]. Devuelve {sku: (precio_min_por_unidad, availability)}."""
     if not region or not items:
         return {}
     url = f"https://{dom}/api/checkout/pub/orderForms/simulation?RnbBehavior=0&regionId={urllib.parse.quote(region)}"
     if sc:
         url += f"&sc={sc}"
 
-    def sim_par(par):
-        body = {"items": [{"id": s, "quantity": 1, "seller": v} for s, v in par],
+    def sim_par(par, qty):
+        body = {"items": [{"id": s, "quantity": qty, "seller": v} for s, v in par],
                 "country": "ARG", "postalCode": CP}
         d = post_json(url, body, cookie=cookie)
         res = {}
@@ -451,13 +447,17 @@ def precios_cencosud(dom, region, items, sc=None, cookie=None, workers=6):
                 if not sid:
                     continue
                 sp = it.get("sellingPrice")
-                res[sid] = (round(sp / 100, 2) if sp else None, it.get("availability"))
+                res[sid] = (round(sp / 100 / qty, 2) if sp else None, it.get("availability"))
         return res
 
+    # SÓLO qty1: el checkout de Cencosud NO escala la cantidad (verificado: Pan Vea da
+    # total $4822 para 1, 2, 3 y 4 unidades → qty4 daría un precio/unidad basura). Por eso
+    # las promos de CANTIDAD (2do al 70%, 4x3) de Vea/Jumbo NO se pueden sacar por simulación;
+    # se cubren con search-promotions donde aparezcan. qty1 sí es el precio base real (=página).
     pares = [items[i:i + 2] for i in range(0, len(items), 2)]   # de a 2 (3+ falsea)
     out = {}
     with concurrent.futures.ThreadPoolExecutor(max_workers=workers) as ex:
-        for r in ex.map(sim_par, pares):
+        for r in ex.map(lambda p: sim_par(p, 1), pares):
             out.update(r)
     return out
 
@@ -809,40 +809,40 @@ def main():
             chain = {k: pr for k, pr in chain.items() if pr.get("sku") not in no_entregable}
             print(f"  {nombre}: {len(chain)} entregables · {len(no_entregable)} descartados "
                   f"(sin stock / no entregable)", file=sys.stderr)
-        # Cencosud (Vea/Jumbo): se muestra el precio del ÍNDICE de intelligent-search
-        # (lo que ve el cliente cuando busca en Vea/Jumbo) CON la promo del día aplicada.
-        # NO se usa la simulación de checkout: sus precios/disponibilidad NO coinciden de
-        # forma confiable con lo que muestra la web (las fuentes de Cencosud son volátiles y
-        # se contradicen; a veces coincide el índice, a veces la simulación), y encima el
-        # camino por simulación PERDÍA las promos. La promo (search-promotions) se aplica
-        # sobre el precio del índice: "fixed" = precio de oferta; "pct" = base*(1-desc).
-        # Ej.: Monster índice $3400 → promo fija $2600.
+        # Cencosud (Vea/Jumbo): PRECIO = simulación de checkout qty1 (precio base REAL de
+        # Tucumán = lo que muestra la página; el índice estaba VIEJO —Pan $3454 vs real
+        # $4822—) con la PROMO del día aplicada si abarata (fija/%: Monster $2600). Se toma
+        # el menor. VISIBILIDAD: se descarta lo NO entregable a Tucumán (fantasma =
+        # cannotBeDelivered; la Veneziana real = available). LIMITACIÓN conocida: las promos
+        # de CANTIDAD (2do al 70%, 4x3) de Cencosud NO se capturan (su checkout no escala la
+        # cantidad y search-promotions/teasers vienen vacíos); sólo se ven en la web al llevar 2+.
         elif seg and dom in SEARCH_PROMO_SELLER:
-            # FILTRO DE FANTASMAS por DISPONIBILIDAD REAL (no por precio): se simula cada
-            # producto DE A 2 (en lote falsea) y se descarta lo que NO se puede recibir en
-            # Tucumán (availability != 'available') — la señal de "no se puede añadir al
-            # carrito para Tucumán", mismo estándar que las cadenas de región. Verificado:
-            # atún 120g fantasma = cannotBeDelivered; Veneziana real = available. El PRECIO
-            # NO cambia (sigue siendo índice × promo); la simulación se usa SÓLO para filtrar.
-            disp = precios_cencosud(dom, region_sim, items, sc=tp, cookie=seg)
-            no_ent = {sku for sku in porsku
-                      if disp.get(str(sku)) is not None and disp[str(sku)][1] != "available"}
-            chain = {k: pr for k, pr in chain.items() if pr.get("sku") not in no_ent}
-            # PRECIO: índice × promo del día (search-promotions), sin tocar
+            sim = precios_cencosud(dom, region_sim, items, sc=tp, cookie=seg)  # {sku:(precio,avail)}
             promos = promos_cencosud(dom, [pr["sku"] for pr in chain.values() if pr.get("sku")],
                                      cookie=seg)
-            n_promo = 0
-            for pr in chain.values():
-                info = promos.get(str(pr.get("sku")))
-                if not info:
+            no_ent, n_promo = set(), 0
+            for sku, (_, prs) in porsku.items():
+                info = sim.get(str(sku))
+                if info is None:
+                    continue                        # sin respuesta (red): se conserva con índice
+                precio_sim, avail = info
+                if avail != "available":
+                    no_ent.add(sku)
                     continue
-                tipo, val = info
-                nuevo = val if tipo == "fixed" else round(pr["p"] * (1 - val), 2)
-                if nuevo and nuevo < pr["p"]:   # el precio con oferta ES el precio
-                    pr["p"] = nuevo
-                    n_promo += 1
+                precio = precio_sim or prs[0]["p"]   # base = simulación (fallback índice)
+                pinfo = promos.get(str(sku))
+                if pinfo:
+                    tipo, val = pinfo
+                    nuevo = val if tipo == "fixed" else round(precio * (1 - val), 2)
+                    if nuevo and nuevo < precio:
+                        precio = nuevo
+                        n_promo += 1
+                for pr in prs:
+                    pr["p"] = precio
+                    pr.pop("op", None)
+            chain = {k: pr for k, pr in chain.items() if pr.get("sku") not in no_ent}
             print(f"  {nombre}: {len(chain)} entregables · {len(no_ent)} descartados "
-                  f"(fantasma/no entregable) · {n_promo} con promo", file=sys.stderr)
+                  f"(no entregable) · {n_promo} con promo", file=sys.stderr)
         # 3) volcar al agrupado global
         for pr in chain.values():
             clave = pr["e"] or pr["l"]
