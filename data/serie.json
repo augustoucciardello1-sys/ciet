@@ -1,5 +1,5 @@
 {
- "actualizado": "2026-07-12",
+ "actualizado": "2026-07-13",
  "base": "índice encadenado (Jevons por tramo), base 100 en el primer día registrado",
  "cadenas": [
   "Hipermercado Carrefour",
@@ -106,10 +106,10 @@
   {
    "fecha": "2026-07-10",
    "indice": 100.04,
-   "var_pct": 0.091,
+   "var_pct": 0.121,
    "canasta_n": 3163,
-   "se_mantienen": 3100,
-   "pares": 29919
+   "se_mantienen": 3072,
+   "pares": 29849
   },
   {
    "fecha": "2026-07-11",
