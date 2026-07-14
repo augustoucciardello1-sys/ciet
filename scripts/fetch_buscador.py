@@ -36,7 +36,11 @@ STOP = {"gaseosa", "bebida", "lt", "lts", "l", "ml", "cc", "cm3", "grs", "gr", "
         "cormillot",
         # descriptores de categoría que cada cadena escribe distinto para el MISMO
         # producto (Suerox "isotónica" en una cadena, "hidratante" en otra).
-        "isotonica", "isotonico", "hidratante", "hidratacion", "rehidratante"}
+        "isotonica", "isotonico", "hidratante", "hidratacion", "rehidratante",
+        # "mate" (toda yerba es yerba MATE → no distingue) y "tacc" (de "sin TACC",
+        # certificación sin gluten que casi toda yerba tiene). OJO: NO se agrega "sin"
+        # (distingue "sin azúcar" de la común) ni "suave" (es una variante real).
+        "mate", "tacc"}
 
 # sinónimos multi-palabra: se reemplazan ANTES de tokenizar (frase -> canónico).
 # Unifican el mismo producto cuando cada cadena usa otra denominación.
