@@ -30,7 +30,7 @@ STOP = {"gaseosa", "bebida", "lt", "lts", "l", "ml", "cc", "cm3", "grs", "gr", "
         "energizante", "energy", "en", "con",
         "tableta", "para", "unidad", "unidades",
         # relleno confirmado (revisión manual): no distinguen producto
-        "pureza", "dp", "litro", "saborizada", "valle", "clasica", "clasico",
+        "pureza", "dp", "litro", "saborizada", "clasica", "clasico",
         # co-marcas/líneas que una cadena agrega y otra no, para el MISMO producto
         # (Tuchanguito "Grisines … Veneziana Cormillot" == Vea "Grisines Veneziana …").
         "cormillot",
@@ -148,6 +148,74 @@ def fusion_por_ean(grupos):
             reps[r] = g
         else:
             _absorber(reps[r], g)
+    return list(reps.values())
+
+
+def fusion_por_similitud(grupos, thresh=0.80):
+    """Une grupos que son el MISMO producto pero con nombre distinto entre cadenas —
+    lo que el match exacto de clave_fuzzy no pesca (Tuchanguito sin EAN; VTEX con EAN
+    distinto o 'refill' vs 'rep'). Similitud = Jaccard de tokens de clave_fuzzy.
+    GUARDAS para no unir cosas distintas: (1) mismo número de tamaño si ambos lo tienen;
+    (2) NO unir grupos que ya comparten una cadena (serían variantes distintas del mismo
+    súper). Umbral ALTO (0.80) → sólo caen los casos obvios; la variante real (p. ej.
+    Playadito 'suave' vs común, J~0.67) queda AFUERA a propósito."""
+    def _toks(g):
+        return set(clave_fuzzy(g["n"], g.get("m", "")).split())
+    def _nums(s):
+        return {x for x in s if any(c.isdigit() for c in x)}
+
+    tk = [_toks(g) for g in grupos]
+    nm = [_nums(t) for t in tk]
+    parent = list(range(len(grupos)))
+
+    def find(x):
+        while parent[x] != x:
+            parent[x] = parent[parent[x]]
+            x = parent[x]
+        return x
+
+    idx = {}
+    for i, t in enumerate(tk):
+        for w in t:
+            idx.setdefault(w, []).append(i)
+    vistos = set()
+    for w, lst in idx.items():
+        if len(lst) > 80:        # token demasiado común: no vale como ancla
+            continue
+        for ii in range(len(lst)):
+            for jj in range(ii + 1, len(lst)):
+                a, b = lst[ii], lst[jj]
+                if a > b:
+                    a, b = b, a
+                if (a, b) in vistos:
+                    continue
+                vistos.add((a, b))
+                ta, tb = tk[a], tk[b]
+                if len(ta) < 2 or len(tb) < 2:
+                    continue
+                if nm[a] and nm[b] and not (nm[a] & nm[b]):
+                    continue                                   # tamaños distintos
+                # umbral según cuán "distintas" son: si CADA lado tiene una palabra propia
+                # (no numérica) que el otro no tiene, puede ser una VARIANTE distinta
+                # (frutos del BOSQUE vs del VALLE) → se exige más (0.85). Si uno es casi
+                # subconjunto del otro (solo orden/abreviatura), basta el umbral base.
+                pa = {x for x in ta - tb if not any(c.isdigit() for c in x)}
+                pb = {x for x in tb - ta if not any(c.isdigit() for c in x)}
+                umbral = 0.85 if (pa and pb) else thresh
+                if len(ta & tb) / len(ta | tb) < umbral:
+                    continue
+                if set(grupos[a]["pr"]) & set(grupos[b]["pr"]):
+                    continue                                   # ya comparten cadena
+                parent[find(b)] = find(a)
+    reps = {}
+    for i, g in enumerate(grupos):
+        r = find(i)
+        if r not in reps:
+            reps[r] = g
+        elif not (set(reps[r]["pr"]) & set(g["pr"])):          # evita choque transitivo
+            _absorber(reps[r], g)
+        else:
+            reps[id(g)] = g                                    # queda aparte
     return list(reps.values())
 
 UA = ("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 "
@@ -984,6 +1052,13 @@ def main():
         if len(g["pr"]) > len(f["pr"]):   # nombre del que aparece en más cadenas
             f["n"], f["m"] = g["n"], g["m"]
     finales = list(fusion.values())
+
+    # 3º agrupado: unir por SIMILITUD de nombre (Jaccard alto) lo que el match exacto no
+    # pescó — mismo producto rotulado distinto entre cadenas (Tuchanguito sin EAN, o VTEX
+    # con 'refill' vs 'rep'). Umbral alto + guardas → sólo los casos obvios.
+    n0 = len(finales)
+    finales = fusion_por_similitud(finales)
+    print(f"  fusión por similitud: {n0} → {len(finales)} grupos", file=sys.stderr)
 
     # === COMPLETAR LA COMPARACIÓN entre súper ===
     # Si un producto (por código de barras) está en unas cadenas y le falta otra que SÍ
