@@ -4,3 +4,5 @@ sepa/
 scripts/__pycache__/
 .DS_Store
 data/buscador.json
+# Datos de la yerba: viven en la rama `yerba-datos` (acumula histórico), no en main.
+data/yerba/
