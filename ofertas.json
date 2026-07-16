@@ -1,6 +1,6 @@
 {
  "fecha": "2026-07-16",
- "actualizado": "2026-07-16 03:07",
+ "actualizado": "2026-07-16 11:04",
  "regla": {
   "min_cadenas": 3,
   "min_baja_pct": 15.0,
@@ -17,7 +17,7 @@
   "2026-07-15",
   "2026-07-16"
  ],
- "total": 43,
+ "total": 40,
  "ofertas": [
   {
    "n": "Miel untable Aleluya 500 g.",
@@ -74,6 +74,33 @@
     "Jumbo": [
      1000.0,
      "https://www.jumbo.com.ar/jugo-del-valle-manzana-1-l/p"
+    ]
+   }
+  },
+  {
+   "n": "Copa Gin Transparente Vidrio 600 Ml 20 Cm Nadir",
+   "m": "NADIR",
+   "i": "https://veaargentina.vtexassets.com/arquivos/ids/789499/Copa-Para-Gin-600-Ml-Nadirx1-1-985802.jpg?v=638265009685300000",
+   "cadena": "ChangoMás",
+   "precio": 3399.5,
+   "link": "https://www.masonline.com.ar/copa-nadir-gin-600ml-2/p",
+   "referencia": 6799.0,
+   "precio_2da": 6649.0,
+   "baja_pct": 50.0,
+   "brecha_pct": 48.9,
+   "score": 2444,
+   "pr": {
+    "Vea": [
+     6649.0,
+     "https://www.vea.com.ar/copa-para-gin-600-ml-nadirx1/p"
+    ],
+    "Jumbo": [
+     6649.0,
+     "https://www.jumbo.com.ar/copa-para-gin-600-ml-nadirx1/p"
+    ],
+    "ChangoMás": [
+     3399.5,
+     "https://www.masonline.com.ar/copa-nadir-gin-600ml-2/p"
     ]
    }
   },
@@ -441,41 +468,6 @@
    }
   },
   {
-   "n": "Mermelada Arcor de durazno 454 g.",
-   "m": "Arcor",
-   "i": "https://carrefourar.vteximg.com.br/arquivos/ids/381265/7790580132163_E01.jpg?v=638315050330100000",
-   "cadena": "Jumbo",
-   "precio": 1650.0,
-   "link": "https://www.jumbo.com.ar/mermeladas-arcor-durazno-454gr/p",
-   "referencia": 3300.0,
-   "precio_2da": 3015.99,
-   "baja_pct": 50.0,
-   "brecha_pct": 45.3,
-   "score": 2265,
-   "pr": {
-    "Carrefour": [
-     3129.0,
-     "https://www.carrefour.com.ar/mermelada-arcor-de-durazno-454-g/p"
-    ],
-    "Vea": [
-     3127.0,
-     "https://www.vea.com.ar/mermeladas-arcor-durazno-454gr/p"
-    ],
-    "Jumbo": [
-     1650.0,
-     "https://www.jumbo.com.ar/mermeladas-arcor-durazno-454gr/p"
-    ],
-    "Comodín": [
-     3015.99,
-     "https://www.comodinencasa.com.ar/mermelada-arcor-durazno-f-454-gr/p"
-    ],
-    "Tuchanguito": [
-     3099.0,
-     "https://www.tuchanguito.com.ar/productos/merm-arcor-durazno-454-gr/"
-    ]
-   }
-  },
-  {
    "n": "Mermelada Extra Sabor Frutilla 340 Grs Schwartau",
    "m": "SCHWARTAU",
    "i": "https://veaargentina.vtexassets.com/arquivos/ids/814482/Mermelada-Schwartau-Artesanal-Frutilla-340-Gr-1-11907.jpg?v=638454229499100000",
@@ -499,6 +491,33 @@
     "Carrefour": [
      7890.0,
      "https://www.carrefour.com.ar/mermelada-de-frutilla-schawartau-en-frasco-340-g-743718/p"
+    ]
+   }
+  },
+  {
+   "n": "Jugo En Polvo De Anana 7 Gr Bc",
+   "m": "BC",
+   "i": "https://veaargentina.vtexassets.com/arquivos/ids/665694/Jugo-En-Polvo-Bc-Anana-7gr-1-878201.jpg?v=637670794022630000",
+   "cadena": "Jumbo",
+   "precio": 225.0,
+   "link": "https://www.jumbo.com.ar/jugo-en-polvo-de-anana-7-gr-bc/p",
+   "referencia": 450,
+   "precio_2da": 400.0,
+   "baja_pct": 50.0,
+   "brecha_pct": 43.8,
+   "score": 2188,
+   "pr": {
+    "Vea": [
+     400.0,
+     "https://www.vea.com.ar/jugo-en-polvo-de-anana-7-gr-bc/p"
+    ],
+    "Jumbo": [
+     225.0,
+     "https://www.jumbo.com.ar/jugo-en-polvo-de-anana-7-gr-bc/p"
+    ],
+    "ChangoMás": [
+     409.0,
+     "https://www.masonline.com.ar/jugo-en-polvo-anana-bc-7-gr-2/p"
     ]
    }
   },
@@ -658,33 +677,6 @@
    }
   },
   {
-   "n": "Acondicionador Fructis Oil Control 200 ml",
-   "m": "Fructis",
-   "i": "https://carrefourar.vteximg.com.br/arquivos/ids/863678/7790033342934_01.jpg?v=639135021297630000",
-   "cadena": "Carrefour",
-   "precio": 2193.75,
-   "link": "https://www.carrefour.com.ar/acondicionador-fructis-oil-control-200-ml-778486/p",
-   "referencia": 3375.0,
-   "precio_2da": 4990.0,
-   "baja_pct": 35.0,
-   "brecha_pct": 56.0,
-   "score": 1961,
-   "pr": {
-    "Carrefour": [
-     2193.75,
-     "https://www.carrefour.com.ar/acondicionador-fructis-oil-control-200-ml-778486/p"
-    ],
-    "Vea": [
-     4990.0,
-     "https://www.vea.com.ar/acondicionador-oil-control-x-200-ml-fructis/p"
-    ],
-    "Jumbo": [
-     5750.0,
-     "https://www.jumbo.com.ar/acondicionador-oil-control-x-200-ml-fructis/p"
-    ]
-   }
-  },
-  {
    "n": "Jugo natural Del Valle de naranja 200 cc.",
    "m": "Del Valle",
    "i": "https://carrefourar.vteximg.com.br/arquivos/ids/817818/7790154008375_E02.jpg?v=639082510869300000",
@@ -774,6 +766,68 @@
    }
   },
   {
+   "n": "Jugo en polvo Arcor de limonada 15 grs",
+   "m": "Arcor",
+   "i": "https://carrefourar.vteximg.com.br/arquivos/ids/817841/7790580143527_E02.jpg?v=639082514290530000",
+   "cadena": "Jumbo",
+   "precio": 225.0,
+   "link": "https://www.jumbo.com.ar/jugo-en-polvo-arcor-limonada-15g/p",
+   "referencia": 450.0,
+   "precio_2da": 359.0,
+   "baja_pct": 50.0,
+   "brecha_pct": 37.3,
+   "score": 1866,
+   "pr": {
+    "Carrefour": [
+     359.0,
+     "https://www.carrefour.com.ar/jugo-en-polvo-arcor-de-limonada-15-grs-750879/p"
+    ],
+    "Vea": [
+     389.0,
+     "https://www.vea.com.ar/jugo-en-polvo-arcor-limonada-15g/p"
+    ],
+    "Jumbo": [
+     225.0,
+     "https://www.jumbo.com.ar/jugo-en-polvo-arcor-limonada-15g/p"
+    ],
+    "ChangoMás": [
+     409.0,
+     "https://www.masonline.com.ar/jugo-en-polvo-arcor-limonada-15-g/p"
+    ]
+   }
+  },
+  {
+   "n": "Jugo en polvo Arcor de multifruta 15 grs",
+   "m": "Arcor",
+   "i": "https://carrefourar.vteximg.com.br/arquivos/ids/817836/7790580142490_E02.jpg?v=639082513555400000",
+   "cadena": "Jumbo",
+   "precio": 225.0,
+   "link": "https://www.jumbo.com.ar/jugo-en-polvo-arcor-multifruta-15g/p",
+   "referencia": 450.0,
+   "precio_2da": 359.0,
+   "baja_pct": 50.0,
+   "brecha_pct": 37.3,
+   "score": 1866,
+   "pr": {
+    "Carrefour": [
+     359.0,
+     "https://www.carrefour.com.ar/jugo-en-polvo-arcor-de-multifruta-15-grs-750886/p"
+    ],
+    "Vea": [
+     389.0,
+     "https://www.vea.com.ar/jugo-en-polvo-arcor-multifruta-15g/p"
+    ],
+    "Jumbo": [
+     225.0,
+     "https://www.jumbo.com.ar/jugo-en-polvo-arcor-multifruta-15g/p"
+    ],
+    "ChangoMás": [
+     409.0,
+     "https://www.masonline.com.ar/jugo-en-polvo-arcor-multifruta-15-g/p"
+    ]
+   }
+  },
+  {
    "n": "Jugo en polvo Arcor de naranja 15 grs",
    "m": "Arcor",
    "i": "https://carrefourar.vteximg.com.br/arquivos/ids/817839/7790580143237_E01.jpg?v=639082514006900000",
@@ -791,7 +845,7 @@
      "https://www.carrefour.com.ar/jugo-en-polvo-arcor-de-naranja-15-grs-750889/p"
     ],
     "Vea": [
-     450.0,
+     389.0,
      "https://www.vea.com.ar/jugo-en-polvo-arcor-naranja-x-15-gr/p"
     ],
     "Jumbo": [
@@ -799,7 +853,7 @@
      "https://www.jumbo.com.ar/jugo-en-polvo-arcor-naranja-x-15-gr/p"
     ],
     "ChangoMás": [
-     359.0,
+     409.0,
      "https://www.masonline.com.ar/jugo-en-polvo-arcor-naranja-15-g/p"
     ]
    }
@@ -822,7 +876,7 @@
      "https://www.carrefour.com.ar/jugo-en-polvo-arcor-de-manzana-15-grs-750867/p"
     ],
     "Vea": [
-     450.0,
+     389.0,
      "https://www.vea.com.ar/jugo-en-polvo-arcor-manzana-15g/p"
     ],
     "Jumbo": [
@@ -830,7 +884,7 @@
      "https://www.jumbo.com.ar/jugo-en-polvo-arcor-manzana-15g/p"
     ],
     "ChangoMás": [
-     359.0,
+     409.0,
      "https://www.masonline.com.ar/jugo-en-polvo-arcor-manzana-15-g/p"
     ]
    }
@@ -853,74 +907,12 @@
      "https://www.carrefour.com.ar/jugo-en-polvo-arcor-de-durazno-15-grs-750888/p"
     ],
     "Vea": [
-     450.0,
+     389.0,
      "https://www.vea.com.ar/jugo-en-polvo-arcor-durazno-15g/p"
     ],
     "Jumbo": [
      225.0,
      "https://www.jumbo.com.ar/jugo-en-polvo-arcor-durazno-15g/p"
-    ]
-   }
-  },
-  {
-   "n": "Jugo en polvo Arcor de multifruta 15 grs",
-   "m": "Arcor",
-   "i": "https://carrefourar.vteximg.com.br/arquivos/ids/817836/7790580142490_E02.jpg?v=639082513555400000",
-   "cadena": "Jumbo",
-   "precio": 225.0,
-   "link": "https://www.jumbo.com.ar/jugo-en-polvo-arcor-multifruta-15g/p",
-   "referencia": 450.0,
-   "precio_2da": 359.0,
-   "baja_pct": 50.0,
-   "brecha_pct": 37.3,
-   "score": 1866,
-   "pr": {
-    "Carrefour": [
-     359.0,
-     "https://www.carrefour.com.ar/jugo-en-polvo-arcor-de-multifruta-15-grs-750886/p"
-    ],
-    "Vea": [
-     450.0,
-     "https://www.vea.com.ar/jugo-en-polvo-arcor-multifruta-15g/p"
-    ],
-    "Jumbo": [
-     225.0,
-     "https://www.jumbo.com.ar/jugo-en-polvo-arcor-multifruta-15g/p"
-    ],
-    "ChangoMás": [
-     359.0,
-     "https://www.masonline.com.ar/jugo-en-polvo-arcor-multifruta-15-g/p"
-    ]
-   }
-  },
-  {
-   "n": "Jugo en polvo Arcor de limonada 15 grs",
-   "m": "Arcor",
-   "i": "https://carrefourar.vteximg.com.br/arquivos/ids/817841/7790580143527_E02.jpg?v=639082514290530000",
-   "cadena": "Jumbo",
-   "precio": 225.0,
-   "link": "https://www.jumbo.com.ar/jugo-en-polvo-arcor-limonada-15g/p",
-   "referencia": 450.0,
-   "precio_2da": 359.0,
-   "baja_pct": 50.0,
-   "brecha_pct": 37.3,
-   "score": 1866,
-   "pr": {
-    "Carrefour": [
-     359.0,
-     "https://www.carrefour.com.ar/jugo-en-polvo-arcor-de-limonada-15-grs-750879/p"
-    ],
-    "Vea": [
-     450.0,
-     "https://www.vea.com.ar/jugo-en-polvo-arcor-limonada-15g/p"
-    ],
-    "Jumbo": [
-     225.0,
-     "https://www.jumbo.com.ar/jugo-en-polvo-arcor-limonada-15g/p"
-    ],
-    "ChangoMás": [
-     359.0,
-     "https://www.masonline.com.ar/jugo-en-polvo-arcor-limonada-15-g/p"
     ]
    }
   },
@@ -942,43 +934,12 @@
      "https://www.carrefour.com.ar/jugo-en-polvo-arcor-de-naranja-dulce-15-grs-750884/p"
     ],
     "Vea": [
-     450.0,
+     389.0,
      "https://www.vea.com.ar/jugo-en-polvo-arcor-naranja-dulce-x-15-gr/p"
     ],
     "Jumbo": [
      225.0,
      "https://www.jumbo.com.ar/jugo-en-polvo-arcor-naranja-dulce-x-15-gr/p"
-    ]
-   }
-  },
-  {
-   "n": "Jugo en polvo BC La Campagnola naranja 7 g.",
-   "m": "BC",
-   "i": "https://carrefourar.vteximg.com.br/arquivos/ids/822078/7790580132774_02.jpg?v=639083181662900000",
-   "cadena": "Jumbo",
-   "precio": 225.0,
-   "link": "https://www.jumbo.com.ar/jugo-en-polvo-de-naranja-7-gr-bc/p",
-   "referencia": 450.0,
-   "precio_2da": 359.0,
-   "baja_pct": 50.0,
-   "brecha_pct": 37.3,
-   "score": 1866,
-   "pr": {
-    "Carrefour": [
-     359.0,
-     "https://www.carrefour.com.ar/jugo-en-polvo-bc-la-campagnola-naranja-7-g/p"
-    ],
-    "Vea": [
-     400.0,
-     "https://www.vea.com.ar/jugo-en-polvo-de-naranja-7-gr-bc/p"
-    ],
-    "Jumbo": [
-     225.0,
-     "https://www.jumbo.com.ar/jugo-en-polvo-de-naranja-7-gr-bc/p"
-    ],
-    "ChangoMás": [
-     359.0,
-     "https://www.masonline.com.ar/jugo-en-polvo-naranja-bc-7-gr-2/p"
     ]
    }
   },
@@ -1006,33 +967,6 @@
     "Carrefour": [
      359.0,
      "https://www.carrefour.com.ar/jugo-en-polvo-bc-la-campagnola-manzana-roja-7-g/p"
-    ]
-   }
-  },
-  {
-   "n": "Jugo En Polvo De Anana 7 Gr Bc",
-   "m": "BC",
-   "i": "https://veaargentina.vtexassets.com/arquivos/ids/665694/Jugo-En-Polvo-Bc-Anana-7gr-1-878201.jpg?v=637670794022630000",
-   "cadena": "Jumbo",
-   "precio": 225.0,
-   "link": "https://www.jumbo.com.ar/jugo-en-polvo-de-anana-7-gr-bc/p",
-   "referencia": 450,
-   "precio_2da": 359.0,
-   "baja_pct": 50.0,
-   "brecha_pct": 37.3,
-   "score": 1866,
-   "pr": {
-    "Vea": [
-     400.0,
-     "https://www.vea.com.ar/jugo-en-polvo-de-anana-7-gr-bc/p"
-    ],
-    "Jumbo": [
-     225.0,
-     "https://www.jumbo.com.ar/jugo-en-polvo-de-anana-7-gr-bc/p"
-    ],
-    "ChangoMás": [
-     359.0,
-     "https://www.masonline.com.ar/jugo-en-polvo-anana-bc-7-gr-2/p"
     ]
    }
   },
@@ -1153,6 +1087,10 @@
     "Carrefour": [
      4299.0,
      "https://www.carrefour.com.ar/aros-de-cereal-frutado-kellogs-froot-loops-en-bolsa-195-g-733171/p"
+    ],
+    "ChangoMás": [
+     4779.0,
+     "https://www.masonline.com.ar/aros-de-cereal-froot-loops-sabor-a-frutas-195-g-2/p"
     ]
    }
   },
@@ -1211,33 +1149,6 @@
     "ChangoMás": [
      5291.4,
      "https://www.masonline.com.ar/escoba-multiusos-virulana-1-u-2/p"
-    ]
-   }
-  },
-  {
-   "n": "Jabón Líquido Hidrata y Purifica Jengibre 200 Ml Vn",
-   "m": "VN",
-   "i": "https://veaargentina.vtexassets.com/arquivos/ids/822355/Jab-n-Liq-Villeneuve-Jengi-H-p-Dp-200ml-1-1001972.jpg?v=638508232641370000",
-   "cadena": "Jumbo",
-   "precio": 1175.0,
-   "link": "https://www.jumbo.com.ar/jabon-liquido-jengibre-hidrata-purifica-doypack-200-ml-villeneuve/p",
-   "referencia": 1762.5,
-   "precio_2da": 2250.0,
-   "baja_pct": 33.3,
-   "brecha_pct": 47.8,
-   "score": 1593,
-   "pr": {
-    "Vea": [
-     2250.0,
-     "https://www.vea.com.ar/jabon-liquido-jengibre-hidrata-purifica-doypack-200-ml-villeneuve/p"
-    ],
-    "Jumbo": [
-     1175.0,
-     "https://www.jumbo.com.ar/jabon-liquido-jengibre-hidrata-purifica-doypack-200-ml-villeneuve/p"
-    ],
-    "ChangoMás": [
-     2259.0,
-     "https://www.masonline.com.ar/jabon-liquido-vn-hidrata-y-purifica-200ml/p"
     ]
    }
   },
