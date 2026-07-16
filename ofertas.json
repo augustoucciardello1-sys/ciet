@@ -1,6 +1,6 @@
 {
  "fecha": "2026-07-16",
- "actualizado": "2026-07-16 11:04",
+ "actualizado": "2026-07-16 16:30",
  "regla": {
   "min_cadenas": 3,
   "min_baja_pct": 15.0,
@@ -17,7 +17,7 @@
   "2026-07-15",
   "2026-07-16"
  ],
- "total": 40,
+ "total": 37,
  "ofertas": [
   {
    "n": "Miel untable Aleluya 500 g.",
@@ -105,36 +105,9 @@
    }
   },
   {
-   "n": "Miel Liquida Sin Tacc Aleluya 500 Gr",
-   "m": "ALELUYA",
-   "i": "https://veaargentina.vtexassets.com/arquivos/ids/644830/Miel-Aleluya-Liquida-Sin-Tacc-Frasco-500-Gr-1-853527.jpg?v=637576825321470000",
-   "cadena": "Jumbo",
-   "precio": 3850.0,
-   "link": "https://www.jumbo.com.ar/miel-liquida-sin-tacc-aleluya-500-gr/p",
-   "referencia": 7700.0,
-   "precio_2da": 7500.0,
-   "baja_pct": 50.0,
-   "brecha_pct": 48.7,
-   "score": 2433,
-   "pr": {
-    "Vea": [
-     7500.0,
-     "https://www.vea.com.ar/miel-liquida-sin-tacc-aleluya-500-gr/p"
-    ],
-    "Jumbo": [
-     3850.0,
-     "https://www.jumbo.com.ar/miel-liquida-sin-tacc-aleluya-500-gr/p"
-    ],
-    "ChangoMás": [
-     8109.0,
-     "https://www.masonline.com.ar/miel-frasco-sin-tacc-aleluya-500gr-2/p"
-    ]
-   }
-  },
-  {
-   "n": "Mermelada Frutilla Light 400 Gr El Brocal",
-   "m": "EL BROCAL",
-   "i": "https://veaargentina.vtexassets.com/arquivos/ids/861572/Mermelada-Frutilla-Light-400-Gr-El-Brocal-1-1519.jpg?v=638793777991930000",
+   "n": "Mermelada El Brocal de frutilla light 400 g.",
+   "m": "El Brocal",
+   "i": "https://carrefourar.vteximg.com.br/arquivos/ids/237036/7798088960325_02.jpg?v=637818418721230000",
    "cadena": "Jumbo",
    "precio": 4200.0,
    "link": "https://www.jumbo.com.ar/mermelada-frutilla-light-400-gr-el-brocal/p",
@@ -144,6 +117,10 @@
    "brecha_pct": 48.5,
    "score": 2423,
    "pr": {
+    "Carrefour": [
+     8150.0,
+     "https://www.carrefour.com.ar/mermelada-el-brocal-de-frutilla-light-400-g-609937/p"
+    ],
     "Vea": [
      8150.0,
      "https://www.vea.com.ar/mermelada-frutilla-light-400-gr-el-brocal/p"
@@ -151,10 +128,6 @@
     "Jumbo": [
      4200.0,
      "https://www.jumbo.com.ar/mermelada-frutilla-light-400-gr-el-brocal/p"
-    ],
-    "Carrefour": [
-     8150.0,
-     "https://www.carrefour.com.ar/mermelada-el-brocal-de-frutilla-light-400-g-609937/p"
     ]
    }
   },
@@ -321,9 +294,9 @@
    }
   },
   {
-   "n": "Mermelada El Brocal Higo 420 Gr",
-   "m": "EL BROCAL",
-   "i": "https://veaargentina.vtexassets.com/arquivos/ids/861568/Mermelada-El-Brocal-Higo-420-Gr-1-1042.jpg?v=638793777980330000",
+   "n": "Mermelada de higo El Brocal frasco 420 g.",
+   "m": "El Brocal",
+   "i": "https://carrefourar.vteximg.com.br/arquivos/ids/214487/7798088960059_02.jpg?v=637678495361800000",
    "cadena": "Jumbo",
    "precio": 3550.0,
    "link": "https://www.jumbo.com.ar/mermelada-el-brocal-higo-420-gr/p",
@@ -333,6 +306,10 @@
    "brecha_pct": 47.4,
    "score": 2370,
    "pr": {
+    "Carrefour": [
+     6750.0,
+     "https://www.carrefour.com.ar/mermelada-de-higo-el-brocal-frasco-420-g/p"
+    ],
     "Vea": [
      6750.0,
      "https://www.vea.com.ar/mermelada-el-brocal-higo-420-gr/p"
@@ -340,10 +317,6 @@
     "Jumbo": [
      3550.0,
      "https://www.jumbo.com.ar/mermelada-el-brocal-higo-420-gr/p"
-    ],
-    "Carrefour": [
-     6750.0,
-     "https://www.carrefour.com.ar/mermelada-de-higo-el-brocal-frasco-420-g/p"
     ]
    }
   },
@@ -398,10 +371,6 @@
     "Jumbo": [
      5150.0,
      "https://www.jumbo.com.ar/isotonico-gatorade-manzana-1-25lt/p"
-    ],
-    "Comodín": [
-     4171.49,
-     "https://www.comodinencasa.com.ar/bebida-isotonica-gatorade-manz-p-1250cc/p"
     ],
     "ChangoMás": [
      1999.0,
@@ -577,13 +546,36 @@
      1763.89,
      "https://www.comodinencasa.com.ar/bebida-del-valle-naranja-sin-alcohol-x1l/p"
     ],
-    "ChangoMás": [
-     2119.0,
-     "https://www.masonline.com.ar/jugo-naranja-del-valle-1000-cc-2/p"
-    ],
     "Carrefour": [
      2000.0,
      "https://www.carrefour.com.ar/jugo-natural-del-valle-de-naranja-1-l/p"
+    ]
+   }
+  },
+  {
+   "n": "Jugo Sabor Durazno 1 Lts Del Valle",
+   "m": "DEL VALLE",
+   "i": "https://veaargentina.vtexassets.com/arquivos/ids/797117/Jugo-Del-Valle-Durazno-1lt-1-869548.jpg?v=638327434531130000",
+   "cadena": "Jumbo",
+   "precio": 1025.0,
+   "link": "https://www.jumbo.com.ar/jugo-del-valle-durazno-1-l/p",
+   "referencia": 2050.0,
+   "precio_2da": 1763.89,
+   "baja_pct": 50.0,
+   "brecha_pct": 41.9,
+   "score": 2094,
+   "pr": {
+    "Vea": [
+     2000.0,
+     "https://www.vea.com.ar/jugo-del-valle-durazno-1-l/p"
+    ],
+    "Jumbo": [
+     1025.0,
+     "https://www.jumbo.com.ar/jugo-del-valle-durazno-1-l/p"
+    ],
+    "Comodín": [
+     1763.89,
+     "https://www.comodinencasa.com.ar/bebida-del-valle-durazno-sin-alcohol-x1l/p"
     ]
    }
   },
@@ -608,10 +600,6 @@
      1025.0,
      "https://www.jumbo.com.ar/jugo-del-valle-multifruta-1lt/p"
     ],
-    "ChangoMás": [
-     2119.0,
-     "https://www.masonline.com.ar/jugo-multifruta-del-valle-1000-cc-2/p"
-    ],
     "Carrefour": [
      2000.0,
      "https://www.carrefour.com.ar/jugo-natural-del-valle-de-multifruta-1-l/p"
@@ -623,56 +611,29 @@
    }
   },
   {
-   "n": "Mermelada \"dulcor\" Frutilla X 500 Gr.",
-   "m": "DULCOR",
-   "i": "https://jumboargentinaio.vtexassets.com/arquivos/ids/814271/Mermelada-dulcor-Frutilla-X-500-Gr-1-9535.jpg?v=638452605634400000",
-   "cadena": "Jumbo",
-   "precio": 1275.0,
-   "link": "https://www.jumbo.com.ar/mermelada-dulcor-frutilla-x-500-gr/p",
-   "referencia": 2550.0,
-   "precio_2da": 2110.0,
-   "baja_pct": 50.0,
-   "brecha_pct": 39.6,
-   "score": 1979,
+   "n": "Acondicionador Fructis Oil Control 200 ml",
+   "m": "Fructis",
+   "i": "https://carrefourar.vteximg.com.br/arquivos/ids/863678/7790033342934_01.jpg?v=639135021297630000",
+   "cadena": "Carrefour",
+   "precio": 2193.75,
+   "link": "https://www.carrefour.com.ar/acondicionador-fructis-oil-control-200-ml-778486/p",
+   "referencia": 3375.0,
+   "precio_2da": 4990.0,
+   "baja_pct": 35.0,
+   "brecha_pct": 56.0,
+   "score": 1961,
    "pr": {
-    "Jumbo": [
-     1275.0,
-     "https://www.jumbo.com.ar/mermelada-dulcor-frutilla-x-500-gr/p"
+    "Carrefour": [
+     2193.75,
+     "https://www.carrefour.com.ar/acondicionador-fructis-oil-control-200-ml-778486/p"
     ],
-    "Comodín": [
-     2210.79,
-     "https://www.comodinencasa.com.ar/mermelada-dulcor-frutilla-x-500-gr/p"
-    ],
-    "Tuchanguito": [
-     2110.0,
-     "https://www.tuchanguito.com.ar/productos/mermelada-dulcor-frutilla-500gr/"
-    ]
-   }
-  },
-  {
-   "n": "Mermelada Dulcor Damasco 500 Gr",
-   "m": "DULCOR",
-   "i": "https://veaargentina.vtexassets.com/arquivos/ids/611862/Mermelada-Dulcor-Damasco-500-Gr-1-9500.jpg?v=637396248656030000",
-   "cadena": "Jumbo",
-   "precio": 1025.0,
-   "link": "https://www.jumbo.com.ar/mermelada-dulcor-4/p",
-   "referencia": 2050.0,
-   "precio_2da": 1693.74,
-   "baja_pct": 50.0,
-   "brecha_pct": 39.5,
-   "score": 1974,
-   "pr": {
     "Vea": [
-     2050.0,
-     "https://www.vea.com.ar/mermelada-dulcor-4/p"
+     4990.0,
+     "https://www.vea.com.ar/acondicionador-oil-control-x-200-ml-fructis/p"
     ],
     "Jumbo": [
-     1025.0,
-     "https://www.jumbo.com.ar/mermelada-dulcor-4/p"
-    ],
-    "Tuchanguito": [
-     1693.74,
-     "https://www.tuchanguito.com.ar/productos/mermelada-dulcor-damasco-500gr/"
+     5750.0,
+     "https://www.jumbo.com.ar/acondicionador-oil-control-x-200-ml-fructis/p"
     ]
    }
   },
@@ -917,33 +878,6 @@
    }
   },
   {
-   "n": "Jugo en polvo Arcor de naranja dulce 15 grs",
-   "m": "Arcor",
-   "i": "https://carrefourar.vteximg.com.br/arquivos/ids/817838/7790580143008_E02.jpg?v=639082513859870000",
-   "cadena": "Jumbo",
-   "precio": 225.0,
-   "link": "https://www.jumbo.com.ar/jugo-en-polvo-arcor-naranja-dulce-x-15-gr/p",
-   "referencia": 450.0,
-   "precio_2da": 359.0,
-   "baja_pct": 50.0,
-   "brecha_pct": 37.3,
-   "score": 1866,
-   "pr": {
-    "Carrefour": [
-     359.0,
-     "https://www.carrefour.com.ar/jugo-en-polvo-arcor-de-naranja-dulce-15-grs-750884/p"
-    ],
-    "Vea": [
-     389.0,
-     "https://www.vea.com.ar/jugo-en-polvo-arcor-naranja-dulce-x-15-gr/p"
-    ],
-    "Jumbo": [
-     225.0,
-     "https://www.jumbo.com.ar/jugo-en-polvo-arcor-naranja-dulce-x-15-gr/p"
-    ]
-   }
-  },
-  {
    "n": "Jugo en Polvo Sabor Manzana 7 Grs Bc",
    "m": "BC",
    "i": "https://veaargentina.vtexassets.com/arquivos/ids/665691/Jugo-En-Polvo-Bc-Manzana-Roja-7gr-1-878198.jpg?v=637670794015230000",
@@ -1037,33 +971,6 @@
    }
   },
   {
-   "n": "Galletitas Oreo Rellenas con crema sabor original 354 g.",
-   "m": "Oreo",
-   "i": "https://carrefourar.vteximg.com.br/arquivos/ids/882317/7622201735258_E01.jpg?v=639155696656670000",
-   "cadena": "Jumbo",
-   "precio": 3690.0,
-   "link": "https://www.jumbo.com.ar/galletitas-rellenas-con-crema-sabor-original-354-gr-x-3-un-oreo/p",
-   "referencia": 6150.0,
-   "precio_2da": 6249.0,
-   "baja_pct": 40.0,
-   "brecha_pct": 41.0,
-   "score": 1638,
-   "pr": {
-    "Carrefour": [
-     6249.0,
-     "https://www.carrefour.com.ar/galletitas-oreo-rellenas-con-crema-sabor-original-354-g-715951/p"
-    ],
-    "Vea": [
-     6421.0,
-     "https://www.vea.com.ar/galletitas-rellenas-con-crema-sabor-original-354-gr-x-3-un-oreo/p"
-    ],
-    "Jumbo": [
-     3690.0,
-     "https://www.jumbo.com.ar/galletitas-rellenas-con-crema-sabor-original-354-gr-x-3-un-oreo/p"
-    ]
-   }
-  },
-  {
    "n": "Cereal Sabor Frutas 195 Grs Froot Loops",
    "m": "FROOT LOOPS",
    "i": "https://veaargentina.vtexassets.com/arquivos/ids/805078/Cereal-Froot-Loops-X195g-1-1001773.jpg?v=638392017679800000",
@@ -1095,33 +1002,6 @@
    }
   },
   {
-   "n": "Nesfit Cereal Sin Azúcar 220 grs",
-   "m": "Nesfit",
-   "i": "https://carrefourar.vteximg.com.br/arquivos/ids/854274/7891000288801_01.jpg?v=639122872805630000",
-   "cadena": "Carrefour",
-   "precio": 3111.0,
-   "link": "https://www.carrefour.com.ar/nesfit-cereal-sin-azucar-220-grs-690360/p",
-   "referencia": 5185.0,
-   "precio_2da": 5200.0,
-   "baja_pct": 40.0,
-   "brecha_pct": 40.2,
-   "score": 1607,
-   "pr": {
-    "Carrefour": [
-     3111.0,
-     "https://www.carrefour.com.ar/nesfit-cereal-sin-azucar-220-grs-690360/p"
-    ],
-    "Vea": [
-     5200.0,
-     "https://www.vea.com.ar/cereal-sin-azucar-220-grs-nesfit/p"
-    ],
-    "Jumbo": [
-     5350.0,
-     "https://www.jumbo.com.ar/cereal-sin-azucar-220-grs-nesfit/p"
-    ]
-   }
-  },
-  {
    "n": "Escoba Virulana multiuso 1 u.",
    "m": "Virulana",
    "i": "https://carrefourar.vteximg.com.br/arquivos/ids/849841/7794440007042_01.jpg?v=639120365702070000",
@@ -1149,6 +1029,33 @@
     "ChangoMás": [
      5291.4,
      "https://www.masonline.com.ar/escoba-multiusos-virulana-1-u-2/p"
+    ]
+   }
+  },
+  {
+   "n": "Limpiador Antihongos Removedor Activo 450 Cc Ayudin",
+   "m": "AYUDIN",
+   "i": "https://veaargentina.vtexassets.com/arquivos/ids/683209/Limpiador-Antihongos-Ayud-n-Removedor-Activo-envase-Econ-mico-450-Ml-1-880058.jpg?v=637768318159300000",
+   "cadena": "Carrefour",
+   "precio": 1319.5,
+   "link": "https://www.carrefour.com.ar/limpiador-antihongos-ayudin-removedor-activo-envase-economico-450-ml/p",
+   "referencia": 2030.0,
+   "precio_2da": 2350.0,
+   "baja_pct": 35.0,
+   "brecha_pct": 43.9,
+   "score": 1535,
+   "pr": {
+    "Vea": [
+     2350.0,
+     "https://www.vea.com.ar/limpiador-antihongos-ayudin-removedor-activo-envase-economico-450-ml/p"
+    ],
+    "Jumbo": [
+     2350.0,
+     "https://www.jumbo.com.ar/limpiador-antihongos-ayudin-removedor-activo-envase-economico-450-ml/p"
+    ],
+    "Carrefour": [
+     1319.5,
+     "https://www.carrefour.com.ar/limpiador-antihongos-ayudin-removedor-activo-envase-economico-450-ml/p"
     ]
    }
   },
