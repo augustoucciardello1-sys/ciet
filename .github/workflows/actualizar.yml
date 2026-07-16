@@ -25,7 +25,7 @@ permissions:
 jobs:
   actualizar:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 50   # la corrida normal tarda ~27-35 min (chequeo de páginas vivas incluido)
     env:
       TZ: America/Argentina/Tucuman   # el runner es UTC; sin esto fecha/hora salen 3 h adelantadas
     steps:
