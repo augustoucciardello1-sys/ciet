@@ -1,0 +1,84 @@
+name: Actualizar buscador (nube)
+
+# Automatización de precios en la NUBE (gratis, repo público) — reemplaza a la laptop.
+# Corre 3×/día: 10/13/16 hora Argentina (UTC-3) = 13/16/19 UTC.
+# - Buscador: scrapea las 6 cadenas y publica buscador.json en la rama `datos`
+#   (commit único, historial liviano, igual que la corrida local).
+# - Yerba: 1×/día (la 1ra corrida que no encuentre la captura de hoy) suma el crudo
+#   diario y reconstruye indice.json en la rama `yerba-datos`.
+# GitHub delays los cron bajo carga (pueden llegar tarde algunos minutos): es esperable.
+on:
+  schedule:
+    - cron: '0 13 * * *'   # 10:00 ART
+    - cron: '0 16 * * *'   # 13:00 ART
+    - cron: '0 19 * * *'   # 16:00 ART
+  workflow_dispatch:
+
+# Cancela una corrida si otra empieza (evita que dos se pisen, como el candado local).
+concurrency:
+  group: actualizar
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  actualizar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Config git
+        run: |
+          git config user.name "ciet-bot"
+          git config user.email "actions@users.noreply.github.com"
+
+      # --- Buscador -> rama datos (buscador.json en la raíz, que es lo que lee el sitio) ---
+      - name: Scrapear y publicar buscador
+        run: |
+          set -e
+          python3 scripts/fetch_buscador.py --tope 150 -o /tmp/buscador.json
+          git fetch origin datos
+          git worktree add -B datos /tmp/datos origin/datos
+          cp /tmp/buscador.json /tmp/datos/buscador.json
+          cd /tmp/datos
+          git add buscador.json
+          if git diff --cached --quiet HEAD; then
+            echo "sin cambios en buscador.json"
+          else
+            git commit --amend -m "Buscador $(date +%F)"
+            git push -f origin datos
+            echo "buscador publicado"
+          fi
+
+      # Verificación post-scrape (25 productos al azar re-consultados en vivo). Informativa:
+      # no aborta ni afecta el push; sólo deja el detalle en el log de la corrida.
+      - name: Verificar buscador (informativo)
+        continue-on-error: true
+        run: python3 scripts/verificar_buscador.py --n 25 --buscador /tmp/datos/buscador.json
+
+      # --- Índice de yerba -> rama yerba-datos (1×/día) ---
+      - name: Capturar yerba (1×/día)
+        if: always()
+        run: |
+          set -e
+          HOY=$(date +%F)
+          git fetch origin yerba-datos
+          git worktree add -B yerba-datos /tmp/yerba origin/yerba-datos
+          if [ -f "/tmp/yerba/crudo/$HOY.json" ]; then
+            echo "ya está la captura de yerba de hoy ($HOY), no hago nada"
+            exit 0
+          fi
+          python3 scripts/fetch_buscador.py --terminos yerba --tope 200 -o "/tmp/yerba/crudo/$HOY.json"
+          python3 scripts/build_indice_yerba.py --crudo /tmp/yerba/crudo -o /tmp/yerba/indice.json
+          cd /tmp/yerba
+          git add -A
+          git commit -m "Yerba: captura $HOY"
+          git push origin yerba-datos
+          echo "yerba publicada ($HOY)"
