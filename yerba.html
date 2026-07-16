@@ -62,7 +62,10 @@
   .hero .var { font-size:1rem; font-weight:700; font-variant-numeric:tabular-nums; margin-top:8px; }
   .hero .var.pos { color:var(--up); } .hero .var.neg { color:var(--down); }
   .hero .sub { font-size:.78rem; color:var(--muted); margin-top:5px; }
+  .hero .sub2 { font-size:.73rem; color:var(--muted); margin-top:7px; padding-top:7px; border-top:1px solid var(--line); }
   .hero .col .num { font-family:var(--serif); font-size:1.7rem; font-weight:500; font-variant-numeric:tabular-nums; }
+  .periodo { display:flex; align-items:center; gap:12px; margin-bottom:16px; flex-wrap:wrap; }
+  .periodo-lbl { font-size:.7rem; text-transform:uppercase; letter-spacing:.05em; color:var(--muted); font-weight:600; }
 
   .card { background:var(--card); border:1px solid var(--line); border-radius:16px; padding:20px 22px; margin:16px 0; }
   .card h2 { font-family:var(--serif); font-weight:500; font-size:1.2rem; letter-spacing:-0.01em; margin-bottom:3px; }
@@ -154,7 +157,7 @@
 <div class="wrap">
   <header class="page">
     <h1>Índice de precios de la yerba en Tucumán</h1>
-    <p>El precio de la yerba mate de 1&nbsp;kg —todas las marcas, todos los días— en los supermercados de Tucumán, con el desglose de cada yerba en cada cadena.</p>
+    <p>Seguimiento del precio de la yerba mate de 1&nbsp;kg en los supermercados de Tucumán.</p>
   </header>
 
   <div id="estado" class="estado">Cargando índice…</div>
@@ -168,15 +171,25 @@
 
     <!-- ============ PESTAÑA ÍNDICE ============ -->
     <section class="tabpane" id="pane-indice">
+      <div class="periodo">
+        <span class="periodo-lbl">Período</span>
+        <div class="seg" id="freq">
+          <button class="segbtn on" data-f="diaria">Diaria</button>
+          <button class="segbtn" data-f="semanal">Semanal</button>
+          <button class="segbtn" data-f="mensual">Mensual</button>
+        </div>
+      </div>
+
       <div class="hero">
         <div class="col">
           <div class="lbl">Índice · base 100</div>
           <div class="big" id="h-indice">—</div>
           <div class="var" id="h-var"></div>
-          <div class="sub" id="h-base"></div>
+          <div class="sub" id="h-vardates"></div>
+          <div class="sub2" id="h-inicio"></div>
         </div>
         <div class="col">
-          <div class="lbl">Mediana hoy · yerba 1&nbsp;kg</div>
+          <div class="lbl" id="h-medlbl">Mediana</div>
           <div class="num" id="h-mediana">—</div>
           <div class="sub" id="h-rango"></div>
         </div>
@@ -189,12 +202,7 @@
 
       <div class="card">
         <h2>Evolución del índice</h2>
-        <div class="hint">Media geométrica de las variaciones de cada yerba en cada cadena (Jevons encadenado). Base 100 el primer día.</div>
-        <div class="seg" id="freq">
-          <button class="segbtn on" data-f="diaria">Diaria</button>
-          <button class="segbtn" data-f="semanal">Semanal</button>
-          <button class="segbtn" data-f="mensual">Mensual</button>
-        </div>
+        <div class="hint" id="chart-hint"></div>
         <div id="chart-wrap"></div>
         <div class="cap-note" id="cap-note"></div>
       </div>
@@ -203,8 +211,8 @@
     <!-- ============ PESTAÑA LAS YERBAS ============ -->
     <section class="tabpane" id="pane-yerbas" hidden>
       <div class="card">
-        <h2>Cada yerba, hoy</h2>
-        <div class="hint">Tocá una yerba para ver su gráfico y su precio en cada cadena, día a día. El precio grande es la mejor oferta disponible hoy.</div>
+        <h2 id="yerbas-title">Cada yerba</h2>
+        <div class="hint">Tocá una yerba para ver su gráfico y su precio en cada cadena, día a día. El precio grande es la mejor oferta disponible.</div>
         <div class="sort" id="sort"></div>
         <div id="lista"></div>
       </div>
@@ -269,46 +277,71 @@ function render() {
     document.querySelectorAll('.tab').forEach(t => t.classList.toggle('on', t === b));
     ['indice', 'yerbas', 'metodo'].forEach(k => $('pane-' + k).hidden = (k !== b.dataset.t));
   };
-  // selector de temporalidad
+  // selector de temporalidad: ajusta índice + variación + gráfico
   $('freq').onclick = e => {
     const b = e.target.closest('.segbtn'); if (!b) return;
     freq = b.dataset.f;
     document.querySelectorAll('.segbtn').forEach(s => s.classList.toggle('on', s === b));
-    dibujarIndice();
+    updateIndice();
   };
   $('sort').onclick = e => { const c = e.target.closest('.chip'); if (!c) return; orden = c.dataset.o; renderLista(); };
 
-  renderHero();
-  dibujarIndice();
+  updateIndice();
   $('method-body').innerHTML = metodologia();
   $('sort').innerHTML = [['precio', 'Más barata'], ['nombre', 'Nombre'], ['suba', 'Más aumentó']]
     .map(([k, t]) => `<span class="chip ${k === orden ? 'on' : ''}" data-o="${k}">${t}</span>`).join('');
   renderLista();
 }
 
-function renderHero() {
-  const n = D.fechas.length, idx = D.indice[n - 1], v = idx - 100;
-  $('h-indice').textContent = idx.toFixed(1);
-  const vEl = $('h-var');
-  if (n > 1) { vEl.textContent = (v >= 0 ? '▲ +' : '▼ ') + v.toFixed(1) + '% desde el inicio'; vEl.className = 'var ' + (v >= 0 ? 'pos' : 'neg'); }
-  else { vEl.textContent = 'Primer día de medición'; vEl.className = 'var'; }
-  $('h-base').textContent = 'Base 100 · ' + fmtLarga(D.base);
-  const st = D.stats[n - 1];
+const PERIODO = {
+  diaria:  { sing: 'día',    ant: 'día anterior',    cap: 'diario'  },
+  semanal: { sing: 'semana', ant: 'semana anterior', cap: 'semanal' },
+  mensual: { sing: 'mes',    ant: 'mes anterior',    cap: 'mensual' },
+};
+
+// Ajusta TODO el bloque del índice (número, variación y gráfico) al período elegido.
+function updateIndice() {
+  const P = PERIODO[freq];
+  const r = resample(D.fechas, D.indice, freq);   // índice observado a fin de cada período
+  const n = r.valores.length;
+  const lastV = r.valores[n - 1], lastF = r.fechas[n - 1];
+
+  // número del índice (último valor del período), con su fecha
+  $('h-indice').textContent = lastV.toFixed(1);
+
+  // variación PERÍODO CONTRA PERÍODO (diaria=vs día previo, semanal=vs semana previa, etc.)
+  const vEl = $('h-var'), dEl = $('h-vardates');
+  if (n > 1) {
+    const prevV = r.valores[n - 2], prevF = r.fechas[n - 2];
+    const pov = (lastV / prevV - 1) * 100;
+    vEl.textContent = (pov >= 0 ? '▲ +' : '▼ ') + pov.toFixed(1) + '% vs ' + P.ant;
+    vEl.className = 'var ' + (pov >= 0 ? 'pos' : 'neg');
+    dEl.textContent = fmtLarga(lastF) + ' vs ' + fmtLarga(prevF);
+  } else {
+    vEl.textContent = 'Primer ' + P.sing; vEl.className = 'var';
+    dEl.textContent = fmtLarga(lastF);
+  }
+
+  // secundario: acumulado desde el inicio, con la fecha base
+  const desde = lastV - 100;
+  $('h-inicio').textContent = (desde >= 0 ? '+' : '') + desde.toFixed(1) + '% desde el inicio · base ' + fmtLarga(D.base);
+
+  // mediana y seguimiento: foto del último día real (etiquetada con su fecha)
+  const iLast = D.fechas.length - 1, st = D.stats[iLast];
+  $('h-medlbl').innerHTML = 'Mediana · ' + fmtLarga(D.fechas[iLast]) + ' · 1&nbsp;kg';
   $('h-mediana').textContent = peso(st.mediana);
   $('h-rango').textContent = 'entre ' + peso(st.min) + ' y ' + peso(st.max);
   $('h-cuenta').textContent = st.n_productos + ' yerbas';
   $('h-cadenas').textContent = D.cadenas.length + ' cadenas · ' + st.n_items + ' precios';
-  $('cap-note').innerHTML = 'Actualizado: <span class="actu">' + fmtLarga(D.actualizado) + '</span>. El precio se toma una vez por día, ~10&nbsp;h de Tucumán.';
-}
 
-function dibujarIndice() {
-  const r = resample(D.fechas, D.indice, freq);
-  const etiqueta = { diaria: 'día', semanal: 'semana', mensual: 'mes' }[freq];
+  // gráfico del período
   if (r.fechas.length < 2) {
-    $('chart-wrap').innerHTML = `<div class="chart-empty">Todavía hay datos de <b>un solo ${etiqueta === 'día' ? 'día' : etiqueta}</b>. La curva aparece cuando haya al menos dos.<br>Hoy el índice está en <b>${D.indice[D.indice.length - 1].toFixed(1)}</b> (base 100 = ${fmtLarga(D.base)}).</div>`;
-    return;
+    $('chart-wrap').innerHTML = `<div class="chart-empty">Todavía hay datos de <b>un solo ${P.sing}</b>. La curva aparece cuando haya al menos dos.<br>Índice actual: <b>${lastV.toFixed(1)}</b> · ${fmtLarga(lastF)} (base 100 = ${fmtLarga(D.base)}).</div>`;
+  } else {
+    $('chart-wrap').innerHTML = lineChart(r.fechas, [{ valores: r.valores, color: '#14395f', width: 2.2, dots: true }], { base100: true });
   }
-  $('chart-wrap').innerHTML = lineChart(r.fechas, [{ valores: r.valores, color: '#14395f', width: 2.2, dots: true }], { base100: true });
+  $('chart-hint').innerHTML = 'Índice ' + P.cap + ' (Jevons encadenado, base 100 = ' + fmtLarga(D.base) + '). Del ' + fmtLarga(r.fechas[0]) + ' al ' + fmtLarga(r.fechas[n - 1]) + '.';
+  $('cap-note').innerHTML = 'Actualizado: <span class="actu">' + fmtLarga(D.actualizado) + '</span>. Precio tomado una vez por día, ~10&nbsp;h de Tucumán.';
 }
 
 // --- gráfico de líneas genérico (SVG puro). series: [{valores, color, width, dots}] ---
@@ -363,6 +396,7 @@ function renderLista() {
   else if (orden === 'suba') items.sort((a, b) => b.varProd - a.varProd);
 
   document.querySelectorAll('.chip').forEach(c => c.classList.toggle('on', c.dataset.o === orden));
+  $('yerbas-title').textContent = 'Cada yerba · al ' + fmtLarga(D.fechas[D.fechas.length - 1]);
 
   $('lista').innerHTML = items.map(({ p, hoy, min, minCad, varProd }) => {
     const cads = D.cadenas.filter(c => hoy[c] != null).sort((a, b) => hoy[a] - hoy[b])
