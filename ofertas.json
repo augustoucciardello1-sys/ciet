@@ -1,6 +1,6 @@
 {
  "fecha": "2026-07-16",
- "actualizado": "2026-07-16 16:30",
+ "actualizado": "2026-07-16 17:30",
  "regla": {
   "min_cadenas": 3,
   "min_baja_pct": 15.0,
@@ -17,7 +17,7 @@
   "2026-07-15",
   "2026-07-16"
  ],
- "total": 37,
+ "total": 36,
  "ofertas": [
   {
    "n": "Miel untable Aleluya 500 g.",
@@ -74,33 +74,6 @@
     "Jumbo": [
      1000.0,
      "https://www.jumbo.com.ar/jugo-del-valle-manzana-1-l/p"
-    ]
-   }
-  },
-  {
-   "n": "Copa Gin Transparente Vidrio 600 Ml 20 Cm Nadir",
-   "m": "NADIR",
-   "i": "https://veaargentina.vtexassets.com/arquivos/ids/789499/Copa-Para-Gin-600-Ml-Nadirx1-1-985802.jpg?v=638265009685300000",
-   "cadena": "ChangoMás",
-   "precio": 3399.5,
-   "link": "https://www.masonline.com.ar/copa-nadir-gin-600ml-2/p",
-   "referencia": 6799.0,
-   "precio_2da": 6649.0,
-   "baja_pct": 50.0,
-   "brecha_pct": 48.9,
-   "score": 2444,
-   "pr": {
-    "Vea": [
-     6649.0,
-     "https://www.vea.com.ar/copa-para-gin-600-ml-nadirx1/p"
-    ],
-    "Jumbo": [
-     6649.0,
-     "https://www.jumbo.com.ar/copa-para-gin-600-ml-nadirx1/p"
-    ],
-    "ChangoMás": [
-     3399.5,
-     "https://www.masonline.com.ar/copa-nadir-gin-600ml-2/p"
     ]
    }
   },
@@ -518,6 +491,37 @@
     "Carrefour": [
      6400.0,
      "https://www.carrefour.com.ar/chocolate-para-taza-aguila-100-g-16788/p"
+    ]
+   }
+  },
+  {
+   "n": "Acondicionador Keratina Antifrizz 250 Ml Tresemmé",
+   "m": "TRESEMMÉ",
+   "i": "https://veaargentina.vtexassets.com/arquivos/ids/865359/Acondicionador-Keratina-Antifrizz-X-250-Ml-Tresemme-1-1000650.jpg?v=638811057784600000",
+   "cadena": "Jumbo",
+   "precio": 3225.0,
+   "link": "https://www.jumbo.com.ar/acondicionador-keratina-antifrizz-x-250-ml-tresemme/p",
+   "referencia": 6450.0,
+   "precio_2da": 5590.0,
+   "baja_pct": 50.0,
+   "brecha_pct": 42.3,
+   "score": 2115,
+   "pr": {
+    "Vea": [
+     5590.0,
+     "https://www.vea.com.ar/acondicionador-keratina-antifrizz-x-250-ml-tresemme/p"
+    ],
+    "Jumbo": [
+     3225.0,
+     "https://www.jumbo.com.ar/acondicionador-keratina-antifrizz-x-250-ml-tresemme/p"
+    ],
+    "ChangoMás": [
+     6769.0,
+     "https://www.masonline.com.ar/acondicionador-tresemme-keratina-antifrizz-250ml-2-2/p"
+    ],
+    "Carrefour": [
+     6100.0,
+     "https://www.carrefour.com.ar/acondicionador-tresemme-keratina-antifrizz-250-cc-730397/p"
     ]
    }
   },
@@ -1029,33 +1033,6 @@
     "ChangoMás": [
      5291.4,
      "https://www.masonline.com.ar/escoba-multiusos-virulana-1-u-2/p"
-    ]
-   }
-  },
-  {
-   "n": "Limpiador Antihongos Removedor Activo 450 Cc Ayudin",
-   "m": "AYUDIN",
-   "i": "https://veaargentina.vtexassets.com/arquivos/ids/683209/Limpiador-Antihongos-Ayud-n-Removedor-Activo-envase-Econ-mico-450-Ml-1-880058.jpg?v=637768318159300000",
-   "cadena": "Carrefour",
-   "precio": 1319.5,
-   "link": "https://www.carrefour.com.ar/limpiador-antihongos-ayudin-removedor-activo-envase-economico-450-ml/p",
-   "referencia": 2030.0,
-   "precio_2da": 2350.0,
-   "baja_pct": 35.0,
-   "brecha_pct": 43.9,
-   "score": 1535,
-   "pr": {
-    "Vea": [
-     2350.0,
-     "https://www.vea.com.ar/limpiador-antihongos-ayudin-removedor-activo-envase-economico-450-ml/p"
-    ],
-    "Jumbo": [
-     2350.0,
-     "https://www.jumbo.com.ar/limpiador-antihongos-ayudin-removedor-activo-envase-economico-450-ml/p"
-    ],
-    "Carrefour": [
-     1319.5,
-     "https://www.carrefour.com.ar/limpiador-antihongos-ayudin-removedor-activo-envase-economico-450-ml/p"
     ]
    }
   },
