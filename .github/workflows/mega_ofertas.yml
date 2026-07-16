@@ -1,0 +1,53 @@
+name: Mega ofertas (nube)
+
+# Detecta las mega ofertas del día a partir del buscador.json de la rama `datos`
+# (venga de la laptop o del workflow "Actualizar buscador (nube)": este job es
+# independiente de QUIÉN publica los datos, sólo los lee).
+# Corre 45 min después de cada corrida del buscador (10/13/16 ART + margen).
+# La historia móvil de precios (historia.json) y el resultado (ofertas.json)
+# viven en la rama `ofertas`, que es de donde lee buscador.html.
+# NO toca la rama `datos` (que se publica con --amend + push -f).
+on:
+  schedule:
+    - cron: '45 13 * * *'   # 10:45 ART
+    - cron: '45 16 * * *'   # 13:45 ART
+    - cron: '45 19 * * *'   # 16:45 ART
+  workflow_dispatch:
+
+concurrency:
+  group: mega-ofertas
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  ofertas:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Config git
+        run: |
+          git config user.name "ciet-bot"
+          git config user.email "actions@users.noreply.github.com"
+
+      - name: Detectar y publicar mega ofertas
+        run: |
+          set -e
+          git fetch origin datos ofertas
+          git show origin/datos:buscador.json > /tmp/buscador.json
+          git worktree add -B ofertas /tmp/ofertas origin/ofertas
+          python3 scripts/build_mega_ofertas.py --buscador /tmp/buscador.json --dir /tmp/ofertas
+          cd /tmp/ofertas
+          git add historia.json ofertas.json
+          if git diff --cached --quiet HEAD; then
+            echo "sin cambios"
+          else
+            git commit -m "Mega ofertas $(date +'%F %H:%M') UTC"
+            git push origin ofertas
+          fi
