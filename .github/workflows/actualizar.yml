@@ -26,6 +26,8 @@ jobs:
   actualizar:
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    env:
+      TZ: America/Argentina/Tucuman   # el runner es UTC; sin esto fecha/hora salen 3 h adelantadas
     steps:
       - uses: actions/checkout@v4
         with:
