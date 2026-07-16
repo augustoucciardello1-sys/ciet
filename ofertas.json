@@ -1,6 +1,6 @@
 {
- "fecha": "2026-07-15",
- "actualizado": "2026-07-15 17:35",
+ "fecha": "2026-07-16",
+ "actualizado": "2026-07-16 03:07",
  "regla": {
   "min_cadenas": 3,
   "min_baja_pct": 15.0,
@@ -14,7 +14,8 @@
   "2026-07-12",
   "2026-07-13",
   "2026-07-14",
-  "2026-07-15"
+  "2026-07-15",
+  "2026-07-16"
  ],
  "total": 43,
  "ofertas": [
@@ -73,64 +74,6 @@
     "Jumbo": [
      1000.0,
      "https://www.jumbo.com.ar/jugo-del-valle-manzana-1-l/p"
-    ]
-   }
-  },
-  {
-   "n": "Cereal Sabor Frutas 195 Grs Froot Loops",
-   "m": "FROOT LOOPS",
-   "i": "https://veaargentina.vtexassets.com/arquivos/ids/805078/Cereal-Froot-Loops-X195g-1-1001773.jpg?v=638392017679800000",
-   "cadena": "Jumbo",
-   "precio": 2200.0,
-   "link": "https://www.jumbo.com.ar/cereal-froot-loops-x195g/p",
-   "referencia": 4400.0,
-   "precio_2da": 4299.0,
-   "baja_pct": 50.0,
-   "brecha_pct": 48.8,
-   "score": 2441,
-   "pr": {
-    "Vea": [
-     4300.0,
-     "https://www.vea.com.ar/cereal-froot-loops-x195g/p"
-    ],
-    "Jumbo": [
-     2200.0,
-     "https://www.jumbo.com.ar/cereal-froot-loops-x195g/p"
-    ],
-    "Carrefour": [
-     4299.0,
-     "https://www.carrefour.com.ar/aros-de-cereal-frutado-kellogs-froot-loops-en-bolsa-195-g-733171/p"
-    ]
-   }
-  },
-  {
-   "n": "Chocolate Aguila Para Taza 100 Gr",
-   "m": "AGUILA",
-   "i": "https://jumboargentinaio.vtexassets.com/arquivos/ids/582968/Chocolate-Aguila-Para-Taza-100-Gr-1-10739.jpg?v=637234676290200000",
-   "cadena": "Jumbo",
-   "precio": 3050.0,
-   "link": "https://www.jumbo.com.ar/chocolate-aguila-para-taza-100-gr/p",
-   "referencia": 6100.0,
-   "precio_2da": 5944.69,
-   "baja_pct": 50.0,
-   "brecha_pct": 48.7,
-   "score": 2435,
-   "pr": {
-    "Jumbo": [
-     3050.0,
-     "https://www.jumbo.com.ar/chocolate-aguila-para-taza-100-gr/p"
-    ],
-    "Comodín": [
-     5944.69,
-     "https://www.comodinencasa.com.ar/chocolate-aguila-p-taza-100gr/p"
-    ],
-    "ChangoMás": [
-     6399.0,
-     "https://www.masonline.com.ar/chocolate-taza-aguila-100-gr-2/p"
-    ],
-    "Carrefour": [
-     6400.0,
-     "https://www.carrefour.com.ar/chocolate-para-taza-aguila-100-g-16788/p"
     ]
    }
   },
@@ -195,7 +138,7 @@
    "cadena": "Jumbo",
    "precio": 5275.0,
    "link": "https://www.jumbo.com.ar/miel-cremosa-extra-white-frasco-x-500-gr-beepure/p",
-   "referencia": 10550,
+   "referencia": 10550.0,
    "precio_2da": 10200.0,
    "baja_pct": 50.0,
    "brecha_pct": 48.3,
@@ -222,7 +165,7 @@
    "cadena": "Jumbo",
    "precio": 4300.0,
    "link": "https://www.jumbo.com.ar/mermelada-diet-frambuesa-260-gr-masseube/p",
-   "referencia": 8600,
+   "referencia": 8600.0,
    "precio_2da": 8300.0,
    "baja_pct": 50.0,
    "brecha_pct": 48.2,
@@ -276,7 +219,7 @@
    "cadena": "Jumbo",
    "precio": 3500.0,
    "link": "https://www.jumbo.com.ar/mermelada-de-durazno-420-gr-el-brocal/p",
-   "referencia": 7000,
+   "referencia": 7000.0,
    "precio_2da": 6750.0,
    "baja_pct": 50.0,
    "brecha_pct": 48.1,
@@ -330,7 +273,7 @@
    "cadena": "Jumbo",
    "precio": 4375.0,
    "link": "https://www.jumbo.com.ar/mermelada-de-frutos-rojos-420-gr-el-brocal/p",
-   "referencia": 8750,
+   "referencia": 8750.0,
    "precio_2da": 8400.0,
    "baja_pct": 50.0,
    "brecha_pct": 47.9,
@@ -401,6 +344,72 @@
     "ChangoMás": [
      3239.0,
      "https://www.masonline.com.ar/mermelada-cormillot-durazno-light-390-gr-2/p"
+    ]
+   }
+  },
+  {
+   "n": "Bebida isotónica Gatorade Manzana 1,25 lts",
+   "m": "Gatorade",
+   "i": "https://carrefourar.vteximg.com.br/arquivos/ids/372565/7792170110575_E01.jpg?v=638303146910100000",
+   "cadena": "ChangoMás",
+   "precio": 1999.0,
+   "link": "https://www.masonline.com.ar/bebida-isotonica-manzana-gatorade-1-25-lt-2/p",
+   "referencia": 3861.75,
+   "precio_2da": 3862.5,
+   "baja_pct": 48.2,
+   "brecha_pct": 48.2,
+   "score": 2327,
+   "pr": {
+    "Carrefour": [
+     3862.5,
+     "https://www.carrefour.com.ar/bebida-isotonica-gatorade-manzana-125-lts-449903/p"
+    ],
+    "Vea": [
+     5150.0,
+     "https://www.vea.com.ar/isotonico-gatorade-manzana-1-25lt/p"
+    ],
+    "Jumbo": [
+     5150.0,
+     "https://www.jumbo.com.ar/isotonico-gatorade-manzana-1-25lt/p"
+    ],
+    "Comodín": [
+     4171.49,
+     "https://www.comodinencasa.com.ar/bebida-isotonica-gatorade-manz-p-1250cc/p"
+    ],
+    "ChangoMás": [
+     1999.0,
+     "https://www.masonline.com.ar/bebida-isotonica-manzana-gatorade-1-25-lt-2/p"
+    ]
+   }
+  },
+  {
+   "n": "Bebida isotónica Gatorade Naranja 1,25 lts",
+   "m": "Gatorade",
+   "i": "https://carrefourar.vteximg.com.br/arquivos/ids/372563/7792170110551_E01.jpg?v=638303146069700000",
+   "cadena": "ChangoMás",
+   "precio": 1999.0,
+   "link": "https://www.masonline.com.ar/bebida-isotonica-naranja-gatorade-1-25-lt-2/p",
+   "referencia": 3861.75,
+   "precio_2da": 3862.5,
+   "baja_pct": 48.2,
+   "brecha_pct": 48.2,
+   "score": 2327,
+   "pr": {
+    "Carrefour": [
+     3862.5,
+     "https://www.carrefour.com.ar/bebida-isotonica-gatorade-naranja-125-lts-449921/p"
+    ],
+    "Vea": [
+     5150.0,
+     "https://www.vea.com.ar/isotonico-gatorade-naranja-1-25lt/p"
+    ],
+    "Jumbo": [
+     5150.0,
+     "https://www.jumbo.com.ar/isotonico-gatorade-naranja-1-25lt/p"
+    ],
+    "ChangoMás": [
+     1999.0,
+     "https://www.masonline.com.ar/bebida-isotonica-naranja-gatorade-1-25-lt-2/p"
     ]
    }
   },
@@ -494,37 +503,33 @@
    }
   },
   {
-   "n": "Mermeladas Light Arcor Ciruela 390gr",
-   "m": "ARCOR",
-   "i": "https://veaargentina.vtexassets.com/arquivos/ids/674446/Mermelada-Arcor-Light-F-Ciruela-X390g-1-880223.jpg?v=637716164596300000",
+   "n": "Chocolate Aguila Para Taza 100 Gr",
+   "m": "AGUILA",
+   "i": "https://jumboargentinaio.vtexassets.com/arquivos/ids/582968/Chocolate-Aguila-Para-Taza-100-Gr-1-10739.jpg?v=637234676290200000",
    "cadena": "Jumbo",
-   "precio": 1750.0,
-   "link": "https://www.jumbo.com.ar/mermeladas-light-arcor-ciruela-390gr/p",
-   "referencia": 3500.0,
-   "precio_2da": 3119.99,
-   "baja_pct": 50.0,
-   "brecha_pct": 43.9,
-   "score": 2196,
+   "precio": 3050.0,
+   "link": "https://www.jumbo.com.ar/chocolate-aguila-para-taza-100-gr/p",
+   "referencia": 5431.25,
+   "precio_2da": 5944.69,
+   "baja_pct": 43.8,
+   "brecha_pct": 48.7,
+   "score": 2135,
    "pr": {
-    "Vea": [
-     3312.0,
-     "https://www.vea.com.ar/mermeladas-light-arcor-ciruela-390gr/p"
-    ],
     "Jumbo": [
-     1750.0,
-     "https://www.jumbo.com.ar/mermeladas-light-arcor-ciruela-390gr/p"
+     3050.0,
+     "https://www.jumbo.com.ar/chocolate-aguila-para-taza-100-gr/p"
     ],
     "Comodín": [
-     3119.99,
-     "https://www.comodinencasa.com.ar/mermelada-arcor-ciruela-light-f-390-gr/p"
+     5944.69,
+     "https://www.comodinencasa.com.ar/chocolate-aguila-p-taza-100gr/p"
     ],
     "ChangoMás": [
-     3519.0,
-     "https://www.masonline.com.ar/mermelada-arcor-light-de-ciruela-390gr-2/p"
+     6399.0,
+     "https://www.masonline.com.ar/chocolate-taza-aguila-100-gr-2/p"
     ],
     "Carrefour": [
-     3309.0,
-     "https://www.carrefour.com.ar/mermelada-arcor-ciruela-light-390-g/p"
+     6400.0,
+     "https://www.carrefour.com.ar/chocolate-para-taza-aguila-100-g-16788/p"
     ]
    }
   },
@@ -653,37 +658,29 @@
    }
   },
   {
-   "n": "Jugo Sabor Multifruta 200 Ml Del Valle",
-   "m": "DEL VALLE",
-   "i": "https://carrefourar.vteximg.com.br/arquivos/ids/902188/7790895000737_01.jpg?v=639196520181430000",
-   "cadena": "Jumbo",
-   "precio": 400.0,
-   "link": "https://www.jumbo.com.ar/jugo-listo-del-valle-multifruta-200cc-2/p",
-   "referencia": 800.0,
-   "precio_2da": 650.0,
-   "baja_pct": 50.0,
-   "brecha_pct": 38.5,
-   "score": 1923,
+   "n": "Acondicionador Fructis Oil Control 200 ml",
+   "m": "Fructis",
+   "i": "https://carrefourar.vteximg.com.br/arquivos/ids/863678/7790033342934_01.jpg?v=639135021297630000",
+   "cadena": "Carrefour",
+   "precio": 2193.75,
+   "link": "https://www.carrefour.com.ar/acondicionador-fructis-oil-control-200-ml-778486/p",
+   "referencia": 3375.0,
+   "precio_2da": 4990.0,
+   "baja_pct": 35.0,
+   "brecha_pct": 56.0,
+   "score": 1961,
    "pr": {
     "Carrefour": [
-     1199.0,
-     "https://www.carrefour.com.ar/jugo-cepita-del-valle-multifruta-200-ml-467824/p"
-    ],
-    "Comodín": [
-     1196.0,
-     "https://www.comodinencasa.com.ar/jugo-cepita-multifrutal-x-200-cc/p"
+     2193.75,
+     "https://www.carrefour.com.ar/acondicionador-fructis-oil-control-200-ml-778486/p"
     ],
     "Vea": [
-     650.0,
-     "https://www.vea.com.ar/jugo-listo-del-valle-multifruta-200cc-2/p"
+     4990.0,
+     "https://www.vea.com.ar/acondicionador-oil-control-x-200-ml-fructis/p"
     ],
     "Jumbo": [
-     400.0,
-     "https://www.jumbo.com.ar/jugo-listo-del-valle-multifruta-200cc-2/p"
-    ],
-    "ChangoMás": [
-     729.0,
-     "https://www.masonline.com.ar/jugo-del-valle-multifruta-200ml-2/p"
+     5750.0,
+     "https://www.jumbo.com.ar/acondicionador-oil-control-x-200-ml-fructis/p"
     ]
    }
   },
@@ -750,64 +747,29 @@
    }
   },
   {
-   "n": "Jugo en polvo Arcor de limonada 15 grs",
-   "m": "Arcor",
-   "i": "https://carrefourar.vteximg.com.br/arquivos/ids/817841/7790580143527_E02.jpg?v=639082514290530000",
+   "n": "Jugo Sabor Multifruta 200 Ml Del Valle",
+   "m": "DEL VALLE",
+   "i": "https://veaargentina.vtexassets.com/arquivos/ids/797120/Jugo-Del-Valle-Multifruta-200-Ml-1-875077.jpg?v=638327434541870000",
    "cadena": "Jumbo",
-   "precio": 225.0,
-   "link": "https://www.jumbo.com.ar/jugo-en-polvo-arcor-limonada-15g/p",
-   "referencia": 450.0,
-   "precio_2da": 359.0,
+   "precio": 400.0,
+   "link": "https://www.jumbo.com.ar/jugo-listo-del-valle-multifruta-200cc-2/p",
+   "referencia": 800.0,
+   "precio_2da": 650.0,
    "baja_pct": 50.0,
-   "brecha_pct": 37.3,
-   "score": 1866,
+   "brecha_pct": 38.5,
+   "score": 1923,
    "pr": {
-    "Carrefour": [
-     359.0,
-     "https://www.carrefour.com.ar/jugo-en-polvo-arcor-de-limonada-15-grs-750879/p"
-    ],
     "Vea": [
-     450.0,
-     "https://www.vea.com.ar/jugo-en-polvo-arcor-limonada-15g/p"
+     650.0,
+     "https://www.vea.com.ar/jugo-listo-del-valle-multifruta-200cc-2/p"
     ],
     "Jumbo": [
-     225.0,
-     "https://www.jumbo.com.ar/jugo-en-polvo-arcor-limonada-15g/p"
+     400.0,
+     "https://www.jumbo.com.ar/jugo-listo-del-valle-multifruta-200cc-2/p"
     ],
     "ChangoMás": [
-     359.0,
-     "https://www.masonline.com.ar/jugo-en-polvo-arcor-limonada-15-g/p"
-    ]
-   }
-  },
-  {
-   "n": "Jugo en polvo Arcor de multifruta 15 grs",
-   "m": "Arcor",
-   "i": "https://carrefourar.vteximg.com.br/arquivos/ids/817836/7790580142490_E02.jpg?v=639082513555400000",
-   "cadena": "Jumbo",
-   "precio": 225.0,
-   "link": "https://www.jumbo.com.ar/jugo-en-polvo-arcor-multifruta-15g/p",
-   "referencia": 450.0,
-   "precio_2da": 359.0,
-   "baja_pct": 50.0,
-   "brecha_pct": 37.3,
-   "score": 1866,
-   "pr": {
-    "Carrefour": [
-     359.0,
-     "https://www.carrefour.com.ar/jugo-en-polvo-arcor-de-multifruta-15-grs-750886/p"
-    ],
-    "Vea": [
-     450.0,
-     "https://www.vea.com.ar/jugo-en-polvo-arcor-multifruta-15g/p"
-    ],
-    "Jumbo": [
-     225.0,
-     "https://www.jumbo.com.ar/jugo-en-polvo-arcor-multifruta-15g/p"
-    ],
-    "ChangoMás": [
-     359.0,
-     "https://www.masonline.com.ar/jugo-en-polvo-arcor-multifruta-15-g/p"
+     729.0,
+     "https://www.masonline.com.ar/jugo-del-valle-multifruta-200ml-2/p"
     ]
    }
   },
@@ -901,13 +863,75 @@
    }
   },
   {
+   "n": "Jugo en polvo Arcor de multifruta 15 grs",
+   "m": "Arcor",
+   "i": "https://carrefourar.vteximg.com.br/arquivos/ids/817836/7790580142490_E02.jpg?v=639082513555400000",
+   "cadena": "Jumbo",
+   "precio": 225.0,
+   "link": "https://www.jumbo.com.ar/jugo-en-polvo-arcor-multifruta-15g/p",
+   "referencia": 450.0,
+   "precio_2da": 359.0,
+   "baja_pct": 50.0,
+   "brecha_pct": 37.3,
+   "score": 1866,
+   "pr": {
+    "Carrefour": [
+     359.0,
+     "https://www.carrefour.com.ar/jugo-en-polvo-arcor-de-multifruta-15-grs-750886/p"
+    ],
+    "Vea": [
+     450.0,
+     "https://www.vea.com.ar/jugo-en-polvo-arcor-multifruta-15g/p"
+    ],
+    "Jumbo": [
+     225.0,
+     "https://www.jumbo.com.ar/jugo-en-polvo-arcor-multifruta-15g/p"
+    ],
+    "ChangoMás": [
+     359.0,
+     "https://www.masonline.com.ar/jugo-en-polvo-arcor-multifruta-15-g/p"
+    ]
+   }
+  },
+  {
+   "n": "Jugo en polvo Arcor de limonada 15 grs",
+   "m": "Arcor",
+   "i": "https://carrefourar.vteximg.com.br/arquivos/ids/817841/7790580143527_E02.jpg?v=639082514290530000",
+   "cadena": "Jumbo",
+   "precio": 225.0,
+   "link": "https://www.jumbo.com.ar/jugo-en-polvo-arcor-limonada-15g/p",
+   "referencia": 450.0,
+   "precio_2da": 359.0,
+   "baja_pct": 50.0,
+   "brecha_pct": 37.3,
+   "score": 1866,
+   "pr": {
+    "Carrefour": [
+     359.0,
+     "https://www.carrefour.com.ar/jugo-en-polvo-arcor-de-limonada-15-grs-750879/p"
+    ],
+    "Vea": [
+     450.0,
+     "https://www.vea.com.ar/jugo-en-polvo-arcor-limonada-15g/p"
+    ],
+    "Jumbo": [
+     225.0,
+     "https://www.jumbo.com.ar/jugo-en-polvo-arcor-limonada-15g/p"
+    ],
+    "ChangoMás": [
+     359.0,
+     "https://www.masonline.com.ar/jugo-en-polvo-arcor-limonada-15-g/p"
+    ]
+   }
+  },
+  {
    "n": "Jugo en polvo Arcor de naranja dulce 15 grs",
    "m": "Arcor",
    "i": "https://carrefourar.vteximg.com.br/arquivos/ids/817838/7790580143008_E02.jpg?v=639082513859870000",
    "cadena": "Jumbo",
    "precio": 225.0,
    "link": "https://www.jumbo.com.ar/jugo-en-polvo-arcor-naranja-dulce-x-15-gr/p",
-   "referencia": 450,
+   "referencia": 450.0,
    "precio_2da": 359.0,
    "baja_pct": 50.0,
    "brecha_pct": 37.3,
@@ -992,7 +1016,7 @@
    "cadena": "Jumbo",
    "precio": 225.0,
    "link": "https://www.jumbo.com.ar/jugo-en-polvo-de-anana-7-gr-bc/p",
-   "referencia": 450.0,
+   "referencia": 450,
    "precio_2da": 359.0,
    "baja_pct": 50.0,
    "brecha_pct": 37.3,
@@ -1009,33 +1033,6 @@
     "ChangoMás": [
      359.0,
      "https://www.masonline.com.ar/jugo-en-polvo-anana-bc-7-gr-2/p"
-    ]
-   }
-  },
-  {
-   "n": "Mermelada Light Arcor Damasco 390gr",
-   "m": "ARCOR",
-   "i": "https://veaargentina.vtexassets.com/arquivos/ids/674445/Mermelada-Arcor-Light-F-Damasco-X390g-1-880222.jpg?v=637716164593470000",
-   "cadena": "Jumbo",
-   "precio": 1750.0,
-   "link": "https://www.jumbo.com.ar/mermelada-light-arcor-damasco-390gr/p",
-   "referencia": 3500.0,
-   "precio_2da": 2779.92,
-   "baja_pct": 50.0,
-   "brecha_pct": 37.0,
-   "score": 1852,
-   "pr": {
-    "Vea": [
-     3312.0,
-     "https://www.vea.com.ar/mermelada-light-arcor-damasco-390gr/p"
-    ],
-    "Jumbo": [
-     1750.0,
-     "https://www.jumbo.com.ar/mermelada-light-arcor-damasco-390gr/p"
-    ],
-    "Tuchanguito": [
-     2779.92,
-     "https://www.tuchanguito.com.ar/productos/mermelada-arcor-light-frasco-duraz-x390g/"
     ]
    }
   },
@@ -1071,33 +1068,37 @@
    }
   },
   {
-   "n": "Arvejas Seca Arcor X300gr",
+   "n": "Mermeladas Light Arcor Ciruela 390gr",
    "m": "ARCOR",
-   "i": "https://veaargentina.vtexassets.com/arquivos/ids/705427/Arvejas-Seca-Arcor-X300gr-1-887023.jpg?v=637904829687600000",
+   "i": "https://veaargentina.vtexassets.com/arquivos/ids/674446/Mermelada-Arcor-Light-F-Ciruela-X390g-1-880223.jpg?v=637716164596300000",
    "cadena": "Jumbo",
-   "precio": 588.0,
-   "link": "https://www.jumbo.com.ar/arvejas-seca-arcor-x300gr-2/p",
-   "referencia": 965.5,
-   "precio_2da": 1077.7,
-   "baja_pct": 39.1,
-   "brecha_pct": 45.4,
-   "score": 1777,
+   "precio": 1750.0,
+   "link": "https://www.jumbo.com.ar/mermeladas-light-arcor-ciruela-390gr/p",
+   "referencia": 2887.5,
+   "precio_2da": 3119.99,
+   "baja_pct": 39.4,
+   "brecha_pct": 43.9,
+   "score": 1730,
    "pr": {
     "Vea": [
-     1250.0,
-     "https://www.vea.com.ar/arvejas-seca-arcor-x300gr-2/p"
+     3312.0,
+     "https://www.vea.com.ar/mermeladas-light-arcor-ciruela-390gr/p"
     ],
     "Jumbo": [
-     588.0,
-     "https://www.jumbo.com.ar/arvejas-seca-arcor-x300gr-2/p"
-    ],
-    "Tuchanguito": [
-     1187.99,
-     "https://www.tuchanguito.com.ar/productos/arveja-seca-arcor-300-gr/"
+     1750.0,
+     "https://www.jumbo.com.ar/mermeladas-light-arcor-ciruela-390gr/p"
     ],
     "Comodín": [
-     1077.7,
-     "https://www.comodinencasa.com.ar/arvejas-arcor-secas-remojadas-300-gr/p"
+     3119.99,
+     "https://www.comodinencasa.com.ar/mermelada-arcor-ciruela-light-f-390-gr/p"
+    ],
+    "ChangoMás": [
+     3519.0,
+     "https://www.masonline.com.ar/mermelada-arcor-light-de-ciruela-390gr-2/p"
+    ],
+    "Carrefour": [
+     3309.0,
+     "https://www.carrefour.com.ar/mermelada-arcor-ciruela-light-390-g/p"
     ]
    }
   },
@@ -1125,6 +1126,33 @@
     "Jumbo": [
      3690.0,
      "https://www.jumbo.com.ar/galletitas-rellenas-con-crema-sabor-original-354-gr-x-3-un-oreo/p"
+    ]
+   }
+  },
+  {
+   "n": "Cereal Sabor Frutas 195 Grs Froot Loops",
+   "m": "FROOT LOOPS",
+   "i": "https://veaargentina.vtexassets.com/arquivos/ids/805078/Cereal-Froot-Loops-X195g-1-1001773.jpg?v=638392017679800000",
+   "cadena": "Jumbo",
+   "precio": 2200.0,
+   "link": "https://www.jumbo.com.ar/cereal-froot-loops-x195g/p",
+   "referencia": 3300.0,
+   "precio_2da": 4299.0,
+   "baja_pct": 33.3,
+   "brecha_pct": 48.8,
+   "score": 1628,
+   "pr": {
+    "Vea": [
+     4300.0,
+     "https://www.vea.com.ar/cereal-froot-loops-x195g/p"
+    ],
+    "Jumbo": [
+     2200.0,
+     "https://www.jumbo.com.ar/cereal-froot-loops-x195g/p"
+    ],
+    "Carrefour": [
+     4299.0,
+     "https://www.carrefour.com.ar/aros-de-cereal-frutado-kellogs-froot-loops-en-bolsa-195-g-733171/p"
     ]
    }
   },
@@ -1210,33 +1238,6 @@
     "ChangoMás": [
      2259.0,
      "https://www.masonline.com.ar/jabon-liquido-vn-hidrata-y-purifica-200ml/p"
-    ]
-   }
-  },
-  {
-   "n": "Whisky Chivas Extra 13 700 Ml",
-   "m": "CHIVAS REGAL",
-   "i": "https://veaargentina.vtexassets.com/arquivos/ids/783153/Whisky-Chivas-Extra-13yo-700-1-889827.jpg?v=638206702082230000",
-   "cadena": "Jumbo",
-   "precio": 54420.0,
-   "link": "https://www.jumbo.com.ar/whisky-chivas-extra-13-700-ml/p",
-   "referencia": 90700.0,
-   "precio_2da": 88039.0,
-   "baja_pct": 40.0,
-   "brecha_pct": 38.2,
-   "score": 1527,
-   "pr": {
-    "Vea": [
-     88050.0,
-     "https://www.vea.com.ar/whisky-chivas-extra-13-700-ml/p"
-    ],
-    "Jumbo": [
-     54420.0,
-     "https://www.jumbo.com.ar/whisky-chivas-extra-13-700-ml/p"
-    ],
-    "ChangoMás": [
-     88039.0,
-     "https://www.masonline.com.ar/tequila-chivas-extra-13yo-700ml-2/p"
     ]
    }
   },
