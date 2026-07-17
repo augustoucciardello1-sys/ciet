@@ -1,0 +1,55 @@
+name: Postear ofertas en X
+
+# Publica la placa diaria de mega ofertas en @ofertastuchoy.
+# Lee ofertas.json de la rama `ofertas` (la genera build_mega_ofertas.py),
+# arma la placa (Pillow) y la postea (tweepy / API de X).
+# Corre 1 vez por día, después de la 1ra detección de mega ofertas (10:45 ART).
+# No escribe en ninguna rama: sólo lee y publica.
+on:
+  schedule:
+    - cron: '15 14 * * *'   # 11:15 ART
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Probar sin publicar (true/false)'
+        default: 'false'
+
+concurrency:
+  group: postear-ofertas
+  cancel-in-progress: false
+
+jobs:
+  postear:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Instalar dependencias
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq fonts-liberation || true
+          pip install --quiet pillow tweepy
+
+      - name: Traer ofertas.json de la rama ofertas
+        run: git fetch origin ofertas --quiet && git show origin/ofertas:ofertas.json > ofertas.json
+
+      - name: Generar placa + caption
+        run: |
+          python3 scripts/generar_placa_ofertas.py \
+            --ofertas ofertas.json --out-img placa.png --out-caption caption.txt --top 5 || true
+          if [ -f placa.png ]; then echo "HAY_PLACA=1" >> "$GITHUB_ENV"; else echo "sin ofertas hoy: no se publica"; fi
+
+      - name: Publicar en X
+        if: env.HAY_PLACA == '1'
+        env:
+          X_API_KEY: ${{ secrets.X_API_KEY }}
+          X_API_SECRET: ${{ secrets.X_API_SECRET }}
+          X_ACCESS_TOKEN: ${{ secrets.X_ACCESS_TOKEN }}
+          X_ACCESS_SECRET: ${{ secrets.X_ACCESS_SECRET }}
+        run: |
+          DRY="${{ github.event.inputs.dry_run }}"
+          python3 scripts/postear_x.py --img placa.png --caption caption.txt \
+            $([ "$DRY" = "true" ] && echo --dry-run)

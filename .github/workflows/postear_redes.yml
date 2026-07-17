@@ -1,0 +1,62 @@
+name: Postear ofertas en redes (gratis)
+
+# Publica la placa diaria de mega ofertas en las redes gratuitas (Bluesky +
+# Telegram). Genera la placa UNA vez y postea a cada red que tenga sus claves
+# cargadas (si falta una, esa se saltea sola). Sin tarjeta, sin costo.
+# Corre 1 vez por día, después de la 1ra detección de mega ofertas (10:45 ART).
+on:
+  schedule:
+    - cron: '15 14 * * *'   # 11:15 ART
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Probar sin publicar (true/false)'
+        default: 'false'
+
+concurrency:
+  group: postear-redes
+  cancel-in-progress: false
+
+env:
+  BSKY_HANDLE: ${{ secrets.BSKY_HANDLE }}
+  BSKY_APP_PASSWORD: ${{ secrets.BSKY_APP_PASSWORD }}
+  TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+  TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+
+jobs:
+  postear:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Instalar dependencias
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq fonts-liberation || true
+          pip install --quiet pillow atproto requests
+
+      - name: Traer ofertas.json de la rama ofertas
+        run: git fetch origin ofertas --quiet && git show origin/ofertas:ofertas.json > ofertas.json
+
+      - name: Generar placa + caption
+        run: |
+          python3 scripts/generar_placa_ofertas.py \
+            --ofertas ofertas.json --out-img placa.png --out-caption caption.txt --top 5 || true
+          if [ -f placa.png ]; then echo "HAY_PLACA=1" >> "$GITHUB_ENV"; else echo "sin ofertas hoy: no se publica"; fi
+
+      - name: Publicar en Bluesky
+        if: env.HAY_PLACA == '1' && env.BSKY_HANDLE != ''
+        run: |
+          DRY="${{ github.event.inputs.dry_run }}"
+          python3 scripts/postear_bluesky.py --img placa.png --caption caption.txt \
+            $([ "$DRY" = "true" ] && echo --dry-run)
+
+      - name: Publicar en Telegram
+        if: env.HAY_PLACA == '1' && env.TELEGRAM_BOT_TOKEN != ''
+        run: |
+          DRY="${{ github.event.inputs.dry_run }}"
+          python3 scripts/postear_telegram.py --img placa.png --caption caption.txt \
+            $([ "$DRY" = "true" ] && echo --dry-run)
