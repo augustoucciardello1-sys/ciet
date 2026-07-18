@@ -154,7 +154,7 @@ def main():
     ap.add_argument("--keywords")
     ap.add_argument("--headless", action="store_true")
     ap.add_argument("--scrolls", type=int, default=12, help="scrolls por producto (más = más anuncios)")
-    ap.add_argument("--umbral", type=int, default=8, help="bits de tolerancia para 'misma imagen' (0-64)")
+    ap.add_argument("--umbral", type=int, default=6, help="bits de tolerancia para 'misma imagen' (0-64; menos = más estricto)")
     ap.add_argument("--tope", type=int, default=60, help="máximo de productos en la salida")
     ap.add_argument("--pausa", type=float, default=4.0)
     args = ap.parse_args()
@@ -219,8 +219,9 @@ def main():
         # Puntaje: duplicación (anuncios) × pluralidad de vendedores × antigüedad.
         f_edad = 1 + min(dias_max, 365) / 365 if dias_max else 1
         score = round(n_ads * (1 + 0.6 * (n_vend - 1)) * f_edad, 1)
-        # Título = la categoría (palabra clave) dominante del grupo: dice qué ES.
-        kw_dom = Counter(a["keyword"] for a in gads).most_common(1)[0][0]
+        # Título = la categoría del anuncio que se muestra (el representativo), así
+        # el título coincide con la imagen. Si no, la categoría dominante del grupo.
+        kw_dom = rep.get("keyword") or Counter(a["keyword"] for a in gads).most_common(1)[0][0]
         titulo = kw_dom[:1].upper() + kw_dom[1:]
         # Detalle por vendedor, con IDs de sus anuncios para linkear a cada uno.
         por_vend = defaultdict(list)
