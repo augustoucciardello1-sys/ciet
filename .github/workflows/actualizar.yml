@@ -9,11 +9,13 @@ name: Actualizar buscador (nube)
 #   diario y reconstruye indice.json en la rama `yerba-datos`.
 # GitHub delays los cron bajo carga (pueden llegar tarde algunos minutos): es esperable.
 on:
+  # OJO: minuto 7, NO en punto — GitHub congestiona los cron de la hora en punto y
+  # los saltea (el 18/7 no corrió ninguno de los de la mañana). Minuto raro = más confiable.
   schedule:
-    - cron: '0 10 * * *'   # 07:00 ART
-    - cron: '0 13 * * *'   # 10:00 ART
-    - cron: '0 16 * * *'   # 13:00 ART
-    - cron: '0 19 * * *'   # 16:00 ART
+    - cron: '7 10 * * *'   # ~07:07 ART
+    - cron: '7 13 * * *'   # ~10:07 ART
+    - cron: '7 16 * * *'   # ~13:07 ART
+    - cron: '7 19 * * *'   # ~16:07 ART
   workflow_dispatch:
 
 # Cancela una corrida si otra empieza (evita que dos se pisen, como el candado local).
