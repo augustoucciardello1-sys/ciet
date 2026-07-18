@@ -1,6 +1,6 @@
 {
  "fecha": "2026-07-18",
- "actualizado": "2026-07-18 14:10",
+ "actualizado": "2026-07-18 19:17",
  "regla": {
   "min_cadenas": 3,
   "min_baja_pct": 15.0,
@@ -19,7 +19,7 @@
   "2026-07-17",
   "2026-07-18"
  ],
- "total": 53,
+ "total": 48,
  "ofertas": [
   {
    "n": "Alfajor triple mousse Toddy 60 grs",
@@ -123,13 +123,13 @@
      1325.0,
      "https://www.jumbo.com.ar/leche-chocolatada-190ml-nestle/p"
     ],
-    "Carrefour": [
-     2649.0,
-     "https://www.carrefour.com.ar/nestle-chocolatada-lista-para-tomar-190-ml-768623/p"
-    ],
     "ChangoMás": [
      2649.0,
      "https://www.masonline.com.ar/leche-chocolatada-nestle-lista-190-ml/p"
+    ],
+    "Carrefour": [
+     2649.0,
+     "https://www.carrefour.com.ar/nestle-chocolatada-lista-para-tomar-190-ml-768623/p"
     ]
    }
   },
@@ -308,29 +308,29 @@
    }
   },
   {
-   "n": "Alfajor triple blanco Jorgelin x3 85 grs",
-   "m": "Jorgelin",
-   "i": "https://carrefourar.vteximg.com.br/arquivos/ids/228173/7790957002709_02.jpg?v=637723354692600000",
+   "n": "Mermelada Light Cormillot Frutilla 390 Gr",
+   "m": "CORMILLOT",
+   "i": "https://veaargentina.vtexassets.com/arquivos/ids/339859/Mermelada-Light-Cormillot-Frutilla-390-Gr-1-13488.jpg?v=636439395664670000",
    "cadena": "Jumbo",
-   "precio": 2926.3,
-   "link": "https://www.jumbo.com.ar/alfajores-jorgelin-blancos/p",
-   "referencia": 5852.59,
-   "precio_2da": 5480.0,
+   "precio": 2025.0,
+   "link": "https://www.jumbo.com.ar/mermelada-light-cormillot-frutilla-390-gr/p",
+   "referencia": 4050,
+   "precio_2da": 3778.19,
    "baja_pct": 50.0,
-   "brecha_pct": 46.6,
-   "score": 2330,
+   "brecha_pct": 46.4,
+   "score": 2320,
    "pr": {
-    "Carrefour": [
-     5480.0,
-     "https://www.carrefour.com.ar/alfajor-triple-blanco-jorgelin-x3-85-grs-274674/p"
-    ],
     "Vea": [
-     5852.59,
-     "https://www.vea.com.ar/alfajores-jorgelin-blancos/p"
+     4050.0,
+     "https://www.vea.com.ar/mermelada-light-cormillot-frutilla-390-gr/p"
     ],
     "Jumbo": [
-     2926.3,
-     "https://www.jumbo.com.ar/alfajores-jorgelin-blancos/p"
+     2025.0,
+     "https://www.jumbo.com.ar/mermelada-light-cormillot-frutilla-390-gr/p"
+    ],
+    "Comodín": [
+     3778.19,
+     "https://www.comodinencasa.com.ar/mermelada-cormillot-light-frut-x-390-gr/p"
     ]
    }
   },
@@ -358,37 +358,6 @@
     "Comodín": [
      1350.99,
      "https://www.comodinencasa.com.ar/discos-de-arroz-grandiet-sin-sal-x-100/p"
-    ]
-   }
-  },
-  {
-   "n": "Vino Tinto Malbec 750 Cc Chacabuco",
-   "m": "CHACABUCO",
-   "i": "https://jumboargentinaio.vtexassets.com/arquivos/ids/787667/Vino-Chacabuco-Malbec-750cc-1-972497.jpg?v=638242762531800000",
-   "cadena": "Jumbo",
-   "precio": 2800.0,
-   "link": "https://www.jumbo.com.ar/vino-chacabuco-malbec-750cc/p",
-   "referencia": 5600.0,
-   "precio_2da": 5085.59,
-   "baja_pct": 50.0,
-   "brecha_pct": 44.9,
-   "score": 2247,
-   "pr": {
-    "Jumbo": [
-     2800.0,
-     "https://www.jumbo.com.ar/vino-chacabuco-malbec-750cc/p"
-    ],
-    "Comodín": [
-     5085.59,
-     "https://www.comodinencasa.com.ar/vino-chacabuco-malbec-750cc/p"
-    ],
-    "Carrefour": [
-     5359.0,
-     "https://www.carrefour.com.ar/vino-tinto-malbec-chacabuco-en-botella-750-cc-734595/p"
-    ],
-    "ChangoMás": [
-     5519.0,
-     "https://www.masonline.com.ar/vino-tinto-chacabuco-malbec-750-ml-2/p"
     ]
    }
   },
@@ -428,6 +397,33 @@
    }
   },
   {
+   "n": "Alfajor triple Milka mousse blanco 55 g.",
+   "m": "Milka",
+   "i": "https://carrefourar.vteximg.com.br/arquivos/ids/428480/7622300457303_E01.jpg?v=638392057969730000",
+   "cadena": "Jumbo",
+   "precio": 1100.0,
+   "link": "https://www.jumbo.com.ar/alfajor-triple-milka-mousse-blanco-55-gr/p",
+   "referencia": 2200.0,
+   "precio_2da": 1909.0,
+   "baja_pct": 50.0,
+   "brecha_pct": 42.4,
+   "score": 2119,
+   "pr": {
+    "Carrefour": [
+     1909.0,
+     "https://www.carrefour.com.ar/alfajor-triple-milka-mousse-blanco-55-g-481894/p"
+    ],
+    "Jumbo": [
+     1100.0,
+     "https://www.jumbo.com.ar/alfajor-triple-milka-mousse-blanco-55-gr/p"
+    ],
+    "ChangoMás": [
+     2209.0,
+     "https://www.masonline.com.ar/alfajor-milka-triple-mousse-blanco-55g-2/p"
+    ]
+   }
+  },
+  {
    "n": "Agua mineral sin gas Eco de los Andes 1 lt",
    "m": "Eco De Los Andes",
    "i": "https://carrefourar.vteximg.com.br/arquivos/ids/823980/7792799000639_01.jpg?v=639083292605130000",
@@ -451,37 +447,6 @@
     "ChangoMás": [
      1767.35,
      "https://www.masonline.com.ar/agua-mineral-de-manantial-con-pico-deportivo-eco-de-los-andes-1-lt-2/p"
-    ]
-   }
-  },
-  {
-   "n": "Alfajor mini torta Aguila choco blanco 69 g.",
-   "m": "Aguila",
-   "i": "https://carrefourar.vteximg.com.br/arquivos/ids/318929/7790040133570_E01.jpg?v=638181154942000000",
-   "cadena": "Jumbo",
-   "precio": 1025.0,
-   "link": "https://www.jumbo.com.ar/alfajor-minitorta-blanco-aguila-x69g/p",
-   "referencia": 2050.0,
-   "precio_2da": 1690.0,
-   "baja_pct": 50.0,
-   "brecha_pct": 39.3,
-   "score": 1967,
-   "pr": {
-    "Carrefour": [
-     1690.0,
-     "https://www.carrefour.com.ar/alfajor-mini-torta-aguila-choco-blanco-69-g-717413/p"
-    ],
-    "Vea": [
-     2000.0,
-     "https://www.vea.com.ar/alfajor-minitorta-blanco-aguila-x69g/p"
-    ],
-    "Jumbo": [
-     1025.0,
-     "https://www.jumbo.com.ar/alfajor-minitorta-blanco-aguila-x69g/p"
-    ],
-    "Comodín": [
-     2226.69,
-     "https://www.comodinencasa.com.ar/mini-torta-aguila-chocolate-blanco-72gr-2/p"
     ]
    }
   },
@@ -513,37 +478,6 @@
     "ChangoMás": [
      729.0,
      "https://www.masonline.com.ar/jugo-naranja-del-valle-200-cc-2/p"
-    ]
-   }
-  },
-  {
-   "n": "Jugo Sabor Manzana 200 Ml Del Valle",
-   "m": "DEL VALLE",
-   "i": "https://veaargentina.vtexassets.com/arquivos/ids/797118/Jugo-Del-Valle-Manzana-200-Ml-1-875075.jpg?v=638327434534570000",
-   "cadena": "Jumbo",
-   "precio": 400.0,
-   "link": "https://www.jumbo.com.ar/jugo-listo-del-valle-manzana-200cc-2/p",
-   "referencia": 800,
-   "precio_2da": 650.0,
-   "baja_pct": 50.0,
-   "brecha_pct": 38.5,
-   "score": 1923,
-   "pr": {
-    "Vea": [
-     650.0,
-     "https://www.vea.com.ar/jugo-listo-del-valle-manzana-200cc-2/p"
-    ],
-    "Jumbo": [
-     400.0,
-     "https://www.jumbo.com.ar/jugo-listo-del-valle-manzana-200cc-2/p"
-    ],
-    "ChangoMás": [
-     789.0,
-     "https://www.masonline.com.ar/jugo-del-valle-de-manzana-200-ml-2/p"
-    ],
-    "Carrefour": [
-     650.0,
-     "https://www.carrefour.com.ar/jugo-natural-del-valle-de-manzana-200-cc-679157-679157/p"
     ]
    }
   },
@@ -815,33 +749,6 @@
    }
   },
   {
-   "n": "Jugo en polvo BC La Campagnola limonada 7 g.",
-   "m": "BC",
-   "i": "https://carrefourar.vteximg.com.br/arquivos/ids/822139/7790580129941_02.jpg?v=639083181678770000",
-   "cadena": "Jumbo",
-   "precio": 225.0,
-   "link": "https://www.jumbo.com.ar/jugo-limonada-7-gr-bc/p",
-   "referencia": 450,
-   "precio_2da": 359.0,
-   "baja_pct": 50.0,
-   "brecha_pct": 37.3,
-   "score": 1866,
-   "pr": {
-    "Carrefour": [
-     359.0,
-     "https://www.carrefour.com.ar/jugo-en-polvo-bc-la-campagnola-limonada-7-g/p"
-    ],
-    "Vea": [
-     400.0,
-     "https://www.vea.com.ar/jugo-limonada-7-gr-bc/p"
-    ],
-    "Jumbo": [
-     225.0,
-     "https://www.jumbo.com.ar/jugo-limonada-7-gr-bc/p"
-    ]
-   }
-  },
-  {
    "n": "Agua saborizada citrus H2OH con gas 1,5 lts",
    "m": "H2oh!",
    "i": "https://carrefourar.vteximg.com.br/arquivos/ids/308974/7791813421603_E01.jpg?v=638146793814400000",
@@ -1031,10 +938,6 @@
     "Carrefour": [
      1050.0,
      "https://www.carrefour.com.ar/alfajor-tofi-negro-46-g/p"
-    ],
-    "Vea": [
-     1050.0,
-     "https://www.vea.com.ar/alfajor-negro-tofi-46-gr/p"
     ],
     "Jumbo": [
      525.0,
@@ -1244,33 +1147,6 @@
    }
   },
   {
-   "n": "Tostadas integral Bauducco 142 g.",
-   "m": "Bauducco",
-   "i": "https://carrefourar.vteximg.com.br/arquivos/ids/318486/7891962060460_E02.jpg?v=638180458995130000",
-   "cadena": "Jumbo",
-   "precio": 1375.0,
-   "link": "https://www.jumbo.com.ar/tostada-bauducco-integral-142gr/p",
-   "referencia": 2750.0,
-   "precio_2da": 1987.5,
-   "baja_pct": 50.0,
-   "brecha_pct": 30.8,
-   "score": 1541,
-   "pr": {
-    "Carrefour": [
-     1987.5,
-     "https://www.carrefour.com.ar/tostadas-integral-bauducco-142-g/p"
-    ],
-    "Vea": [
-     2650.0,
-     "https://www.vea.com.ar/tostada-bauducco-integral-142gr/p"
-    ],
-    "Jumbo": [
-     1375.0,
-     "https://www.jumbo.com.ar/tostada-bauducco-integral-142gr/p"
-    ]
-   }
-  },
-  {
    "n": "Tostadas multigrano Bauducco 142 g.",
    "m": "Bauducco",
    "i": "https://carrefourar.vteximg.com.br/arquivos/ids/318485/7891962060477_E02.jpg?v=638180458994700000",
@@ -1294,6 +1170,33 @@
     "Jumbo": [
      1375.0,
      "https://www.jumbo.com.ar/tostada-bauducco-multigrano-142gr/p"
+    ]
+   }
+  },
+  {
+   "n": "Tostadas integral Bauducco 142 g.",
+   "m": "Bauducco",
+   "i": "https://carrefourar.vteximg.com.br/arquivos/ids/318486/7891962060460_E02.jpg?v=638180458995130000",
+   "cadena": "Jumbo",
+   "precio": 1375.0,
+   "link": "https://www.jumbo.com.ar/tostada-bauducco-integral-142gr/p",
+   "referencia": 2750.0,
+   "precio_2da": 1987.5,
+   "baja_pct": 50.0,
+   "brecha_pct": 30.8,
+   "score": 1541,
+   "pr": {
+    "Carrefour": [
+     1987.5,
+     "https://www.carrefour.com.ar/tostadas-integral-bauducco-142-g/p"
+    ],
+    "Vea": [
+     2650.0,
+     "https://www.vea.com.ar/tostada-bauducco-integral-142gr/p"
+    ],
+    "Jumbo": [
+     1375.0,
+     "https://www.jumbo.com.ar/tostada-bauducco-integral-142gr/p"
     ]
    }
   },
@@ -1491,60 +1394,6 @@
     "Comodín": [
      3793.99,
      "https://www.comodinencasa.com.ar/avena-quaker-tradicional-550-gr/p"
-    ]
-   }
-  },
-  {
-   "n": "Copos de cereal Zucaritas de chocolate 240 g.",
-   "m": "Kelloggs",
-   "i": "https://carrefourar.vteximg.com.br/arquivos/ids/318195/7896004004983_E02.jpg?v=638180312949530000",
-   "cadena": "Jumbo",
-   "precio": 1800.0,
-   "link": "https://www.jumbo.com.ar/copo-de-maiz-zucarita-chocolate-kellogs-240-gr/p",
-   "referencia": 3000.0,
-   "precio_2da": 2900.0,
-   "baja_pct": 40.0,
-   "brecha_pct": 37.9,
-   "score": 1517,
-   "pr": {
-    "Carrefour": [
-     2900.0,
-     "https://www.carrefour.com.ar/copos-de-cereal-zucaritas-de-chocolate-240-g-719200/p"
-    ],
-    "Vea": [
-     2900.0,
-     "https://www.vea.com.ar/copo-de-maiz-zucarita-chocolate-kellogs-240-gr/p"
-    ],
-    "Jumbo": [
-     1800.0,
-     "https://www.jumbo.com.ar/copo-de-maiz-zucarita-chocolate-kellogs-240-gr/p"
-    ]
-   }
-  },
-  {
-   "n": "Cereal de chocolate Kellogs Muesli 255 g.",
-   "m": "Kelloggs",
-   "i": "https://carrefourar.vteximg.com.br/arquivos/ids/318196/7896004004990_E02.jpg?v=638180312961730000",
-   "cadena": "Jumbo",
-   "precio": 2700.0,
-   "link": "https://www.jumbo.com.ar/cereal-musli-chocolate-kellogs-255-gr/p",
-   "referencia": 4500.0,
-   "precio_2da": 4350.0,
-   "baja_pct": 40.0,
-   "brecha_pct": 37.9,
-   "score": 1517,
-   "pr": {
-    "Carrefour": [
-     4350.0,
-     "https://www.carrefour.com.ar/cereal-de-chocolate-kellogs-muesli-255-g-719201/p"
-    ],
-    "Vea": [
-     4350.0,
-     "https://www.vea.com.ar/cereal-musli-chocolate-kellogs-255-gr/p"
-    ],
-    "Jumbo": [
-     2700.0,
-     "https://www.jumbo.com.ar/cereal-musli-chocolate-kellogs-255-gr/p"
     ]
    }
   }
