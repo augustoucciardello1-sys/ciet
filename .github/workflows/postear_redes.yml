@@ -3,10 +3,10 @@ name: Postear ofertas en redes (gratis)
 # Publica la placa diaria de mega ofertas en las redes gratuitas (Bluesky +
 # Telegram). Genera la placa UNA vez y postea a cada red que tenga sus claves
 # cargadas (si falta una, esa se saltea sola). Sin tarjeta, sin costo.
-# Corre 1 vez por día, después de la 1ra detección de mega ofertas (10:45 ART).
+# El posteo diario ahora lo hace la LAPTOP (~/.ciet-run.sh, ~10 h ART), que es
+# confiable y tiene los datos frescos. Este workflow queda sólo como respaldo
+# MANUAL (Run workflow), sin horario, para no duplicar posts.
 on:
-  schedule:
-    - cron: '15 14 * * *'   # 11:15 ART
   workflow_dispatch:
     inputs:
       dry_run:
