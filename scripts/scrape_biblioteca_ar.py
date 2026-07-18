@@ -24,6 +24,7 @@ import concurrent.futures
 import datetime
 import io
 import json
+from collections import Counter, defaultdict
 import sys
 import time
 import unicodedata
@@ -218,18 +219,28 @@ def main():
         # Puntaje: duplicación (anuncios) × pluralidad de vendedores × antigüedad.
         f_edad = 1 + min(dias_max, 365) / 365 if dias_max else 1
         score = round(n_ads * (1 + 0.6 * (n_vend - 1)) * f_edad, 1)
+        # Título = la categoría (palabra clave) dominante del grupo: dice qué ES.
+        kw_dom = Counter(a["keyword"] for a in gads).most_common(1)[0][0]
+        titulo = kw_dom[:1].upper() + kw_dom[1:]
+        # Detalle por vendedor, con IDs de sus anuncios para linkear a cada uno.
+        por_vend = defaultdict(list)
+        for a in gads:
+            if a.get("id"):
+                por_vend[(a.get("adv") or "—")].append(a["id"])
+        detalle = [{"adv": v, "n": len(ids), "ids": ids[:6]}
+                   for v, ids in sorted(por_vend.items(), key=lambda x: -len(x[1]))][:20]
         productos.append({
+            "titulo": titulo,
             "texto": rep.get("texto") or "",
             "anuncios": n_ads,
             "vendedores": n_vend,
-            "vendedores_lista": vendedores[:8],
             "dias_activo": dias_max,
             "varias_versiones": any(a.get("versiones") for a in gads),
-            "keywords": sorted({a["keyword"] for a in gads}),
+            "detalle": detalle,
             "_img_url": rep.get("img"),
             "img": None,
             "link": ("https://www.facebook.com/ads/library/?active_status=active&ad_type=all"
-                     f"&country=AR&q={(gads[0]['keyword']).replace(' ', '%20')}"
+                     f"&country=AR&q={kw_dom.replace(' ', '%20')}"
                      "&media_type=all&search_type=keyword_unordered"),
             "score": score,
         })

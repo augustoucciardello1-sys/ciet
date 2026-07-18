@@ -63,12 +63,12 @@
 
   /* Productos */
   .prods { display:flex; flex-direction:column; gap:12px; }
-  .prod { display:grid; grid-template-columns:34px 104px 1fr auto; gap:16px; align-items:center; border:1px solid var(--line); border-radius:12px; padding:14px 18px; background:var(--card); text-decoration:none; color:inherit; transition:transform .18s, box-shadow .18s, border-color .18s; }
-  .prod:hover { transform:translateY(-2px); box-shadow:0 12px 28px -14px rgba(20,57,95,.26); border-color:var(--line-strong); }
-  .prod .pos { font-family:var(--serif); font-size:1.3rem; font-weight:600; color:var(--accent); text-align:center; font-variant-numeric:tabular-nums; }
+  .prod { display:grid; grid-template-columns:34px 104px 1fr auto; gap:16px; align-items:start; border:1px solid var(--line); border-radius:12px; padding:16px 18px; background:var(--card); }
+  .prod .pos { font-family:var(--serif); font-size:1.3rem; font-weight:600; color:var(--accent); text-align:center; font-variant-numeric:tabular-nums; padding-top:2px; }
   .prod .thumb { width:104px; height:104px; border-radius:10px; object-fit:cover; background:var(--surface); border:1px solid var(--line); }
-  .prod .body .txt { font-weight:600; font-size:.98rem; line-height:1.35; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
-  .prod .body .tags { display:flex; flex-wrap:wrap; gap:6px; margin-top:9px; }
+  .prod .titulo { font-family:var(--serif); font-weight:600; font-size:1.16rem; letter-spacing:-.01em; line-height:1.2; }
+  .prod .txt { color:var(--muted); font-size:.82rem; line-height:1.4; margin-top:3px; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+  .prod .tags { display:flex; flex-wrap:wrap; gap:6px; margin-top:9px; }
   .tag { font-size:.7rem; font-weight:600; padding:3px 9px; border-radius:20px; background:var(--surface); color:var(--muted); display:inline-flex; align-items:center; gap:5px; }
   .tag.dup { background:var(--hot-soft); color:var(--hot); }
   .tag.vend { background:var(--accent-soft); color:var(--accent-2); }
@@ -76,6 +76,19 @@
   .prod .score { text-align:right; }
   .prod .score .n { font-family:var(--serif); font-size:1.5rem; font-weight:600; font-variant-numeric:tabular-nums; line-height:1; }
   .prod .score .l { font-size:.66rem; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); margin-top:4px; }
+  .toggle { margin-top:12px; background:none; border:none; padding:0; font-family:var(--sans); font-size:.8rem; font-weight:600; color:var(--accent); cursor:pointer; display:inline-flex; align-items:center; gap:7px; }
+  .toggle .arw { transition:transform .18s; font-size:.6rem; }
+  .prod.open .toggle .arw { transform:rotate(90deg); }
+  .detalle { grid-column:1 / -1; display:none; margin-top:2px; padding-top:14px; border-top:1px dashed var(--line-strong); }
+  .prod.open .detalle { display:block; }
+  .det-v { font-size:.85rem; padding:8px 0; display:flex; flex-wrap:wrap; align-items:baseline; gap:5px 10px; border-bottom:1px solid var(--line); }
+  .det-v .vn { font-weight:600; }
+  .det-v .vc { color:var(--muted); font-size:.76rem; }
+  .det-v .ads { display:flex; flex-wrap:wrap; gap:5px; }
+  .det-v .ads a { font-size:.74rem; color:var(--accent); text-decoration:none; border:1px solid var(--line); border-radius:6px; padding:1px 8px; }
+  .det-v .ads a:hover { background:var(--accent-soft); }
+  .det-all { display:inline-block; margin-top:12px; font-size:.82rem; font-weight:600; text-decoration:none; }
+  .det-all:hover { text-decoration:underline; }
 
   .empty { border:1px dashed var(--line-strong); border-radius:14px; padding:40px 28px; text-align:center; color:var(--muted); }
   .empty h3 { font-family:var(--serif); font-weight:500; color:var(--ink); font-size:1.2rem; margin-bottom:8px; }
@@ -182,6 +195,7 @@ tabs.addEventListener("click", e => {
   document.querySelectorAll(".panel").forEach(p => p.classList.toggle("on", p.dataset.panel===t.dataset.src));
 });
 
+const adUrl = id => `https://www.facebook.com/ads/library/?id=${id}`;
 function pintarAR(d) {
   const cont = document.getElementById("prods-ar");
   const items = (d.productos||[]).slice().sort((a,b)=>b.score-a.score);
@@ -189,22 +203,38 @@ function pintarAR(d) {
   if (!items.length) { cont.innerHTML = vacio(); return; }
   cont.innerHTML = items.map((p,i) => {
     const img = p.img ? `<img class="thumb" src="${p.img}" alt="" loading="lazy">` : `<div class="thumb"></div>`;
-    return `<a class="prod" href="${p.link||"#"}" target="_blank" rel="noopener">
+    const det = (p.detalle||[]).map(v => `<div class="det-v">
+        <span class="vn">${esc(v.adv)}</span><span class="vc">${v.n} ${v.n===1?"anuncio":"anuncios"}</span>
+        <span class="ads">${(v.ids||[]).map((id,k)=>`<a href="${adUrl(id)}" target="_blank" rel="noopener">anuncio ${k+1}</a>`).join("")}</span>
+      </div>`).join("");
+    const nVend = p.vendedores>1 ? `las ${p.vendedores} tiendas` : "la tienda";
+    return `<div class="prod">
       <div class="pos">${i+1}</div>
       ${img}
       <div class="body">
-        <div class="txt">${esc(p.texto)||"(anuncio sin texto)"}</div>
+        <div class="titulo">${esc(p.titulo)||"Producto"}</div>
+        ${p.texto ? `<div class="txt">${esc(p.texto)}</div>` : ""}
         <div class="tags">
           <span class="tag dup">${p.anuncios} anuncios</span>
           ${p.vendedores>=2 ? `<span class="tag vend">${p.vendedores} vendedores</span>` : ""}
           ${p.dias_activo!=null ? `<span class="tag age">${p.dias_activo} días al aire</span>` : ""}
           ${p.varias_versiones ? `<span class="tag">varias versiones</span>` : ""}
         </div>
+        <button class="toggle"><span class="arw">▶</span> Ver ${nVend} que lo venden</button>
       </div>
       <div class="score"><div class="n">${Math.round(p.score||0)}</div><div class="l">puntaje</div></div>
-    </a>`;
+      <div class="detalle">
+        ${det}
+        <a class="det-all" href="${p.link||"#"}" target="_blank" rel="noopener">Ver todos los anuncios en la biblioteca de Meta →</a>
+      </div>
+    </div>`;
   }).join("");
 }
+// Desplegar/plegar el detalle de cada producto.
+document.getElementById("prods-ar").addEventListener("click", e => {
+  const t = e.target.closest(".toggle"); if (!t) return;
+  t.closest(".prod").classList.toggle("open");
+});
 function vacio() {
   return `<div class="empty"><h3>Esperando la primera corrida</h3>
     <p>Todavía no hay datos. Corré <code>scripts/publicar_ganadores_ar.sh</code> para publicar <code>productos_ar.json</code> en la rama <code>${RAMA}</code>.</p></div>`;
