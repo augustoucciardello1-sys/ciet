@@ -403,6 +403,11 @@ TERMINOS = [
     "alimento perro", "alimento gato", "arena para gatos",
     # otros
     "pilas", "encendedor", "velas", "fosforos", "servilletas de papel",
+    # canasta básica alimentaria (rubros del cuadro INDEC que faltaban):
+    # cortes de carnicería, frescos de verdulería y variedades puntuales
+    "asado", "carnaza", "nalga", "osobuco", "higado", "pechito de cerdo",
+    "pollo entero", "filet de merluza", "acelga", "mandarina", "pera",
+    "pan frances", "jugo concentrado",
 ]
 
 

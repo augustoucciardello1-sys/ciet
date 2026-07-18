@@ -9,13 +9,11 @@ name: Actualizar buscador (nube)
 #   diario y reconstruye indice.json en la rama `yerba-datos`.
 # GitHub delays los cron bajo carga (pueden llegar tarde algunos minutos): es esperable.
 on:
-  # OJO: minuto 7, NO en punto — GitHub congestiona los cron de la hora en punto y
-  # los saltea (el 18/7 no corrió ninguno de los de la mañana). Minuto raro = más confiable.
   schedule:
-    - cron: '7 10 * * *'   # ~07:07 ART
-    - cron: '7 13 * * *'   # ~10:07 ART
-    - cron: '7 16 * * *'   # ~13:07 ART
-    - cron: '7 19 * * *'   # ~16:07 ART
+    - cron: '0 10 * * *'   # 07:00 ART
+    - cron: '0 13 * * *'   # 10:00 ART
+    - cron: '0 16 * * *'   # 13:00 ART
+    - cron: '0 19 * * *'   # 16:00 ART
   workflow_dispatch:
 
 # Cancela una corrida si otra empieza (evita que dos se pisen, como el candado local).
@@ -68,6 +66,34 @@ jobs:
       - name: Verificar buscador (informativo)
         continue-on-error: true
         run: python3 scripts/verificar_buscador.py --n 25 --buscador /tmp/datos/buscador.json
+
+      # --- Canasta básica alimentaria -> rama canasta-datos (1×/día) ---
+      # Valoriza la CBA del NOA (INDEC) con el buscador recién scrapeado. Corre en la
+      # primera corrida del día que no tenga el punto de hoy en la serie.
+      - name: Valorizar canasta básica (1×/día)
+        if: always()
+        continue-on-error: true
+        run: |
+          set -e
+          HOY=$(date +%F)
+          git fetch origin canasta-datos || true
+          if git rev-parse --verify origin/canasta-datos >/dev/null 2>&1; then
+            git worktree add -B canasta-datos /tmp/canasta origin/canasta-datos
+          else
+            git worktree add --detach /tmp/canasta
+            cd /tmp/canasta && git checkout --orphan canasta-datos && git rm -rf . >/dev/null 2>&1 || true
+            cd "$GITHUB_WORKSPACE"
+          fi
+          if [ -f /tmp/canasta/serie.json ] && python3 -c "import json,sys; d=json.load(open('/tmp/canasta/serie.json')); sys.exit(0 if any(x['fecha']=='$HOY' for x in d['puntos']) else 1)"; then
+            echo "la canasta de hoy ($HOY) ya está, no hago nada"
+            exit 0
+          fi
+          python3 scripts/build_canasta.py --buscador /tmp/buscador.json -o /tmp/canasta
+          cd /tmp/canasta
+          git add -A
+          git commit -m "Canasta: $HOY"
+          git push origin canasta-datos
+          echo "canasta publicada ($HOY)"
 
       # --- Índice de yerba -> rama yerba-datos (1×/día) ---
       - name: Capturar yerba (1×/día)
