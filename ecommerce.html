@@ -63,10 +63,10 @@
 
   /* Productos */
   .prods { display:flex; flex-direction:column; gap:12px; }
-  .prod { display:grid; grid-template-columns:34px 76px 1fr auto; gap:16px; align-items:center; border:1px solid var(--line); border-radius:12px; padding:14px 18px; background:var(--card); text-decoration:none; color:inherit; transition:transform .18s, box-shadow .18s, border-color .18s; }
+  .prod { display:grid; grid-template-columns:34px 104px 1fr auto; gap:16px; align-items:center; border:1px solid var(--line); border-radius:12px; padding:14px 18px; background:var(--card); text-decoration:none; color:inherit; transition:transform .18s, box-shadow .18s, border-color .18s; }
   .prod:hover { transform:translateY(-2px); box-shadow:0 12px 28px -14px rgba(20,57,95,.26); border-color:var(--line-strong); }
   .prod .pos { font-family:var(--serif); font-size:1.3rem; font-weight:600; color:var(--accent); text-align:center; font-variant-numeric:tabular-nums; }
-  .prod .thumb { width:76px; height:76px; border-radius:10px; object-fit:cover; background:var(--surface); border:1px solid var(--line); }
+  .prod .thumb { width:104px; height:104px; border-radius:10px; object-fit:cover; background:var(--surface); border:1px solid var(--line); }
   .prod .body .txt { font-weight:600; font-size:.98rem; line-height:1.35; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
   .prod .body .tags { display:flex; flex-wrap:wrap; gap:6px; margin-top:9px; }
   .tag { font-size:.7rem; font-weight:600; padding:3px 9px; border-radius:20px; background:var(--surface); color:var(--muted); display:inline-flex; align-items:center; gap:5px; }
@@ -85,8 +85,8 @@
   footer .wrap { padding:26px 28px; color:var(--muted); font-size:.78rem; }
 
   @media (max-width:620px) {
-    .prod { grid-template-columns:26px 60px 1fr; row-gap:8px; }
-    .prod .thumb { width:60px; height:60px; }
+    .prod { grid-template-columns:26px 84px 1fr; row-gap:8px; }
+    .prod .thumb { width:84px; height:84px; }
     .prod .score { grid-column:2 / -1; text-align:left; }
   }
 </style>
@@ -168,7 +168,6 @@ document.getElementById("gf").addEventListener("submit", async e => {
   if (h === CLAVE_HASH) { sessionStorage.setItem("ciet_ec","1"); abrir(); }
   else { document.getElementById("ge").textContent="Clave incorrecta."; document.getElementById("gc").select(); }
 });
-if (sessionStorage.getItem("ciet_ec")==="1") abrir();
 
 // ---- Datos ----
 const RAMA = "ecommerce-datos";
@@ -216,6 +215,10 @@ function cargar() {
     .then(pintarAR)
     .catch(() => { document.getElementById("prods-ar").innerHTML = vacio(); });
 }
+
+// Auto-desbloqueo si ya entró en esta sesión. Va AL FINAL: abrir()→cargar() usa
+// constantes (URL_AR, fmtFecha) declaradas arriba, que ya están inicializadas acá.
+if (sessionStorage.getItem("ciet_ec") === "1") abrir();
 </script>
 </body>
 </html>

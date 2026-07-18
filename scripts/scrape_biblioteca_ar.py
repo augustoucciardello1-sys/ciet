@@ -19,6 +19,7 @@ Requisitos (una sola vez):
     pip3 install --user playwright pillow && python3 -m playwright install chromium
 """
 import argparse
+import base64
 import concurrent.futures
 import datetime
 import io
@@ -63,8 +64,15 @@ JS_ADS = r"""() => {
     if(dm&&meses[dm[2].toLowerCase()]!=null){const dt=new Date(+dm[3],meses[dm[2].toLowerCase()],+dm[1]);dias=Math.round((Date.now()-dt)/864e5);}
     const desp=t.split(/\n\s*Publicidad\s*\n/)[1]||'';
     const texto=desp.split('\n').map(x=>x.trim()).filter(x=>x&&!/^(Ver detalles|Ver resumen|Abrir|Me gusta|Más información|Comprar|Enviar mensaje|Reservar|Registrar|Contact|Descargar|Solicitar|Suscribir)/.test(x)).slice(0,2).join(' ').slice(0,180);
-    const im=c.querySelector('img[src*="t39.35426"]');
-    out.push({id,adv:adv?adv.trim():null,dias,versiones:/varias versiones/.test(t),texto,img:im?im.src:null});
+    // Imagen: la miniatura chica (60×60) para comparar barato, y la grande
+    // (poster de video o el creativo) para mostrar. dHash da igual con cualquier tamaño.
+    const imgs=[...c.querySelectorAll('img[src*="t39.35426"]')];
+    let small=null,sA=Infinity,big=null,bA=0;
+    for(const im of imgs){const a=(im.naturalWidth||0)*(im.naturalHeight||0); if(a>0){if(a<sA){sA=a;small=im.src;} if(a>bA){bA=a;big=im.src;}}}
+    if(!small&&imgs[0])small=imgs[0].src;
+    const poster=[...c.querySelectorAll('video')].map(v=>v.poster).filter(Boolean)[0];
+    const imgBig=poster||big||small;
+    out.push({id,adv:adv?adv.trim():null,dias,versiones:/varias versiones/.test(t),texto,thumb:(small||imgBig),img:imgBig});
   }
   return out;
 }"""
@@ -98,8 +106,24 @@ def hamming(a, b):
 def bajar(url):
     try:
         req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
-        with urllib.request.urlopen(req, timeout=15) as r:
+        with urllib.request.urlopen(req, timeout=20) as r:
             return r.read()
+    except Exception:
+        return None
+
+
+def imagen_display(url, lado=440):
+    """Baja la imagen grande del producto y la deja lista para mostrar:
+    redimensionada a `lado` px máx y comprimida, como data URI base64."""
+    data = bajar(url)
+    if not data:
+        return None
+    try:
+        im = Image.open(io.BytesIO(data)).convert("RGB")
+        im.thumbnail((lado, lado), Image.LANCZOS)
+        buf = io.BytesIO()
+        im.save(buf, "JPEG", quality=82)
+        return "data:image/jpeg;base64," + base64.b64encode(buf.getvalue()).decode("ascii")
     except Exception:
         return None
 
@@ -161,12 +185,10 @@ def main():
                 time.sleep(args.pausa)
         ctx.close()
 
-    # Bajar miniaturas y calcular la huella de cada anuncio (en paralelo).
+    # Bajar la miniatura chica (liviana) y calcular la huella de cada anuncio.
     print(f"Comparando imágenes de {len(ads)} anuncios…")
     def procesar(a):
-        data = bajar(a["img"])
-        a["_bytes"] = data
-        a["_hash"] = dhash(data) if data else None
+        a["_hash"] = dhash(bajar(a["thumb"]))
         return a
     with concurrent.futures.ThreadPoolExecutor(max_workers=12) as ex:
         ads = list(ex.map(procesar, ads))
@@ -196,10 +218,6 @@ def main():
         # Puntaje: duplicación (anuncios) × pluralidad de vendedores × antigüedad.
         f_edad = 1 + min(dias_max, 365) / 365 if dias_max else 1
         score = round(n_ads * (1 + 0.6 * (n_vend - 1)) * f_edad, 1)
-        img_b64 = None
-        if rep.get("_bytes"):
-            import base64
-            img_b64 = "data:image/jpeg;base64," + base64.b64encode(rep["_bytes"]).decode("ascii")
         productos.append({
             "texto": rep.get("texto") or "",
             "anuncios": n_ads,
@@ -208,7 +226,8 @@ def main():
             "dias_activo": dias_max,
             "varias_versiones": any(a.get("versiones") for a in gads),
             "keywords": sorted({a["keyword"] for a in gads}),
-            "img": img_b64,
+            "_img_url": rep.get("img"),
+            "img": None,
             "link": ("https://www.facebook.com/ads/library/?active_status=active&ad_type=all"
                      f"&country=AR&q={(gads[0]['keyword']).replace(' ', '%20')}"
                      "&media_type=all&search_type=keyword_unordered"),
@@ -219,6 +238,15 @@ def main():
     productos = [p for p in productos if p["anuncios"] >= 2 or (p["dias_activo"] or 0) >= 120]
     productos.sort(key=lambda p: -p["score"])
     productos = productos[:args.tope]
+
+    # Recién ahora bajamos la imagen grande (redimensionada) de los productos finales.
+    print(f"Bajando imágenes de {len(productos)} productos…")
+    def poner_img(p):
+        url = p.pop("_img_url", None)
+        p["img"] = imagen_display(url) if url else None
+        return p
+    with concurrent.futures.ThreadPoolExecutor(max_workers=8) as ex:
+        productos = list(ex.map(poner_img, productos))
 
     salida = {
         "generado": datetime.datetime.now().astimezone().isoformat(timespec="seconds"),
