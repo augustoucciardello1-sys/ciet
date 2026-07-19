@@ -1,19 +1,17 @@
 name: Actualizar buscador (nube)
 
 # Automatización de precios en la NUBE (gratis, repo público) — reemplaza a la laptop.
-# Corre 4×/día: 7/10/13/16 hora Argentina (UTC-3) = 10/13/16/19 UTC (más tarde los
-# precios ya no cambian). La yerba se captura en la corrida de las 7 (1ra del día).
-# - Buscador: scrapea las 6 cadenas y publica buscador.json en la rama `datos`
-#   (commit único, historial liviano, igual que la corrida local).
-# - Yerba: 1×/día (la 1ra corrida que no encuentre la captura de hoy) suma el crudo
-#   diario y reconstruye indice.json en la rama `yerba-datos`.
-# GitHub delays los cron bajo carga (pueden llegar tarde algunos minutos): es esperable.
+# Objetivo: 4 corridas/día a las 7/10/13/16 hora Argentina.
+#
+# DISEÑO ANTI-SALTEO: GitHub saltea cron programados sin aviso (el 18-19/7 salteó
+# la mayoría, hasta 16 h sin correr). Por eso el cron es CADA HORA (minuto 7) y una
+# COMPUERTA decide adentro: corre si es hora de corrida (7/10/13/16 ART) O si lo
+# publicado tiene más de 3h15 (perro guardián). Así, CUALQUIER cron que sí dispare
+# repara el atraso; los demás salen en segundos sin gastar nada.
+# La yerba se captura en la primera corrida del día que la encuentre faltante.
 on:
   schedule:
-    - cron: '0 10 * * *'   # 07:00 ART
-    - cron: '0 13 * * *'   # 10:00 ART
-    - cron: '0 16 * * *'   # 13:00 ART
-    - cron: '0 19 * * *'   # 16:00 ART
+    - cron: '7 * * * *'
   workflow_dispatch:
 
 # Cancela una corrida si otra empieza (evita que dos se pisen, como el candado local).
@@ -27,24 +25,48 @@ permissions:
 jobs:
   actualizar:
     runs-on: ubuntu-latest
-    timeout-minutes: 50   # la corrida normal tarda ~27-35 min (chequeo de páginas vivas incluido)
+    timeout-minutes: 50   # la corrida normal tarda ~27-45 min (chequeo de páginas vivas incluido)
     env:
       TZ: America/Argentina/Tucuman   # el runner es UTC; sin esto fecha/hora salen 3 h adelantadas
     steps:
+      - name: Compuerta (¿toca correr?)
+        id: gate
+        run: |
+          set -e
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "run=true" >> "$GITHUB_OUTPUT"; echo "disparo manual → corre"; exit 0
+          fi
+          HORA=$(date +%-H)
+          ULTIMO=$(curl -s https://api.github.com/repos/${{ github.repository }}/branches/datos \
+                   | python3 -c "import json,sys; print(json.load(sys.stdin)['commit']['commit']['committer']['date'])")
+          EDAD=$(( $(date +%s) - $(date -d "$ULTIMO" +%s) ))
+          echo "hora ART=$HORA · publicado hace $((EDAD/60)) min"
+          if [ "$HORA" = "7" ] || [ "$HORA" = "10" ] || [ "$HORA" = "13" ] || [ "$HORA" = "16" ]; then
+            echo "run=true" >> "$GITHUB_OUTPUT"; echo "hora de corrida → corre"
+          elif [ "$EDAD" -gt 11700 ]; then
+            echo "run=true" >> "$GITHUB_OUTPUT"; echo "datos viejos (>3h15) → corre (perro guardián)"
+          else
+            echo "run=false" >> "$GITHUB_OUTPUT"; echo "nada que hacer → salgo"
+          fi
+
       - uses: actions/checkout@v4
+        if: steps.gate.outputs.run == 'true'
         with:
           fetch-depth: 0
       - uses: actions/setup-python@v5
+        if: steps.gate.outputs.run == 'true'
         with:
           python-version: '3.11'
 
       - name: Config git
+        if: steps.gate.outputs.run == 'true'
         run: |
           git config user.name "ciet-bot"
           git config user.email "actions@users.noreply.github.com"
 
       # --- Buscador -> rama datos (buscador.json en la raíz, que es lo que lee el sitio) ---
       - name: Scrapear y publicar buscador
+        if: steps.gate.outputs.run == 'true'
         run: |
           set -e
           python3 scripts/fetch_buscador.py --tope 150 -o /tmp/buscador.json
@@ -64,40 +86,13 @@ jobs:
       # Verificación post-scrape (25 productos al azar re-consultados en vivo). Informativa:
       # no aborta ni afecta el push; sólo deja el detalle en el log de la corrida.
       - name: Verificar buscador (informativo)
+        if: steps.gate.outputs.run == 'true'
         continue-on-error: true
         run: python3 scripts/verificar_buscador.py --n 25 --buscador /tmp/datos/buscador.json
 
-      # --- Canasta básica alimentaria -> rama canasta-datos (1×/día) ---
-      # Valoriza la CBA del NOA (INDEC) con el buscador recién scrapeado. Corre en la
-      # primera corrida del día que no tenga el punto de hoy en la serie.
-      - name: Valorizar canasta básica (1×/día)
-        if: always()
-        continue-on-error: true
-        run: |
-          set -e
-          HOY=$(date +%F)
-          git fetch origin canasta-datos || true
-          if git rev-parse --verify origin/canasta-datos >/dev/null 2>&1; then
-            git worktree add -B canasta-datos /tmp/canasta origin/canasta-datos
-          else
-            git worktree add --detach /tmp/canasta
-            cd /tmp/canasta && git checkout --orphan canasta-datos && git rm -rf . >/dev/null 2>&1 || true
-            cd "$GITHUB_WORKSPACE"
-          fi
-          if [ -f /tmp/canasta/serie.json ] && python3 -c "import json,sys; d=json.load(open('/tmp/canasta/serie.json')); sys.exit(0 if any(x['fecha']=='$HOY' for x in d['puntos']) else 1)"; then
-            echo "la canasta de hoy ($HOY) ya está, no hago nada"
-            exit 0
-          fi
-          python3 scripts/build_canasta.py --buscador /tmp/buscador.json -o /tmp/canasta
-          cd /tmp/canasta
-          git add -A
-          git commit -m "Canasta: $HOY"
-          git push origin canasta-datos
-          echo "canasta publicada ($HOY)"
-
       # --- Índice de yerba -> rama yerba-datos (1×/día) ---
       - name: Capturar yerba (1×/día)
-        if: always()
+        if: always() && steps.gate.outputs.run == 'true'
         run: |
           set -e
           HOY=$(date +%F)
