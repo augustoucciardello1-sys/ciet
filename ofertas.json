@@ -1,6 +1,6 @@
 {
  "fecha": "2026-07-22",
- "actualizado": "2026-07-22 13:38",
+ "actualizado": "2026-07-22 16:39",
  "regla": {
   "min_cadenas": 3,
   "min_baja_pct": 15.0,
@@ -21,7 +21,7 @@
   "2026-07-21",
   "2026-07-22"
  ],
- "total": 18,
+ "total": 19,
  "ofertas": [
   {
    "n": "Jugo en Polvo Clight Naranja Durazno 7,5 grs",
@@ -210,41 +210,6 @@
    }
   },
   {
-   "n": "Jugo en Polvo Clight Limonada 8 grs",
-   "m": "Clight",
-   "i": "https://carrefourar.vteximg.com.br/arquivos/ids/812033/7622201702656_E01.jpg?v=639082499084870000",
-   "cadena": "ChangoMás",
-   "precio": 299.0,
-   "link": "https://www.masonline.com.ar/jugo-en-polvo-clight-sabor-limonada-8g-2/p",
-   "referencia": 579.0,
-   "precio_2da": 509.59,
-   "baja_pct": 48.4,
-   "brecha_pct": 41.3,
-   "score": 1998,
-   "pr": {
-    "Carrefour": [
-     579.0,
-     "https://www.carrefour.com.ar/jugo-en-polvo-clight-limonada-8-grs-711434/p"
-    ],
-    "Vea": [
-     570.0,
-     "https://www.vea.com.ar/jugo-en-polvo-limonada-8-grs-clight/p"
-    ],
-    "Jumbo": [
-     564.0,
-     "https://www.jumbo.com.ar/jugo-en-polvo-limonada-8-grs-clight/p"
-    ],
-    "Comodín": [
-     509.59,
-     "https://www.comodinencasa.com.ar/jugo-clight-limonada-8-gr/p"
-    ],
-    "ChangoMás": [
-     299.0,
-     "https://www.masonline.com.ar/jugo-en-polvo-clight-sabor-limonada-8g-2/p"
-    ]
-   }
-  },
-  {
    "n": "Jugo en Polvo Clight Naranja 8 grs",
    "m": "Clight",
    "i": "https://carrefourar.vteximg.com.br/arquivos/ids/814693/7622201703110_E01.jpg?v=639082500363700000",
@@ -276,6 +241,41 @@
     "ChangoMás": [
      299.0,
      "https://www.masonline.com.ar/jugo-en-polvo-clight-sabor-naranja-7-5g-2/p"
+    ]
+   }
+  },
+  {
+   "n": "Jugo en Polvo Clight Limonada 8 grs",
+   "m": "Clight",
+   "i": "https://carrefourar.vteximg.com.br/arquivos/ids/812033/7622201702656_E01.jpg?v=639082499084870000",
+   "cadena": "ChangoMás",
+   "precio": 299.0,
+   "link": "https://www.masonline.com.ar/jugo-en-polvo-clight-sabor-limonada-8g-2/p",
+   "referencia": 579.0,
+   "precio_2da": 509.59,
+   "baja_pct": 48.4,
+   "brecha_pct": 41.3,
+   "score": 1998,
+   "pr": {
+    "Carrefour": [
+     579.0,
+     "https://www.carrefour.com.ar/jugo-en-polvo-clight-limonada-8-grs-711434/p"
+    ],
+    "Vea": [
+     570.0,
+     "https://www.vea.com.ar/jugo-en-polvo-limonada-8-grs-clight/p"
+    ],
+    "Jumbo": [
+     564.0,
+     "https://www.jumbo.com.ar/jugo-en-polvo-limonada-8-grs-clight/p"
+    ],
+    "Comodín": [
+     509.59,
+     "https://www.comodinencasa.com.ar/jugo-clight-limonada-8-gr/p"
+    ],
+    "ChangoMás": [
+     299.0,
+     "https://www.masonline.com.ar/jugo-en-polvo-clight-sabor-limonada-8g-2/p"
     ]
    }
   },
@@ -439,6 +439,33 @@
     "ChangoMás": [
      10499.4,
      "https://www.masonline.com.ar/vino-tinto-fabre-montmayou-reserva-terruno-cabernet-franc-2/p"
+    ]
+   }
+  },
+  {
+   "n": "Bizcochuelo Chocman Black Con Cacao 35 G",
+   "m": "Bonafide",
+   "i": "https://masonlineprod.vteximg.com.br/arquivos/ids/325622/Bizcochuelo-Chocman-Black-Con-Cacao-35-G-1-57735.jpg?v=638531121817030000",
+   "cadena": "ChangoMás",
+   "precio": 479.4,
+   "link": "https://www.masonline.com.ar/bizcochuelo-chocman-black-con-cacao-35-g-2/p",
+   "referencia": 799.0,
+   "precio_2da": 799.0,
+   "baja_pct": 40.0,
+   "brecha_pct": 40.0,
+   "score": 1600,
+   "pr": {
+    "ChangoMás": [
+     479.4,
+     "https://www.masonline.com.ar/bizcochuelo-chocman-black-con-cacao-35-g-2/p"
+    ],
+    "Carrefour": [
+     799.0,
+     "https://www.carrefour.com.ar/bizcochuelo-black-chocman-35-grs-760139/p"
+    ],
+    "Comodín": [
+     956.79,
+     "https://www.comodinencasa.com.ar/bizcochuelo-chocman-black-35gr-2/p"
     ]
    }
   },
